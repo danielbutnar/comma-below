@@ -49,7 +49,7 @@ I split it into six tasks. Every score is computed from Unicode code points; the
 
 If the problem lives in the training data, size and lab should matter. If it lives somewhere else, they shouldn't. That was the point of the spread.
 
-Everything ran on Kaggle's model proxy with Kaggle's defaults, with output capped at 8,192 tokens. Most models run at their provider's default temperature there, so I ran the key task, Echo, three times per model. I dropped gpt-oss-120b, whose provider answered most of my calls with "heavy load", and Grok 4.6, which Kaggle lists but can't serve. The whole thing, including pilots and repeats, cost $10.47 of Kaggle's free inference quota.
+Everything ran on Kaggle's model proxy with Kaggle's defaults, with output capped at 8,192 tokens. Most models run at their provider's default temperature there, so I ran the key task, Echo, three times per model. I dropped gpt-oss-120b, whose provider answered most of my calls with "heavy load", and Grok 4.6, which Kaggle lists but can't serve. The whole thing, including pilots and repeats, cost $11.53 of Kaggle's free inference quota.
 
 ## Findings
 
@@ -111,7 +111,7 @@ If I'd only tested pairs that differ, I would have written the opposite conclusi
 
 ### 5. Code: the more precisely I described the bug, the narrower the fix
 
-Asked for `fix_romanian(text)`, almost every model wrote a clean translation table, `str.maketrans("şŞţŢ", "șȘțȚ")`. That passes most tests, but **23 of 30 programs failed on decomposed letters**: an `s` followed by a combining cedilla (U+0327), which is what you get from some PDFs and macOS file names. When my prompt named the four letters explicitly, **none of the 15 programs normalized the text first**. When I only described the goal, a few did, and those mostly passed. Claude Opus 5 was the only model with all 14 tests passing on both prompts.
+Asked for `fix_romanian(text)`, almost every model wrote a clean translation table, `str.maketrans("şŞţŢ", "șȘțȚ")`. That passes most tests, but **23 of 30 programs failed on decomposed letters**: an `s` followed by a combining cedilla (U+0327), which is what you get from some PDFs and macOS file names. When my prompt named the four wrong letters, **only 1 of 15 programs handled the decomposed ones** (Claude Opus 5's). When I only described the goal, "normalize the Romanian diacritics", 6 of 15 did. Naming the letters made the models write exactly that four-letter replacement and nothing more. Opus 5 was the only model with all 14 tests passing on both prompts.
 
 ### 6. The bug that almost ate my benchmark
 
@@ -159,7 +159,7 @@ And the obvious fix, simply telling the model? I tested that as a follow-up task
 
 > *Use correct Romanian orthography: write ș and ț with a comma below, never ş or ţ with a cedilla, even if the input uses them.*
 
-Clean answers went from **64 % to 96 %** across all models. Ten of the fifteen were perfect, including Claude Opus 5 (56 % → 100 %), GPT-6 Astra (55 % → 100 %) and Grok 4.20 (44 % → 100 %). The holdouts were the smaller models: GPT-5.4 nano still copied the wrong letters in about a quarter of its answers.
+Clean answers went from **64 % to 96 %** across all models. Ten of the fifteen were perfect, including Claude Opus 5 (56 % → 100 %), GPT-6 Astra (55 % → 100 %) and Grok 4.20 (44 % → 100 %). The holdouts were the smaller models: GPT-5.4 nano still copied the wrong letters in 5 of its 22 answers.
 
 So the models know the rule. They just don't apply it unless you ask, because matching your text is what they're built to do. Ask, and normalize anyway.
 
