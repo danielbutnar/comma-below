@@ -1,6 +1,6 @@
 ---
 title: Braşov or Brașov? 15 LLMs spell my city right, until you spell it wrong first
-published: false
+published: true
 tags: devchallenge, kagglechallenge, ai, machinelearning
 cover_image: COVER_URL
 ---
