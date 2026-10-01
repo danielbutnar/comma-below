@@ -83,9 +83,9 @@ The surprise came from the other 7 %. Some models wrote cedilla letters into wor
 
 *Îndrumaţi* ("directed") isn't in the source. Opus wrote it, and wrote it with a cedilla, because the whole text was in cedilla. Every single failing answer from Opus 5, GPT-6 Astra and Gemini 3.8 Flash was cedilla from start to finish. Smaller models fail differently: Qwen 3 and GPT-5.4 nano mostly *mix* the two letters inside one sentence, like this answer from Gemini 3.5 Flash-Lite:
 
-> **Ș**oferii sunt ruga**ț**i să folosească parcările de pe strada Mure**ş**enilor **ş**i de lângă Gara Bra**ş**ov.
+> Șoferii sunt rugați să folosească parcările de pe strada Mureşenilor şi de lângă Gara Braşov.
 
-Its own words came out right; the borrowed ones came out the way they were typed. I counted 71 sentences like that.
+Its own words came out right (*Șoferii*, *rugați*); the borrowed ones came out the way they were typed (*Mureşenilor*, *şi*, *Braşov*). I counted 71 sentences like that.
 
 So the stronger the model, the more consistently it treats the encoding of your text as a *style* to match, the same way it would match your tone or your formality. That's usually a feature. Here it means the error is contagious.
 
