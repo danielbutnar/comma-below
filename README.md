@@ -7,7 +7,7 @@ workaround that still fills the Romanian web. The two look almost identical and 
 Seven tasks, every score computed from Unicode code points (after NFC). No LLM judge.
 
 - **Benchmark and leaderboard:** https://www.kaggle.com/benchmarks/danielbutnar/romanian-comma-below
-- **Write-up:** DEV_POST_URL
+- **Write-up:** https://dev.to/danielbutnar/brasov-or-brasov-15-llms-spell-my-city-right-until-you-spell-it-wrong-first-75a
 
 | # | Task | Question | Items |
 | --- | --- | --- | --- |
