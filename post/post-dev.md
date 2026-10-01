@@ -2,7 +2,7 @@
 title: Braşov or Brașov? 15 LLMs spell my city right, until you spell it wrong first
 published: false
 tags: devchallenge, kagglechallenge, ai, machinelearning
-cover_image: COVER_URL
+cover_image: https://raw.githubusercontent.com/danielbutnar/comma-below/main/post/cover.png
 ---
 
 *This is a submission for the [Kaggle Benchmarking Challenge](https://dev.to/challenges/kaggle-2026-09-23)*
@@ -19,7 +19,7 @@ Romanian has two letters with a little mark underneath: **ș** and **ț**. The m
 
 That's history, I thought. So before writing a single prompt, I counted. I fetched the front pages of 35 Romanian sites on 30 September 2026 and counted both kinds of letter.
 
-![30 of 35 Romanian front pages contain cedilla letters](CHART_CENSUS_URL)
+![30 of 35 Romanian front pages contain cedilla letters](https://raw.githubusercontent.com/danielbutnar/comma-below/main/post/chart-web-census.png)
 
 **30 of 35 still contain the wrong letters.** The government's site has an "INFORMAŢIE DE PRESĂ". The National Bank lists "Elemente de siguranţă". My own city hall quotes an "Ordonanţa de Urgenţă". The national rail operator shows a "Preţul integral". One financial daily is 93 % cedilla. Many pages mix both kinds, sometimes in the same paragraph.
 
@@ -63,7 +63,7 @@ So if the models know the right letter, where does the wrong one come from?
 
 This is the main result.
 
-![Echo results: every model scores 100 % on clean input, 44–85 % on the same text typed with cedillas, and 77–100 % once one sentence is added to the system prompt](CHART_ECHO_URL)
+![Echo results: every model scores 100 % on clean input, 44–85 % on the same text typed with cedillas, and 77–100 % once one sentence is added to the system prompt](https://raw.githubusercontent.com/danielbutnar/comma-below/main/post/chart-echo.png)
 
 When the guest message or news paragraph was typed correctly, **every model kept every letter correct, in all 45 runs.** When the *same text* was typed with cedillas, the share of clean answers fell to **between 44 % (Grok 4.20) and 85 % (Qwen 3)**. Model size bought nothing: Claude Opus 5 (56 %) and GPT-6 Astra (55 %) sit next to GPT-5.4 nano (61 %), well below Qwen 3.
 
@@ -103,7 +103,7 @@ In 19 of the 90 plain proofreads the model fixed the typo and kept the cedilla l
 
 I expected the models to fail at telling ş from ș. Instead, everyone scored nearly 100 % on pairs that really differ. Then I looked at the control pairs.
 
-![Some models call every ș/ş pair different, even identical ones](CHART_SEE_URL)
+![Some models call every ș/ş pair different, even identical ones](https://raw.githubusercontent.com/danielbutnar/comma-below/main/post/chart-see.png)
 
 Asked whether two **byte-identical** strings like "Brașov" and "Brașov" are the same sequence of characters, Claude Opus 5, Claude Sonnet 5, Claude Haiku 4.5 and Gemini 3.8 Flash answered "false" every time. The question is obviously a trick, so they assume the answer is "different". Their perfect score on the real differences says nothing about perception. Eight other models, including GPT-5.5, GPT-6 Astra, DeepSeek-R1, Grok 4.20 and Qwen 3, got every identical pair right.
 
@@ -173,6 +173,6 @@ So the models know the rule. They just don't apply it unless you ask, because ma
 
 **Romanian Comma Below on Kaggle:** [kaggle.com/benchmarks/danielbutnar/romanian-comma-below](https://www.kaggle.com/benchmarks/danielbutnar/romanian-comma-below)
 
-All task notebooks are public, every model answer is in the run outputs, and the code that generates the tasks, the census of Romanian sites and the charts is GITHUB_LINE
+All task notebooks are public, every model answer is in the run outputs, and the code that generates the tasks, the census of Romanian sites and the charts is on GitHub: [github.com/danielbutnar/comma-below](https://github.com/danielbutnar/comma-below).
 
 {% embed https://github.com/danielbutnar/comma-below %}
