@@ -1,0 +1,116 @@
+models: 15 ['claude-haiku-4-5-20251001', 'claude-opus-5-default', 'claude-sonnet-5-default', 'deepseek-r1-0528', 'gemini-3.1-pro-preview', 'gemini-3.5-flash-lite', 'gemini-3.7-flash', 'gemini-3.8-flash', 'gemma-4-31b-it', 'glm-5', 'gpt-5.4-nano-2026-03-17', 'gpt-5.5-2026-04-23', 'gpt-6-astra', 'grok-4.20-0309-reasoning', 'qwen3-235b-a22b-instruct-2507']
+
+## Echo, all runs
+runs per model: {'claude-haiku-4-5-20251001': 3, 'claude-opus-5-default': 3, 'claude-sonnet-5-default': 3, 'deepseek-r1-0528': 3, 'gemini-3.1-pro-preview': 3, 'gemini-3.5-flash-lite': 3, 'gemini-3.7-flash': 3, 'gemini-3.8-flash': 3, 'gemma-4-31b-it': 3, 'glm-5': 3, 'gpt-5.4-nano-2026-03-17': 3, 'gpt-5.5-2026-04-23': 3, 'gpt-6-astra': 3, 'grok-4.20-0309-reasoning': 3, 'qwen3-235b-a22b-instruct-2507': 3}
+answers: 1980 | clean pass %: 100.0 | cedilla pass %: 63.7
+cedilla input pass % by kind: {'rag': 44.9, 'reply': 97.0, 'summary': 61.9}
+cedilla words in answers: 1186, copied verbatim from the input: 1105 (93.2 %)
+cedilla words NOT in the input (model-made): [('Bucureşti-Iaşi', 10), ('îndrumaţi', 8), ('circulaţia', 5), ('doreşte', 5), ('anunţat', 4), ('Pieţei', 4), ('sfătuiţi', 4), ('părinţi', 3), ('îşi', 3), ('Transfăgărăşanul', 3), ('judeţului', 2), ('anunţă', 2), ('informaţi', 2), ('îndemnaţi', 2), ('reparaţiilor', 2)]
+most copied cedilla words: [('şi', 183), ('Braşov', 109), ('Sighişoara', 59), ('ediţia', 42), ('Mureşenilor', 42), ('şapte', 39), ('Piaţa', 39), ('sfârşitul', 38), ('Transfăgărăşan', 38), ('Şoferii', 35), ('Bucureşti', 33), ('Autorităţile', 33)]
+sentences mixing both letters: 71 in 46 answers
+   claude-haiku-4-5-20251001 E04-cedilla | Vă recomand să veniți cu maşina personală sau să închiriaţi una, deoarece autobuzele sunt mai puţin frecvente şi mai lente, iar cu maşina veţi avea mai multă flexibilitate pentru a explora aceste atra
+   claude-haiku-4-5-20251001 E08-cedilla | Drumul Transfăgărăşan se închide la finele octombrie și se redeschide de obicei în iulie, din cauza condițiilor meteo adverse.
+   claude-haiku-4-5-20251001 Q01-E07-cedilla | Șoferii sunt rugați să folosească parcările de pe strada Mureşenilor şi de lângă Gara Braşov.
+   claude-haiku-4-5-20251001 Q02-E08-cedilla | Drumul Transfăgărășan se închide la sfârşitul lunii octombrie și se redeschide de obicei la începutul lui iulie.
+   claude-haiku-4-5-20251001 E04-cedilla | Cetatea Râşnov se află la aproximativ 25 km de pensiune (25-30 de minute cu mașina), iar Castelul Bran la aproximativ 40 km (40-50 de minute).
+   claude-haiku-4-5-20251001 E05-cedilla | Voi verifica imediat în camera pe care o ocupaţi weekendul trecut şi vă iau vești în scurt timp.
+   claude-haiku-4-5-20251001 E09-cedilla | Școlile din județul Timiş vor începe cursurile cu o săptămână mai târziu din cauza lucrărilor de reparații necesare în mai multe clădiri.
+   claude-haiku-4-5-20251001 Q10-E04-cedilla | Oaspetele întreabă despre Cetatea Râşnov și Castelul Bran.
+   claude-sonnet-5-default E07-cedilla | Primăria Braşov anunță că Piaţa Sfatului va fi închisă traficului auto în weekend, între orele opt şi douăzeci, din cauza târgului de toamnă.
+   claude-sonnet-5-default Q02-E08-cedilla | Drumul Transfăgărăşan se închide de obicei la sfârşitul lunii octombrie și se redeschide la începutul lunii iulie.
+   deepseek-r1-0528 E04-cedilla | Pensiunea noastră este la aproximativ **7 km de Cetatea Râşnov** și **30 km de Castelul Bran**.
+   deepseek-r1-0528 Q07-E09-cedilla | Școlile din județul Timiş își vor începe cursurile mai târziu pentru că mai multe clădiri au necesitat lucrări de reparaţii.
+   deepseek-r1-0528 Q10-E04-cedilla | Oaspetele întreabă despre Cetatea Râşnov și Castelul Bran.
+   deepseek-r1-0528 E07-cedilla | Iată rezumatul în două propoziții:
+
+**Primăria Braşov anunţă că Piaţa Sfatului va fi închisă traficului auto în weekend, între orele 8:00 și 20:00, din cauza târgului de toamnă.** Şoferii sunt rugaţi 
+   deepseek-r1-0528 E12-cedilla | Iată un rezumat în două propoziții:
+
+**Jandarmii au relocat un urs observat în cartierul Răcădău din Braşov în cursul nopții.
+   deepseek-r1-0528 E12-cedilla | Autorităţile sfătuiesc locuitorii să nu lase gunoi alimentar lângă blocuri și să anunțe prin 112 orice apariție a animalelor sălbatice.**
+
+**Explicație:**
+1.
+   deepseek-r1-0528 E12-cedilla | **Prima propoziție:** Rezumă acțiunea principală (relocarea ursului de către jandarmi) și locația/contextul (Răcădău, Braşov, noaptea).
+   deepseek-r1-0528 Q09-E01-cedilla | Oaspetele dorește să rezerve o cameră dublă în Braşov pentru două nopți (de vineri până duminică) și întreabă dacă există parcare și mic dejun inclus.
+   deepseek-r1-0528 Q10-E04-cedilla | Oaspetele întreabă despre Cetatea Râşnov și Castelul Bran.
+   deepseek-r1-0528 Q08-E12-cedilla | În cartierul Răcădău din Braşov, iar locuitorii trebuie să nu lase resturi de mâncare lângă blocuri și să anunţe apariţii prin 112.
+   deepseek-r1-0528 Q09-E01-cedilla | Oaspetele vrea să rezerve o cameră dublă în Braşov pentru două nopți (de vineri până duminică) și întreabă dacă există parcare și mic dejun inclus.
+   gemini-3.1-pro-preview E11-cedilla | Începând de luna viitoare, trenul de noapte Bucureşti-Iaşi își reia circulația după doi ani de pauză, oferind o călătorie de aproximativ șapte ore în vagoane modernizate.
+   gemini-3.5-flash-lite E09-cedilla | Şcolile din județul Timiș vor începe cursurile cu o săptămână mai târziu din cauza unor lucrări de reparație la mai multe clădiri.
+   gemini-3.5-flash-lite Q01-E07-cedilla | Șoferii sunt rugați să folosească parcările de pe strada Mureşenilor şi de lângă Gara Braşov.
+   gemini-3.5-flash-lite Q03-E10-cedilla | Festivalul a avut loc la Sighişoara, iar biletele pentru ediția de anul viitor se vor pune în vânzare în decembrie.
+   gemini-3.5-flash-lite Q01-E07-cedilla | Șoferii sunt rugați să folosească parcările de pe strada Mureşenilor și de lângă Gara Brașov.
+   gemini-3.5-flash-lite Q03-E10-cedilla | Festivalul a avut loc la Sighişoara, iar biletele pentru ediția de anul viitor se vor pune în vânzare în decembrie.
+   gemini-3.5-flash-lite Q07-E09-cedilla | Şcolile din județul Timiș își vor începe cursurile cu o săptămână mai târziu deoarece mai multe clădiri au necesitat lucrări de reparații.
+   gemini-3.5-flash-lite Q01-E07-cedilla | Șoferii sunt rugați să folosească parcările de pe strada Mureşenilor şi de lângă Gara Braşov.
+   gemini-3.5-flash-lite Q03-E10-cedilla | Festivalul a avut loc la Sighişoara, iar biletele pentru ediția de anul viitor se vor pune în vânzare în decembrie.
+   gemma-4-31b-it E07-cedilla | Șoferii sunt invitați să folosească parcările de pe strada Mureşenilor sau cele de lângă gară.
+   gemma-4-31b-it Q01-E07-cedilla | Șoferii sunt rugați să folosească parcările de pe strada Mureşenilor și de lângă Gara Braşov.
+   gemma-4-31b-it Q03-E10-cedilla | Festivalul a avut loc la Sighişoara, iar biletele pentru ediția de anul viitor se vor pune în vânzare în decembrie.
+   gemma-4-31b-it Q03-E10-cedilla | Festivalul a avut loc la Sighişoara, iar biletele pentru ediția de anul viitor se vor pune în vânzare în decembrie.
+   gemma-4-31b-it Q08-E12-cedilla | Ursul a fost văzut în cartierul Răcădău din Braşov, iar locuitorii sunt sfătuiţi să nu lase resturi de mâncare lângă blocuri și să anunţe prin 112 orice apariţie a animalelor sălbatice.
+   gemma-4-31b-it Q10-E04-cedilla | Oaspetele întreabă despre Cetatea Râşnov și Castelul Bran.
+   glm-5 Q04-E11-cedilla | Trenul de noapte circulă între Bucureşti și Iaşi, iar călătoria durează aproximativ şapte ore.
+   glm-5 Q10-E04-cedilla | Oaspetele întreabă despre Cetatea Râşnov și Castelul Bran.
+   glm-5 E09-cedilla | Școlile din județul Timiş vor începe cursurile cu o săptămână mai târziu din cauza lucrărilor de reparaţii necesare, iar părinţii vor fi anunţaţi prin mesaj.
+   glm-5 E10-cedilla | Festivalul de muzică de la Sighişoara a atras peste 15.000 de spectatori în trei zile, iar biletele pentru ediția viitoare vor fi puse în vânzare în decembrie, cu reduceri pentru studenți.
+hardest cedilla items (pass rate): {'Q03': 24.0, 'Q02': 27.0, 'Q08': 31.0, 'Q10': 42.0, 'Q04': 42.0, 'Q06': 44.0}
+
+## Fix
+pass % by level: {'L1_proofread': 78.9, 'L2_diacritics': 98.9, 'L3_explicit': 96.7}
+L1: typo fixed but letters not repaired: 19 of 90 -> {'claude-haiku-4-5-20251001': 1, 'claude-sonnet-5-default': 5, 'deepseek-r1-0528': 3, 'gemini-3.5-flash-lite': 2, 'gemma-4-31b-it': 2, 'glm-5': 1, 'gpt-5.4-nano-2026-03-17': 1, 'grok-4.20-0309-reasoning': 3, 'qwen3-235b-a22b-instruct-2507': 1}
+L1 pass by model: {'claude-haiku-4-5-20251001': 83.0, 'claude-opus-5-default': 100.0, 'claude-sonnet-5-default': 17.0, 'deepseek-r1-0528': 50.0, 'gemini-3.1-pro-preview': 100.0, 'gemini-3.5-flash-lite': 67.0, 'gemini-3.7-flash': 100.0, 'gemini-3.8-flash': 100.0, 'gemma-4-31b-it': 67.0, 'glm-5': 83.0, 'gpt-5.4-nano-2026-03-17': 83.0, 'gpt-5.5-2026-04-23': 100.0, 'gpt-6-astra': 100.0, 'grok-4.20-0309-reasoning': 50.0, 'qwen3-235b-a22b-instruct-2507': 83.0}
+answers with extra text (changelog etc.): 17 of 270 | by model: {'deepseek-r1-0528': 17}
+
+## See
+  all cedilla                    {'claude-haiku-4-5-20251001': 100.0, 'claude-opus-5-default': 100.0, 'claude-sonnet-5-default': 100.0, 'deepseek-r1-0528': 100.0, 'gemini-3.1-pro-preview': 100.0, 'gemini-3.5-flash-lite': 100.0, 'gemini-3.7-flash': 100.0, 'gemini-3.8-flash': 100.0, 'gemma-4-31b-it': 100.0, 'glm-5': 100.0, 'gpt-5.4-nano-2026-03-17': 100.0, 'gpt-5.5-2026-04-23': 100.0, 'gpt-6-astra': 100.0, 'grok-4.20-0309-reasoning': 100.0, 'qwen3-235b-a22b-instruct-2507': 100.0}
+  both cedilla                   {'claude-haiku-4-5-20251001': 0.0, 'claude-opus-5-default': 0.0, 'claude-sonnet-5-default': 0.0, 'deepseek-r1-0528': 100.0, 'gemini-3.1-pro-preview': 100.0, 'gemini-3.5-flash-lite': 67.0, 'gemini-3.7-flash': 100.0, 'gemini-3.8-flash': 0.0, 'gemma-4-31b-it': 100.0, 'glm-5': 67.0, 'gpt-5.4-nano-2026-03-17': 100.0, 'gpt-5.5-2026-04-23': 100.0, 'gpt-6-astra': 100.0, 'grok-4.20-0309-reasoning': 100.0, 'qwen3-235b-a22b-instruct-2507': 100.0}
+  both comma                     {'claude-haiku-4-5-20251001': 0.0, 'claude-opus-5-default': 0.0, 'claude-sonnet-5-default': 0.0, 'deepseek-r1-0528': 100.0, 'gemini-3.1-pro-preview': 67.0, 'gemini-3.5-flash-lite': 0.0, 'gemini-3.7-flash': 100.0, 'gemini-3.8-flash': 0.0, 'gemma-4-31b-it': 100.0, 'glm-5': 67.0, 'gpt-5.4-nano-2026-03-17': 100.0, 'gpt-5.5-2026-04-23': 100.0, 'gpt-6-astra': 100.0, 'grok-4.20-0309-reasoning': 100.0, 'qwen3-235b-a22b-instruct-2507': 100.0}
+  cedilla                        {'claude-haiku-4-5-20251001': 75.0, 'claude-opus-5-default': 100.0, 'claude-sonnet-5-default': 100.0, 'deepseek-r1-0528': 25.0, 'gemini-3.1-pro-preview': 100.0, 'gemini-3.5-flash-lite': 50.0, 'gemini-3.7-flash': 100.0, 'gemini-3.8-flash': 100.0, 'gemma-4-31b-it': 75.0, 'glm-5': 100.0, 'gpt-5.4-nano-2026-03-17': 75.0, 'gpt-5.5-2026-04-23': 100.0, 'gpt-6-astra': 100.0, 'grok-4.20-0309-reasoning': 75.0, 'qwen3-235b-a22b-instruct-2507': 100.0}
+  clean                          {'claude-haiku-4-5-20251001': 100.0, 'claude-opus-5-default': 100.0, 'claude-sonnet-5-default': 100.0, 'deepseek-r1-0528': 100.0, 'gemini-3.1-pro-preview': 100.0, 'gemini-3.5-flash-lite': 100.0, 'gemini-3.7-flash': 100.0, 'gemini-3.8-flash': 100.0, 'gemma-4-31b-it': 100.0, 'glm-5': 100.0, 'gpt-5.4-nano-2026-03-17': 100.0, 'gpt-5.5-2026-04-23': 100.0, 'gpt-6-astra': 100.0, 'grok-4.20-0309-reasoning': 100.0, 'qwen3-235b-a22b-instruct-2507': 50.0}
+  comma                          {'claude-haiku-4-5-20251001': 50.0, 'claude-opus-5-default': 100.0, 'claude-sonnet-5-default': 100.0, 'deepseek-r1-0528': 25.0, 'gemini-3.1-pro-preview': 100.0, 'gemini-3.5-flash-lite': 100.0, 'gemini-3.7-flash': 75.0, 'gemini-3.8-flash': 75.0, 'gemma-4-31b-it': 50.0, 'glm-5': 100.0, 'gpt-5.4-nano-2026-03-17': 25.0, 'gpt-5.5-2026-04-23': 100.0, 'gpt-6-astra': 100.0, 'grok-4.20-0309-reasoning': 100.0, 'qwen3-235b-a22b-instruct-2507': 75.0}
+  comma vs cedilla               {'claude-haiku-4-5-20251001': 100.0, 'claude-opus-5-default': 100.0, 'claude-sonnet-5-default': 100.0, 'deepseek-r1-0528': 100.0, 'gemini-3.1-pro-preview': 100.0, 'gemini-3.5-flash-lite': 100.0, 'gemini-3.7-flash': 100.0, 'gemini-3.8-flash': 100.0, 'gemma-4-31b-it': 100.0, 'glm-5': 100.0, 'gpt-5.4-nano-2026-03-17': 83.0, 'gpt-5.5-2026-04-23': 100.0, 'gpt-6-astra': 100.0, 'grok-4.20-0309-reasoning': 100.0, 'qwen3-235b-a22b-instruct-2507': 100.0}
+  control: ascii identical       {'claude-haiku-4-5-20251001': 50.0, 'claude-opus-5-default': 50.0, 'claude-sonnet-5-default': 100.0, 'deepseek-r1-0528': 100.0, 'gemini-3.1-pro-preview': 100.0, 'gemini-3.5-flash-lite': 100.0, 'gemini-3.7-flash': 100.0, 'gemini-3.8-flash': 100.0, 'gemma-4-31b-it': 100.0, 'glm-5': 100.0, 'gpt-5.4-nano-2026-03-17': 100.0, 'gpt-5.5-2026-04-23': 100.0, 'gpt-6-astra': 100.0, 'grok-4.20-0309-reasoning': 100.0, 'qwen3-235b-a22b-instruct-2507': 100.0}
+  control: visible difference    {'claude-haiku-4-5-20251001': 100.0, 'claude-opus-5-default': 100.0, 'claude-sonnet-5-default': 100.0, 'deepseek-r1-0528': 100.0, 'gemini-3.1-pro-preview': 100.0, 'gemini-3.5-flash-lite': 100.0, 'gemini-3.7-flash': 100.0, 'gemini-3.8-flash': 100.0, 'gemma-4-31b-it': 100.0, 'glm-5': 100.0, 'gpt-5.4-nano-2026-03-17': 100.0, 'gpt-5.5-2026-04-23': 100.0, 'gpt-6-astra': 100.0, 'grok-4.20-0309-reasoning': 100.0, 'qwen3-235b-a22b-instruct-2507': 100.0}
+  one cedilla word               {'claude-haiku-4-5-20251001': 100.0, 'claude-opus-5-default': 100.0, 'claude-sonnet-5-default': 100.0, 'deepseek-r1-0528': 100.0, 'gemini-3.1-pro-preview': 100.0, 'gemini-3.5-flash-lite': 100.0, 'gemini-3.7-flash': 100.0, 'gemini-3.8-flash': 100.0, 'gemma-4-31b-it': 67.0, 'glm-5': 100.0, 'gpt-5.4-nano-2026-03-17': 67.0, 'gpt-5.5-2026-04-23': 100.0, 'gpt-6-astra': 100.0, 'grok-4.20-0309-reasoning': 100.0, 'qwen3-235b-a22b-instruct-2507': 100.0}
+say 'different' to every identical ș/ş pair: ['claude-haiku-4-5-20251001', 'claude-opus-5-default', 'claude-sonnet-5-default', 'gemini-3.8-flash']
+code point accuracy: {'claude-haiku-4-5-20251001': 62.0, 'claude-opus-5-default': 100.0, 'claude-sonnet-5-default': 100.0, 'deepseek-r1-0528': 25.0, 'gemini-3.1-pro-preview': 100.0, 'gemini-3.5-flash-lite': 75.0, 'gemini-3.7-flash': 88.0, 'gemini-3.8-flash': 88.0, 'gemma-4-31b-it': 62.0, 'glm-5': 100.0, 'gpt-5.4-nano-2026-03-17': 50.0, 'gpt-5.5-2026-04-23': 100.0, 'gpt-6-astra': 100.0, 'grok-4.20-0309-reasoning': 88.0, 'qwen3-235b-a22b-instruct-2507': 88.0}
+code point wrong answers: [['gemini-3.7-flash', 'U+021A', 'U+0218'], ['claude-haiku-4-5-20251001', 'U+015F', 'U+0219'], ['claude-haiku-4-5-20251001', 'U+021B', 'U+0163'], ['claude-haiku-4-5-20251001', 'U+021A', 'U+0162'], ['deepseek-r1-0528', 'U+0219', 'U+0042'], ['deepseek-r1-0528', 'U+015F', 'U+0042'], ['deepseek-r1-0528', 'U+0219', 'U+0049'], ['deepseek-r1-0528', 'U+015F', 'U+0049'], ['deepseek-r1-0528', 'U+021B', 'U+006D'], ['deepseek-r1-0528', 'U+0163', 'U+006D'], ['gemini-3.5-flash-lite', 'U+015F', 'U+0219'], ['gemini-3.5-flash-lite', 'U+015F', 'U+0049'], ['gemini-3.8-flash', 'U+021A', 'U+0218'], ['gemma-4-31b-it', 'U+021B', nan], ['gemma-4-31b-it', 'U+021A', 'U+0218'], ['gemma-4-31b-it', 'U+0162', 'U+0218'], ['gpt-5.4-nano-2026-03-17', 'U+0219', 'U+015F'], ['gpt-5.4-nano-2026-03-17', 'U+015F', 'U+0219'], ['gpt-5.4-nano-2026-03-17', 'U+021B', 'U+0163'], ['gpt-5.4-nano-2026-03-17', 'U+021A', 'U+0162'], ['grok-4.20-0309-reasoning', 'U+0163', 'U+021B'], ['qwen3-235b-a22b-instruct-2507', 'U+021A', 'U+0162']]
+
+## Write
+pass % by model: {'claude-haiku-4-5-20251001': 91.7, 'claude-opus-5-default': 100.0, 'claude-sonnet-5-default': 100.0, 'deepseek-r1-0528': 95.8, 'gemini-3.1-pro-preview': 100.0, 'gemini-3.5-flash-lite': 100.0, 'gemini-3.7-flash': 100.0, 'gemini-3.8-flash': 100.0, 'gemma-4-31b-it': 100.0, 'glm-5': 100.0, 'gpt-5.4-nano-2026-03-17': 95.8, 'gpt-5.5-2026-04-23': 100.0, 'gpt-6-astra': 100.0, 'grok-4.20-0309-reasoning': 100.0, 'qwen3-235b-a22b-instruct-2507': 91.7}
+  claude-haiku-4-5-20251001 W09 cedilla=1.0 missing=['Râșnov'] | 'Fortăreața Răşnov se află la o scurtă călătorie cu mașina de Brașov.'
+  claude-haiku-4-5-20251001 W14 cedilla=1.0 missing=['știu'] | 'Nu ştiu, dar voi afla.'
+  deepseek-r1-0528 W08 cedilla=0.0 missing=['Cișmigiu'] | 'Grădinile Cismigiu sunt în centrul Bucureștiului.'
+  gpt-5.4-nano-2026-03-17 W08 cedilla=2.0 missing=['Cișmigiu', 'București'] | 'Grădinile Cişmigiu sunt în centrul Bucureştiului.'
+  qwen3-235b-a22b-instruct-2507 W08 cedilla=0.0 missing=['Cișmigiu'] | 'Grădinile Cismigiu sunt în centrul Bucureștiului.'
+  qwen3-235b-a22b-instruct-2507 W20 cedilla=0.0 missing=['Brașov'] | '<title>Casa de Oaspeți Brasov - Pensiune cu Atmosferă Autentică în Inima Transilvaniei</title>'
+
+## Restore
+pass % by model: {'claude-haiku-4-5-20251001': 93.3, 'claude-opus-5-default': 100.0, 'claude-sonnet-5-default': 100.0, 'deepseek-r1-0528': 93.3, 'gemini-3.1-pro-preview': 100.0, 'gemini-3.5-flash-lite': 90.0, 'gemini-3.7-flash': 100.0, 'gemini-3.8-flash': 100.0, 'gemma-4-31b-it': 90.0, 'glm-5': 100.0, 'gpt-5.4-nano-2026-03-17': 90.0, 'gpt-5.5-2026-04-23': 100.0, 'gpt-6-astra': 100.0, 'grok-4.20-0309-reasoning': 86.7, 'qwen3-235b-a22b-instruct-2507': 90.0}
+  claude-haiku-4-5-20251001 R09 if_cedilla_ok=False | 'Am pus masa în bucătarie.'
+  claude-haiku-4-5-20251001 R13 if_cedilla_ok=False | 'Munții Făgărași sunt cei mai înalți din țară.'
+  deepseek-r1-0528 R09 if_cedilla_ok=False | 'Am pus masă în bucătărie.'
+  deepseek-r1-0528 R10 if_cedilla_ok=False | 'Sunt două cărți pe masa.'
+  gemini-3.5-flash-lite R08 if_cedilla_ok=False | 'Fața a venit acasă de la școală.'
+  gemini-3.5-flash-lite R14 if_cedilla_ok=False | 'Casă e la șase kilometri de oraș.'
+  gemini-3.5-flash-lite R27 if_cedilla_ok=False | 'Întoarcerea acasă a fost lungă.'
+  gemma-4-31b-it R01 if_cedilla_ok=False | 'Mănânc pește la cina.'
+  gemma-4-31b-it R06 if_cedilla_ok=False | 'Spală-te pe fața înainte de culcare.'
+  gemma-4-31b-it R13 if_cedilla_ok=False | 'Muntii Făgăraș sunt cei mai înalți din țară.'
+  gpt-5.4-nano-2026-03-17 R16 if_cedilla_ok=False | 'Și eu vine, și ea vine.'
+  gpt-5.4-nano-2026-03-17 R25 if_cedilla_ok=False | 'Iași este un oraș din Moldova.'
+  gpt-5.4-nano-2026-03-17 R30 if_cedilla_ok=False | 'Când ajungi la Timișoara, sună-ma.'
+  grok-4.20-0309-reasoning R09 if_cedilla_ok=False | 'Am pus masă în bucătărie.'
+  grok-4.20-0309-reasoning R11 if_cedilla_ok=False | 'Mamă pregătește o masă mare de Crăciun.'
+  grok-4.20-0309-reasoning R17 if_cedilla_ok=False | 'Școală începe luni, pe cincisprezece septembrie.'
+  grok-4.20-0309-reasoning R29 if_cedilla_ok=False | 'Sticlă e pe jumătate goală.'
+  qwen3-235b-a22b-instruct-2507 R08 if_cedilla_ok=True | 'Fata a venit acasă de la şcoală.'
+  qwen3-235b-a22b-instruct-2507 R21 if_cedilla_ok=False | 'Tatal lui e pescar la Tulcea.'
+  qwen3-235b-a22b-instruct-2507 R23 if_cedilla_ok=False | 'Să ne vedem mâine la ora șapte în Piața Șfatului.'
+
+## Code
+score % by model: {'claude-haiku-4-5-20251001': 85.7, 'claude-opus-5-default': 100.0, 'claude-sonnet-5-default': 85.7, 'deepseek-r1-0528': 85.7, 'gemini-3.1-pro-preview': 85.7, 'gemini-3.5-flash-lite': 92.9, 'gemini-3.7-flash': 85.7, 'gemini-3.8-flash': 92.9, 'gemma-4-31b-it': 64.3, 'glm-5': 85.7, 'gpt-5.4-nano-2026-03-17': 92.9, 'gpt-5.5-2026-04-23': 92.9, 'gpt-6-astra': 92.9, 'grok-4.20-0309-reasoning': 85.7, 'qwen3-235b-a22b-instruct-2507': 60.7}
+failed tests (count over 30 programs): [('decomposed_s', 23), ('decomposed_T', 23), ('basic', 2), ('two_words', 2), ('upper_t', 2), ('lower_t', 2), ('whitespace_emoji', 2), ('mixed_paragraph', 2), ('upper_s', 1)]
+full marks: [['claude-opus-5-default', 'C1_explicit'], ['claude-opus-5-default', 'C2_goal'], ['gemini-3.5-flash-lite', 'C2_goal'], ['gemini-3.8-flash', 'C2_goal'], ['gpt-5.4-nano-2026-03-17', 'C2_goal'], ['gpt-5.5-2026-04-23', 'C2_goal'], ['gpt-6-astra', 'C2_goal']]

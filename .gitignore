@@ -1,0 +1,13 @@
+.env
+.env.*
+!.env.example
+__pycache__/
+.venv/
+results/raw/
+kaggle_benchmarks_reference.md
+example_task.py
+# working notes and review builds stay local
+NOTES.md
+post/outline.md
+post/preview.html
+node_modules/

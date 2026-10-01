@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Comma Below cover</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Mono:wght@400;500&display=block" rel="stylesheet">
+<style>
+  :root {
+    --paper: #f3eee4;
+    --ink: #1c1a17;
+    --muted: #6b645a;
+    --wrong: #b2452f;
+    --right: #1f6b58;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body { width: 1000px; height: 420px; background: var(--paper); color: var(--ink);
+         font-family: "Source Serif 4", Georgia, serif; overflow: hidden; }
+  .frame { position: relative; width: 100%; height: 100%; padding: 34px 48px; }
+  .kicker { font: 500 14px/1 "IBM Plex Mono", monospace; letter-spacing: .14em; text-transform: uppercase;
+            color: var(--muted); }
+  .words { position: absolute; left: 48px; right: 48px; top: 92px; display: flex; align-items: baseline;
+           justify-content: space-between; }
+  .word { font-weight: 600; font-size: 132px; line-height: 1; letter-spacing: -0.01em; position: relative; }
+  .neq { font-weight: 400; font-size: 96px; color: var(--muted); }
+  .hit { position: relative; display: inline-block; }
+  .wrong .hit { color: var(--wrong); }
+  .right .hit { color: var(--right); }
+  .tag { position: absolute; left: 50%; top: 176px; transform: translateX(-50%); white-space: nowrap;
+         font: 500 15px/1.35 "IBM Plex Mono", monospace; text-align: center; }
+  .tag::before { content: ""; position: absolute; left: 50%; top: -16px; height: 10px; border-left: 2px solid currentColor; }
+  .wrong .tag { color: var(--wrong); }
+  .right .tag { color: var(--right); }
+  .tag small { display: block; font-size: 13px; color: var(--muted); }
+  .foot { position: absolute; left: 48px; right: 48px; bottom: 30px; display: flex; justify-content: space-between;
+          font: 400 15px/1 "IBM Plex Mono", monospace; color: var(--muted); }
+  .foot b { color: var(--ink); font-weight: 500; }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="kicker">Romanian comma below · a Kaggle benchmark</div>
+  <div class="words">
+    <div class="word wrong">Bra<span class="hit">ş<span class="tag">U+015F<small>s with cedilla</small></span></span>ov</div>
+    <div class="neq">≠</div>
+    <div class="word right">Bra<span class="hit">ș<span class="tag">U+0219<small>s with comma below</small></span></span>ov</div>
+  </div>
+  <div class="foot"><span><b id="models">15 models</b> · <b>6 tasks</b> · <b>0 LLM judges</b></span><span>scored byte by byte</span></div>
+</div>
+</body>
+</html>
