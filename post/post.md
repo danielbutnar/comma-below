@@ -63,7 +63,7 @@ So if the models know the right letter, where does the wrong one come from?
 
 This is the main result.
 
-![Echo results: every model is perfect on clean input and drops to 44–85 % on cedilla input](CHART_ECHO_URL)
+![Echo results: every model scores 100 % on clean input, 44–85 % on the same text typed with cedillas, and 77–100 % once one sentence is added to the system prompt](CHART_ECHO_URL)
 
 When the guest message or news paragraph was typed correctly, **every model kept every letter correct, in all 45 runs.** When the *same text* was typed with cedillas, the share of clean answers fell to **between 44 % (Grok 4.20) and 85 % (Qwen 3)**. Model size bought nothing: Claude Opus 5 (56 %) and GPT-6 Astra (55 %) sit next to GPT-5.4 nano (61 %), well below Qwen 3.
 
@@ -117,6 +117,28 @@ Asked for `fix_romanian(text)`, almost every model wrote a clean translation tab
 
 The first version of my task file contained the word "Brașov". On my laptop, the Kaggle CLI reads task files with `open(file)` and no encoding argument, so Windows decoded my UTF-8 as cp1250, the Central European code page, and would have uploaded **"BraČ™ov"**. A benchmark about one wrong character, broken by one wrong character on the way in. My task files are now pure ASCII (every Romanian letter is a `\u` escape) and check a SHA-256 of their data before running.
 
+### All the numbers
+
+Percent of items passed; Echo is the mean of three runs on cedilla input (on clean input every model scored 100). Rows are sorted by Echo.
+
+| Model | Write | Echo: cedilla input | Echo + rule | Fix | See | Restore | Code |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Qwen 3 235B | 92 | 85 | 91 | 89 | 89 | 90 | 61 |
+| Gemini 3.1 Pro | 100 | 82 | 100 | 100 | 97 | 100 | 86 |
+| Gemini 3.7 Flash | 100 | 76 | 100 | 100 | 97 | 100 | 86 |
+| Gemini 3.8 Flash | 100 | 71 | 100 | 100 | 81 | 100 | 93 |
+| DeepSeek-R1 | 96 | 70 | 91 | 83 | 83 | 93 | 86 |
+| Gemini 3.5 Flash-Lite | 100 | 68 | 100 | 89 | 83 | 90 | 93 |
+| Gemma 4 31B | 100 | 68 | 100 | 89 | 89 | 90 | 64 |
+| GPT-5.5 | 100 | 65 | 100 | 100 | 100 | 100 | 93 |
+| GPT-5.4 nano | 96 | 61 | 77 | 83 | 83 | 90 | 93 |
+| Claude Sonnet 5 | 100 | 58 | 91 | 72 | 83 | 100 | 86 |
+| Claude Opus 5 | 100 | 56 | 100 | 100 | 81 | 100 | 100 |
+| GPT-6 Astra | 100 | 55 | 100 | 100 | 100 | 100 | 93 |
+| GLM-5 | 100 | 53 | 100 | 94 | 94 | 100 | 86 |
+| Claude Haiku 4.5 | 92 | 45 | 86 | 89 | 72 | 93 | 86 |
+| Grok 4.20 Reasoning | 100 | 44 | 100 | 83 | 97 | 87 | 86 |
+
 ### What changed in how I think about these models
 
 I started out thinking of this as a knowledge problem: maybe the models never learned the right letter. They did. They write it correctly when nobody shows them the wrong one. The failure is **inheritance**: whatever encoding is in the context comes back out, and the better the model, the more faithfully it comes back.
@@ -133,7 +155,13 @@ def fix_romanian(text: str) -> str:
     return unicodedata.normalize("NFC", text).translate(CEDILLA_TO_COMMA)
 ```
 
-And the obvious one-line fix, telling the model in the system prompt? I tested that too: TASK7_RESULT
+And the obvious fix, simply telling the model? I tested that as a follow-up task, [Echo With a Rule](https://www.kaggle.com/benchmarks/tasks/danielbutnar/romanian-comma-below-7-echo-with-a-rule): the same 22 cedilla inputs, plus one sentence in the system prompt:
+
+> *Use correct Romanian orthography: write ș and ț with a comma below, never ş or ţ with a cedilla, even if the input uses them.*
+
+Clean answers went from **64 % to 96 %** across all models. Ten of the fifteen were perfect, including Claude Opus 5 (56 % → 100 %), GPT-6 Astra (55 % → 100 %) and Grok 4.20 (44 % → 100 %). The holdouts were the smaller models: GPT-5.4 nano still copied the wrong letters in about a quarter of its answers.
+
+So the models know the rule. They just don't apply it unless you ask, because matching your text is what they're built to do. Ask, and normalize anyway.
 
 ### What I'd measure next
 

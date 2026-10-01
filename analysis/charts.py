@@ -36,7 +36,7 @@ NAMES = {
 
 # Palette: reference categorical slots 1-2 (validated), chrome from the reference instance.
 C = dict(surface="#fcfcfb", ink="#0b0b0b", ink2="#52514e", muted="#898781", grid="#e1e0d9",
-         base="#c3c2b7", s1="#2a78d6", s2="#eb6834")
+         base="#c3c2b7", s1="#2a78d6", s2="#eb6834", s3="#1baf7a")
 
 CSS = f"""
 * {{ margin: 0; box-sizing: border-box; }}
@@ -55,7 +55,7 @@ def page(title: str, svg: str) -> str:
             f"<style>{CSS}</style></head><body>{svg}</body></html>")
 
 
-def dumbbell(rows, a_key, b_key, a_label, b_label, title, subtitle, note, file, label_b=True):
+def dumbbell(rows, a_key, b_key, a_label, b_label, title, subtitle, note, file, label_b=True, c_key=None, c_label=None):
     """rows: list of dicts with name, a (0-100), b (0-100). Sorted by caller."""
     W, left, right = 1000, 250, 70
     top, row_h = 150, 34
@@ -71,7 +71,8 @@ def dumbbell(rows, a_key, b_key, a_label, b_label, title, subtitle, note, file, 
     parts.append(f'<text x="40" y="74" font-size="15" fill="{C["ink2"]}">{esc(subtitle)}</text>')
     # legend
     lx = 40
-    for color, label in ((C["s1"], a_label), (C["s2"], b_label)):
+    legend = [(C["s1"], a_label), (C["s2"], b_label)] + ([(C["s3"], c_label)] if c_key else [])
+    for color, label in legend:
         parts.append(f'<circle cx="{lx + 6}" cy="104" r="6" fill="{color}"/>')
         parts.append(f'<text x="{lx + 18}" y="109" font-size="14" fill="{C["ink2"]}">{esc(label)}</text>')
         lx += 30 + 7.4 * len(label)
@@ -84,6 +85,7 @@ def dumbbell(rows, a_key, b_key, a_label, b_label, title, subtitle, note, file, 
     for i, r in enumerate(rows):
         y = top + i * row_h + 6
         a, b = r[a_key], r[b_key]
+        cv = r.get(c_key) if c_key else None
         parts.append(f'<text x="{left - 16}" y="{y + 5}" font-size="15" fill="{C["ink"]}" '
                      f'text-anchor="end">{esc(r["name"])}</text>')
         if pd.notna(a) and pd.notna(b):
@@ -93,7 +95,10 @@ def dumbbell(rows, a_key, b_key, a_label, b_label, title, subtitle, note, file, 
         if lo is not None and hi is not None and pd.notna(lo) and pd.notna(hi) and hi > lo:
             parts.append(f'<line x1="{X(lo):.1f}" y1="{y}" x2="{X(hi):.1f}" y2="{y}" stroke="{C["s2"]}" '
                          f'stroke-width="6" stroke-linecap="round" opacity="0.28"/>')
-        for v, color in ((a, C["s1"]), (b, C["s2"])):
+        if cv is not None and pd.notna(cv) and pd.notna(b):
+            parts.append(f'<line x1="{X(min(b, cv)):.1f}" y1="{y}" x2="{X(max(b, cv)):.1f}" y2="{y}" '
+                         f'stroke="{C["s3"]}" stroke-width="2" stroke-dasharray="0" opacity="0.55"/>')
+        for v, color in ((a, C["s1"]), (cv, C["s3"]), (b, C["s2"])):
             if pd.notna(v):
                 parts.append(f'<circle cx="{X(v):.1f}" cy="{y}" r="6" fill="{color}" '
                              f'stroke="{C["surface"]}" stroke-width="2"/>')
@@ -155,6 +160,62 @@ def paired_bars(rows, a_key, b_key, a_label, b_label, title, subtitle, note, fil
     print("wrote", file)
 
 
+def echo_chart(rows, file):
+    """Cedilla input (mean, range) -> same input with the rule; clean input as a 100% reference line."""
+    W, left, right = 1000, 250, 70
+    top, row_h = 168, 34
+    H = top + row_h * len(rows) + 74
+    x0, x1 = left, W - right
+
+    def X(v):
+        return x0 + (x1 - x0) * v / 100
+
+    title = "Clean in, clean out. Cedilla in, cedilla out."
+    sub = "Share of answers that use only correct ș/ț letters · 22 prompts per condition"
+    p = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}" role="img" '
+         f'aria-label="{esc(title)}">',
+         f'<text x="40" y="46" font-size="24" font-weight="600" fill="{C["ink"]}">{esc(title)}</text>',
+         f'<text x="40" y="74" font-size="15" fill="{C["ink2"]}">{esc(sub)}</text>']
+    lx = 40
+    for kind, color, label in (("dot", C["s2"], "Text typed with cedilla (ş ţ): mean of 3 runs, shaded = range"),
+                               ("dot", C["s3"], "Same text + one sentence in the system prompt")):
+        p.append(f'<circle cx="{lx + 6}" cy="104" r="6" fill="{color}"/>')
+        p.append(f'<text x="{lx + 18}" y="109" font-size="14" fill="{C["ink2"]}">{esc(label)}</text>')
+        lx += 30 + 7.1 * len(label)
+    p.append(f'<line x1="40" y1="130" x2="56" y2="130" stroke="{C["s1"]}" stroke-width="2"/>')
+    p.append(f'<text x="64" y="135" font-size="14" fill="{C["ink2"]}">Clean input (ș ț): 100% for every model, in all 45 runs</text>')
+    for v in (0, 25, 50, 75):
+        p.append(f'<line x1="{X(v):.1f}" y1="{top - 14}" x2="{X(v):.1f}" y2="{top + row_h * len(rows) - 10}" '
+                 f'stroke="{C["grid"]}" stroke-width="1"/>')
+    p.append(f'<line x1="{X(100):.1f}" y1="{top - 14}" x2="{X(100):.1f}" y2="{top + row_h * len(rows) - 10}" '
+             f'stroke="{C["s1"]}" stroke-width="2"/>')
+    for v in (0, 25, 50, 75, 100):
+        p.append(f'<text x="{X(v):.1f}" y="{top + row_h * len(rows) + 10}" font-size="13" fill="{C["muted"]}" '
+                 f'text-anchor="middle">{v}%</text>')
+    for i, r in enumerate(rows):
+        y = top + i * row_h + 6
+        b, lo, hi, q = r["echo_mean"], r["echo_min"], r["echo_max"], r.get("echo_rule")
+        p.append(f'<text x="{left - 16}" y="{y + 5}" font-size="15" fill="{C["ink"]}" text-anchor="end">{esc(r["name"])}</text>')
+        if pd.notna(q):
+            p.append(f'<line x1="{X(b):.1f}" y1="{y}" x2="{X(q):.1f}" y2="{y}" stroke="{C["base"]}" stroke-width="2" '
+                     f'stroke-linecap="round"/>')
+        if pd.notna(lo) and pd.notna(hi) and hi > lo:
+            p.append(f'<line x1="{X(lo):.1f}" y1="{y}" x2="{X(hi):.1f}" y2="{y}" stroke="{C["s2"]}" stroke-width="6" '
+                     f'stroke-linecap="round" opacity="0.28"/>')
+        p.append(f'<circle cx="{X(b):.1f}" cy="{y}" r="6" fill="{C["s2"]}" stroke="{C["surface"]}" stroke-width="2"/>')
+        edge = min(b, lo) if pd.notna(lo) else b
+        p.append(f'<text x="{X(edge) - 12:.1f}" y="{y + 5}" font-size="13" fill="{C["ink2"]}" text-anchor="end">{b:.0f}%</text>')
+        if pd.notna(q):
+            p.append(f'<circle cx="{X(q):.1f}" cy="{y}" r="6" fill="{C["s3"]}" stroke="{C["surface"]}" stroke-width="2"/>')
+            if q < 99.5:
+                p.append(f'<text x="{X(q) + 12:.1f}" y="{y + 5}" font-size="13" fill="{C["ink2"]}">{q:.0f}%</text>')
+    p.append(f'<text x="40" y="{H - 22}" font-size="13" fill="{C["muted"]}">Romanian Comma Below 2: Echo and 7: Echo With a Rule '
+             f'· Kaggle Benchmarks, 30 Sep – 1 Oct 2026 · unlabeled green dots are 100%</text>')
+    p.append("</svg>")
+    (POST / file).write_text(page(title, "".join(p)), encoding="utf-8", newline=chr(10))
+    print("wrote", file)
+
+
 def census_chart():
     rows = []
     with (ROOT / "analysis" / "web_census.csv").open(encoding="utf-8") as fh:
@@ -203,12 +264,7 @@ def main():
 
     echo = s.dropna(subset=["echo_mean"]).sort_values(["echo_mean", "name"], ascending=[False, True]).copy()
     echo["b_lo"], echo["b_hi"] = echo["echo_min"], echo["echo_max"]
-    dumbbell(echo.to_dict("records"), "echo_clean", "echo_mean",
-             "Clean input (ș ț)", "Same text, typed with cedilla (ş ţ)",
-             "Clean in, clean out. Cedilla in, cedilla out.",
-             "Share of answers that use only correct ș/ț letters · 22 prompts per condition · mean of 3 runs, shaded = range",
-             "Romanian Comma Below 2: Echo · Kaggle Benchmarks, 30 Sep – 1 Oct 2026 · clean input scored 100% in all 45 runs",
-             "chart-echo.html")
+    echo_chart(echo.to_dict("records"), "chart-echo.html")
 
     see = s.dropna(subset=["see_same_identical"]).sort_values(["see_same_identical", "name"], ascending=[True, True])
     paired_bars(see.to_dict("records"), "see_same_comma_vs_cedilla", "see_same_identical",
