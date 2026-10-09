@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Same letter?</title>
+<style>
+  :root { --bg: #faf8f3; --fg: #1d1b16; --muted: #6b665c; --line: #d9d3c5; --accent: #1f5fbf; --ok: #1b7a46; --bad: #b3261e; }
+  @media (prefers-color-scheme: dark) { :root { --bg: #17161a; --fg: #f1eee6; --muted: #a9a398; --line: #3a3832; --accent: #7fb0ff; --ok: #6fd39b; --bad: #ff8a80; } }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg);
+         font: 17px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  main { max-width: 34rem; margin: 0 auto; padding: 20px 16px 40px; }
+  h1, h2 { font-size: 1.35rem; line-height: 1.25; margin: 0 0 .5rem; }
+  p { margin: .5rem 0; }
+  .muted { color: var(--muted); font-size: .9rem; }
+  .langs { display: flex; gap: .5rem; justify-content: flex-end; margin-bottom: .75rem; }
+  .langs button { min-height: 36px; padding: 0 .75rem; font-size: .9rem; }
+  button { font: inherit; color: var(--fg); background: transparent; border: 1.5px solid var(--line); border-radius: 10px;
+           min-height: 52px; padding: 0 1rem; cursor: pointer; }
+  button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+  button.primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; width: 100%; }
+  @media (prefers-color-scheme: dark) { button.primary { color: #0b1530; } }
+  .pair { display: flex; justify-content: center; gap: 2.25rem; margin: 1.75rem 0; flex-wrap: wrap; }
+  .word { font-size: var(--size, 18px); letter-spacing: 0; }
+  .choices { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
+  .choices button { width: 100%; }
+  .pick { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; margin: 1.5rem 0; }
+  .pick button { min-height: 64px; }
+  .pick .word { font-size: var(--size, 18px); }
+  .progress { color: var(--muted); font-size: .9rem; margin-top: 1rem; }
+  .code { font: 600 1.05rem/1.4 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; padding: .75rem; border: 1.5px dashed var(--line);
+          border-radius: 10px; user-select: all; -webkit-user-select: all; word-break: break-all; margin: .75rem 0; }
+  .big { font-size: 2rem; font-weight: 700; margin: .25rem 0; }
+  .ok { color: var(--ok); } .bad { color: var(--bad); }
+  .hidden { display: none; }
+  table { border-collapse: collapse; margin: .75rem 0; }
+  td { padding: .2rem .75rem .2rem 0; }
+</style>
+</head>
+<body>
+<main>
+  <div class="langs" role="group" aria-label="Language">
+    <button type="button" data-lang="ro">RO</button><button type="button" data-lang="de">DE</button><button type="button" data-lang="en">EN</button>
+  </div>
+  <section id="intro">
+    <h1 data-t="title"></h1>
+    <p data-t="intro1"></p>
+    <p data-t="intro2"></p>
+    <p class="muted" data-t="privacy"></p>
+    <p data-t="reads"></p>
+    <div class="choices">
+      <button type="button" data-reads="1" data-t="yes"></button>
+      <button type="button" data-reads="0" data-t="no"></button>
+    </div>
+  </section>
+  <section id="trial" class="hidden" aria-live="polite">
+    <p id="question"></p>
+    <div class="pair" id="pair"></div>
+    <div class="choices" id="sd">
+      <button type="button" data-answer="same" data-t="same"></button>
+      <button type="button" data-answer="diff" data-t="diff"></button>
+    </div>
+    <div class="pick hidden" id="wr"></div>
+    <p id="feedback" class="hidden"></p>
+    <button type="button" id="next" class="primary hidden" data-t="next"></button>
+    <p class="progress" id="progress"></p>
+  </section>
+  <section id="done" class="hidden">
+    <h2 data-t="doneTitle"></h2>
+    <table>
+      <tr><td data-t="sdScore"></td><td class="big" id="sdScore"></td></tr>
+      <tr><td data-t="wrScore"></td><td class="big" id="wrScore"></td></tr>
+    </table>
+    <p class="muted" data-t="chance"></p>
+    <p data-t="send"></p>
+    <div class="code" id="code"></div>
+    <p data-t="reveal"></p>
+  </section>
+</main>
+<script>
+"use strict";
+// The same word pairs as task 4 ("See") of the benchmark, where every model was right on all of them.
+const COMMA = { "ș": "ş", "Ș": "Ş", "ț": "ţ", "Ț": "Ţ" };
+const ced = w => [...w].map(c => COMMA[c] || c).join("");
+const WORDS = ["Brașov", "Timișoara", "Iași", "mulțumesc", "Ștefan", "țară", "Constanța", "știri"];
+const SD = [];
+WORDS.slice(0, 6).forEach((w, n) => SD.push(n % 2 === 0 ? [w, ced(w), "diff"] : [ced(w), w, "diff"]));
+WORDS.slice(5, 8).forEach(w => SD.push([w, w, "same"]));
+[WORDS[1], WORDS[3], WORDS[4]].forEach(w => SD.push([ced(w), ced(w), "same"]));
+const WR = [WORDS[0], WORDS[2], WORDS[6], WORDS[7]];   // which one is spelled right?
+const PRACTICE = ["Brasov", "Brașov", "diff"];
+
+const T = {
+  ro: { title: "Test de 2 minute: vezi diferența?", intro1: "Vei vedea perechi de cuvinte. Spune dacă sunt identice, literă cu literă, sau diferite. La final, câteva perechi în care alegi cuvântul scris corect.",
+        intro2: "Citește ca de obicei: fără zoom și fără să apropii telefonul.", privacy: "Anonim. Nu se trimite și nu se salvează nimic; la final primești un cod scurt pe care i-l trimiți lui Daniel.",
+        reads: "Citești în română?", yes: "Da", no: "Nu", same: "Identice", diff: "Diferite", next: "Mai departe",
+        qSD: "Sunt identice, literă cu literă?", qWR: "Care e scris corect în română?", practice: "Exemplu:",
+        practiceOk: "Corect: diferite. Unul are s fără semn. De aici încolo nu mai primești răspunsul.", practiceBad: "Erau diferite: unul are s fără semn. De aici încolo nu mai primești răspunsul.",
+        doneTitle: "Gata, mulțumesc!", sdScore: "Identice sau diferite", wrScore: "Scris corect", chance: "La întâmplare ai nimeri jumătate.",
+        send: "Trimite-i lui Daniel acest cod (doar codul):",
+        reveal: "Diferența: ș cu virgulă dedesubt e litera română corectă. ş cu sedilă e litera turcească, folosită din greșeală în română din anii '90, când calculatoarele nu aveau litera corectă.",
+        of: "din" },
+  de: { title: "2-Minuten-Test: Sehen Sie den Unterschied?", intro1: "Sie sehen Wortpaare. Sagen Sie, ob sie Buchstabe für Buchstabe gleich oder verschieden sind. Am Ende wählen Sie bei einigen Paaren das richtig geschriebene Wort.",
+        intro2: "Lesen Sie wie gewohnt: ohne Zoom und ohne das Handy näher heranzuholen.", privacy: "Anonym. Nichts wird gesendet oder gespeichert; am Ende erhalten Sie einen kurzen Code für Daniel.",
+        reads: "Lesen Sie Rumänisch?", yes: "Ja", no: "Nein", same: "Gleich", diff: "Verschieden", next: "Weiter",
+        qSD: "Buchstabe für Buchstabe gleich?", qWR: "Welches ist richtiges Rumänisch?", practice: "Beispiel:",
+        practiceOk: "Richtig: verschieden. Eines hat ein s ohne Zeichen. Ab jetzt gibt es keine Auflösung mehr.", practiceBad: "Die beiden waren verschieden: Eines hat ein s ohne Zeichen. Ab jetzt gibt es keine Auflösung mehr.",
+        doneTitle: "Fertig, vielen Dank!", sdScore: "Gleich oder verschieden", wrScore: "Richtig geschrieben", chance: "Mit Raten trifft man die Hälfte.",
+        send: "Schicken Sie Daniel diesen Code (nur den Code):",
+        reveal: "Der Unterschied: ș mit Komma darunter ist der richtige rumänische Buchstabe. ş mit Cedille ist der türkische, der seit den 90ern aus Versehen fürs Rumänische benutzt wird, weil Computer den richtigen nicht hatten.",
+        of: "von" },
+  en: { title: "2-minute test: can you see the difference?", intro1: "You will see pairs of words. Say whether they are the same, letter for letter, or different. At the end, a few pairs where you pick the correctly spelled word.",
+        intro2: "Read as you normally do: no zoom, and don't bring the phone closer.", privacy: "Anonymous. Nothing is sent or saved; at the end you get a short code to send to Daniel.",
+        reads: "Do you read Romanian?", yes: "Yes", no: "No", same: "Same", diff: "Different", next: "Next",
+        qSD: "Same, letter for letter?", qWR: "Which one is correct Romanian?", practice: "Example:",
+        practiceOk: "Right: different. One has an s with no mark. From now on there are no answers.", practiceBad: "They were different: one has an s with no mark. From now on there are no answers.",
+        doneTitle: "Done, thank you!", sdScore: "Same or different", wrScore: "Spelled right", chance: "Guessing gets half of them.",
+        send: "Send Daniel this code (just the code):",
+        reveal: "The difference: ș with a comma below is the correct Romanian letter. ş with a cedilla is the Turkish one, used by mistake for Romanian since the 1990s, when computers didn't have the right letter.",
+        of: "of" }
+};
+let lang = "ro";
+const $ = id => document.getElementById(id);
+function paint() {
+  document.documentElement.lang = lang;
+  document.querySelectorAll("[data-t]").forEach(el => { el.textContent = T[lang][el.dataset.t]; });
+  document.querySelectorAll("[data-lang]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.lang === lang)));
+}
+document.querySelectorAll("[data-lang]").forEach(b => b.addEventListener("click", () => { lang = b.dataset.lang; paint(); }));
+const size = (() => { const s = parseInt(new URLSearchParams(location.search).get("size"), 10); return s >= 12 && s <= 40 ? s : 18; })();
+document.documentElement.style.setProperty("--size", size + "px");
+
+function shuffle(a) {
+  const r = new Uint32Array(a.length); crypto.getRandomValues(r);
+  for (let i = a.length - 1; i > 0; i--) { const j = r[i] % (i + 1); [a[i], a[j]] = [a[j], a[i]]; }
+  return a;
+}
+const coin = () => { const r = new Uint8Array(1); crypto.getRandomValues(r); return r[0] % 2 === 0; };
+let reads = null, step = -1, sdRight = 0, wrRight = 0, started = 0;
+const sdOrder = shuffle(SD.slice());
+const wrOrder = shuffle(WR.slice()).map(w => coin() ? [w, ced(w), 0] : [ced(w), w, 1]);   // [left, right, index of the right one]
+
+function wordSpan(text) { const s = document.createElement("span"); s.className = "word"; s.textContent = text; return s; }
+function showPair(a, b) { const p = $("pair"); p.replaceChildren(wordSpan(a), wordSpan(b)); }
+function progress() { $("progress").textContent = step < 0 ? "" : `${Math.min(step + 1, sdOrder.length + wrOrder.length)} ${T[lang].of} ${sdOrder.length + wrOrder.length}`; }
+
+function render() {
+  $("feedback").classList.add("hidden"); $("next").classList.add("hidden");
+  if (step === -1) {                         // practice pair, with feedback
+    $("question").textContent = T[lang].practice + " " + T[lang].qSD;
+    showPair(PRACTICE[0], PRACTICE[1]); $("sd").classList.remove("hidden"); $("wr").classList.add("hidden");
+  } else if (step < sdOrder.length) {
+    $("question").textContent = T[lang].qSD;
+    showPair(sdOrder[step][0], sdOrder[step][1]); $("sd").classList.remove("hidden"); $("wr").classList.add("hidden");
+  } else if (step < sdOrder.length + wrOrder.length) {
+    const [l, r] = wrOrder[step - sdOrder.length];
+    $("question").textContent = T[lang].qWR; $("pair").replaceChildren(); $("sd").classList.add("hidden");
+    const box = $("wr"); box.classList.remove("hidden");
+    box.replaceChildren(...[l, r].map((w, k) => { const b = document.createElement("button"); b.type = "button"; b.dataset.pick = String(k); b.append(wordSpan(w)); return b; }));
+  } else return finish();
+  progress();
+  const first = document.querySelector("#trial button:not(.hidden):not([disabled])"); if (first) first.focus({ preventScroll: true });
+}
+document.querySelectorAll("[data-reads]").forEach(b => b.addEventListener("click", () => {
+  reads = b.dataset.reads; started = Date.now();
+  $("intro").classList.add("hidden"); $("trial").classList.remove("hidden"); render();
+}));
+document.querySelectorAll("#sd button").forEach(b => b.addEventListener("click", () => {
+  const ans = b.dataset.answer;
+  if (step === -1) {
+    const fb = $("feedback"); fb.textContent = ans === "diff" ? T[lang].practiceOk : T[lang].practiceBad;
+    fb.className = ans === "diff" ? "ok" : "bad"; $("next").classList.remove("hidden"); $("next").focus(); return;
+  }
+  if (ans === sdOrder[step][2]) sdRight++;
+  step++; render();
+}));
+$("next").addEventListener("click", () => { step = 0; render(); });
+$("wr").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  if (Number(b.dataset.pick) === wrOrder[step - sdOrder.length][2]) wrRight++;
+  step++; render();
+});
+function finish() {
+  $("trial").classList.add("hidden"); $("done").classList.remove("hidden");
+  $("sdScore").textContent = `${sdRight}/${sdOrder.length}`; $("wrScore").textContent = `${wrRight}/${wrOrder.length}`;
+  const ua = navigator.userAgent, os = /iPhone|iPad|iPod/.test(ua) ? "ios" : /Android/.test(ua) ? "android" : /Mac/.test(ua) ? "mac" : /Windows/.test(ua) ? "win" : "other";
+  const secs = Math.round((Date.now() - started) / 1000);
+  $("code").textContent = `SD${sdRight}-WR${wrRight}-RO${reads}-${os}-${size}px-${innerWidth}w-${(devicePixelRatio || 1).toFixed(1)}x-${secs}s`;
+}
+paint();
+</script>
+</body>
+</html>
