@@ -3,7 +3,12 @@
 !.env.example
 __pycache__/
 .venv/
-results/raw/
+# the per-item answers (*.jsonl, ~9 MB) are committed so the analysis reruns from the repo;
+# the run traces (*.json, ~90 MB) stay on Kaggle
+results/raw/**
+!results/raw/romanian-comma-below-*/
+!results/raw/romanian-comma-below-*/**/
+!results/raw/romanian-comma-below-*/**/*.jsonl
 kaggle_benchmarks_reference.md
 example_task.py
 # working notes and review builds stay local
@@ -20,3 +25,7 @@ PLAN-28.md
 human/results.txt
 human/link.txt
 post/preview3.html
+.work/
+NEXT-SESSION.md
+judging/
+judging-stopped/

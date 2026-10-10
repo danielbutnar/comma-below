@@ -37,6 +37,9 @@ def load(all_runs: bool = False) -> pd.DataFrame:
         task, version, model, run_id = f.parts[-5], f.parts[-4], f.parts[-3], f.parts[-2]
         rank = (int(version) if version.isdigit() else 0, int(run_id) if run_id.isdigit() else 0)
         files.setdefault((task, model), []).append((*rank, f))
+    if not files:
+        raise SystemExit(f"No answers under {RAW}: they are committed with the repo (git pull), or download "
+                         "them with: kaggle b t download romanian-comma-below-<task> -o results/raw")
     rows = []
     for (task, model), found in files.items():
         newest_version = max(v for v, _, _ in found)

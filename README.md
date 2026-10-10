@@ -29,8 +29,8 @@ Tasks 8–13 (Round 2) carry predictions in their Kaggle descriptions, pushed be
 
 Also here:
 
-- **A two-minute human test** on task 4's word pairs: https://danielbutnar.github.io/comma-below/human/test.html (`human/test.html`; Romanian, German, English; nothing is sent or stored). Only totals are published (`results/human_summary.json`).
-- **A cedilla checker** for any text (`post/checker.html`), embedded in the write-up. Its fix is the post's `fix_romanian()`: it swaps ş ţ for ș ț sentence by sentence and skips sentences with ı ğ ç ö ü, so Turkish keeps its ş (`analysis/fix_check.py` measures it on the models' Turkish and Romanian answers).
+- **A two-minute human test** on task 4's word pairs: https://danielbutnar.github.io/comma-below/human/test.html (`human/test.html`; Romanian, German, English; nothing is sent or stored). Only totals are published (`results/human_summary.json`). Version 1 (until 10 Oct) marked the words as Romanian, and on a Romanian page fonts such as Segoe UI, Roboto, Noto Sans and Open Sans draw ş with a comma, so many people saw two identical words; version 2 marks them as English and scores identical and different pairs separately. The two versions are summarised apart.
+- **A cedilla checker** for any text (`post/checker.html`), embedded in the write-up. Its fix is the post's `fix_romanian()`: it swaps ş ţ for ș ț sentence by sentence; in a sentence with ı ğ ç ö ü it swaps only ţ (Turkish has no ţ) and leaves ş alone. A Turkish sentence without those letters ("Hoş geldiniz!") still gets changed, and a Romanian sentence quoting Zürich keeps its ş (the checker says so). `analysis/fix_check.py` measures it on the models' Turkish and Romanian answers.
 
 ## Layout
 
@@ -48,7 +48,7 @@ Also here:
   pre-registered in task 13); `own_words.py` (do the model's own words follow a copied cedilla?); `fix_check.py`;
   `human_summary.py`; `models.py` (labs, product lines, versions); `charts.py`, `charts2.py`, `charts3.py`;
   `check_claims.py` recomputes the numbers the post quotes and scores the predictions; cost and quota scripts.
-- `results/`: per-item answers and scores (`items.csv`), per-model summaries, Round 2 tables, Echo runs.
+- `results/`: every scored answer as Kaggle returned it (`results/raw/<task>/<version>/<model>/<run>/*.jsonl`, the rows the analysis reads; the run traces stay on Kaggle), per-item tables (`items.csv`, `items_round2.csv`), per-model summaries, Round 2 tables, Echo runs.
 - `post/`: cover, charts and the text of the write-up.
 
 ## Run
@@ -58,7 +58,7 @@ uv run --no-project --with pandas python src/build.py
 uv run --no-project --with pandas --with-editable <path-to>/kaggle-benchmarks python src/dry_run.py
 PYTHONUTF8=1 kaggle b t push romanian-comma-below-1-write -f tasks/romanian-comma-below-1-write.py --wait
 PYTHONUTF8=1 kaggle b t run romanian-comma-below-1-write -m gemini-3.8-flash
-PYTHONUTF8=1 kaggle b t download romanian-comma-below-8-echo-four-inputs -o results/raw
+PYTHONUTF8=1 kaggle b t download romanian-comma-below-8-echo-four-inputs -o results/raw   # optional: the answers are committed
 uv run --no-project --with pandas --with numpy python analysis/round2.py
 uv run --no-project --with pandas --with numpy python analysis/check_claims.py
 ```

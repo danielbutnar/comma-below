@@ -1,0 +1,36 @@
+{"answer": "false", "got": "false", "item_id": "S01", "kind": "same", "note": "comma vs cedilla", "pass": true, "response": "false"}
+{"answer": "false", "got": "false", "item_id": "S02", "kind": "same", "note": "comma vs cedilla", "pass": true, "response": "false"}
+{"answer": "false", "got": "false", "item_id": "S03", "kind": "same", "note": "comma vs cedilla", "pass": true, "response": "false"}
+{"answer": "false", "got": "false", "item_id": "S04", "kind": "same", "note": "comma vs cedilla", "pass": true, "response": "false"}
+{"answer": "false", "got": "false", "item_id": "S05", "kind": "same", "note": "comma vs cedilla", "pass": true, "response": "false"}
+{"answer": "false", "got": "false", "item_id": "S06", "kind": "same", "note": "comma vs cedilla", "pass": true, "response": "false"}
+{"answer": "true", "got": "true", "item_id": "S07", "kind": "same", "note": "both comma", "pass": true, "response": "true"}
+{"answer": "true", "got": "true", "item_id": "S08", "kind": "same", "note": "both comma", "pass": true, "response": "true"}
+{"answer": "true", "got": "true", "item_id": "S09", "kind": "same", "note": "both comma", "pass": true, "response": "true"}
+{"answer": "true", "got": "true", "item_id": "S10", "kind": "same", "note": "both cedilla", "pass": true, "response": "true"}
+{"answer": "true", "got": "true", "item_id": "S11", "kind": "same", "note": "both cedilla", "pass": true, "response": "true"}
+{"answer": "true", "got": "true", "item_id": "S12", "kind": "same", "note": "both cedilla", "pass": true, "response": "true"}
+{"answer": "false", "got": "false", "item_id": "S13", "kind": "same", "note": "control: visible difference", "pass": true, "response": "false"}
+{"answer": "false", "got": "false", "item_id": "S14", "kind": "same", "note": "control: visible difference", "pass": true, "response": "false"}
+{"answer": "true", "got": "true", "item_id": "S15", "kind": "same", "note": "control: ascii identical", "pass": true, "response": "true"}
+{"answer": "true", "got": "true", "item_id": "S16", "kind": "same", "note": "control: ascii identical", "pass": true, "response": "true"}
+{"answer": "true", "got": "true", "item_id": "S17", "kind": "detect", "note": "all cedilla", "pass": true, "response": "true"}
+{"answer": "true", "got": "true", "item_id": "S18", "kind": "detect", "note": "all cedilla", "pass": true, "response": "true"}
+{"answer": "true", "got": "true", "item_id": "S19", "kind": "detect", "note": "all cedilla", "pass": true, "response": "true"}
+{"answer": "true", "got": "true", "item_id": "S20", "kind": "detect", "note": "one cedilla word", "pass": true, "response": "true"}
+{"answer": "true", "got": "true", "item_id": "S21", "kind": "detect", "note": "one cedilla word", "pass": true, "response": "true"}
+{"answer": "true", "got": "true", "item_id": "S22", "kind": "detect", "note": "one cedilla word", "pass": true, "response": "true"}
+{"answer": "false", "got": "true", "item_id": "S23", "kind": "detect", "note": "clean", "pass": false, "response": "true"}
+{"answer": "false", "got": "true", "item_id": "S24", "kind": "detect", "note": "clean", "pass": false, "response": "true"}
+{"answer": "false", "got": "false", "item_id": "S25", "kind": "detect", "note": "clean", "pass": true, "response": "false"}
+{"answer": "false", "got": "false", "item_id": "S26", "kind": "detect", "note": "clean", "pass": true, "response": "false"}
+{"answer": "false", "got": "false", "item_id": "S27", "kind": "detect", "note": "clean", "pass": true, "response": "false"}
+{"answer": "false", "got": "true", "item_id": "S28", "kind": "detect", "note": "clean", "pass": false, "response": "true"}
+{"answer": "U+0219", "got": "U+0219", "item_id": "S29", "kind": "codepoint", "note": "comma", "pass": true, "response": "The word \"Bra\u0219ov\" consists of the following characters:\n\n1. B  \n2. r  \n3. a  \n4. \u0219  \n\nThe fourth letter is \"\u0219\" (s with comma below).\n\nThe Unicode code point for \"\u0219\" is **U+0219**.\n\nAnswer: `U+0219`"}
+{"answer": "U+015F", "got": "U+015F", "item_id": "S30", "kind": "codepoint", "note": "cedilla", "pass": true, "response": "The word \"Bra\u015fov\" consists of the following characters:\n\n1. B  \n2. r  \n3. a  \n4. \u015f  \n\nThe fourth letter is \"\u015f\" (s with cedilla).\n\nThe Unicode code point for \"\u015f\" is U+015F.\n\nAnswer: U+015F"}
+{"answer": "U+0219", "got": "U+0219", "item_id": "S31", "kind": "codepoint", "note": "comma", "pass": true, "response": "The word \"Ia\u0219i\" consists of the following characters:\n\n1. I  \n2. a  \n3. \u0219  \n4. i\n\nThe third character is \"\u0219\" (s with comma below).\n\nThe Unicode code point for \"\u0219\" is U+0219.\n\nAnswer: U+0219"}
+{"answer": "U+015F", "got": "U+015F", "item_id": "S32", "kind": "codepoint", "note": "cedilla", "pass": true, "response": "The word \"Ia\u015fi\" consists of the following characters:\n\n1. I  \n2. a  \n3. \u015f  \n4. i\n\nThe third letter is \"\u015f\", which is the Latin small letter s with cedilla.\n\nThe Unicode code point for \"\u015f\" is U+015F.\n\nAnswer: U+015F"}
+{"answer": "U+021B", "got": "U+021B", "item_id": "S33", "kind": "codepoint", "note": "comma", "pass": true, "response": "The word \"mul\u021bumesc\" has the following letters:\n\n1. m  \n2. u  \n3. l  \n4. \u021b\n\nThe fourth letter is \"\u021b\" (Latin small letter t with comma below).\n\nThe Unicode code point for \"\u021b\" is **U+021B**.\n\nAnswer: U+021B"}
+{"answer": "U+0163", "got": "U+0163", "item_id": "S34", "kind": "codepoint", "note": "cedilla", "pass": true, "response": "The word \"mul\u0163umesc\" contains the following characters:\n\n1. m  \n2. u  \n3. l  \n4. \u0163  \n\nThe fourth letter is \"\u0163\", which is the Latin small letter t with cedilla.\n\nThe Unicode code point for \"\u0163\" (t with cedilla) is **U+0163**.\n\nNote: Although \"\u0163\" is sometimes confused with \"\u021b\" (t with comma below, used in Romanian), in this case, \"\u0163\" is the cedilla form, which is U+0163.\n\nThus, the answer is: **U+0163**."}
+{"answer": "U+021A", "got": "U+0162", "item_id": "S35", "kind": "codepoint", "note": "comma", "pass": false, "response": "The word \"\u021aar\u0103\" consists of the following characters:\n\n1. \u021a  \n2. a  \n3. r  \n4. \u0103\n\nThe first character is \"\u021a\" (Latin Capital Letter T with Comma Below).\n\nThe Unicode code point for \"\u021a\" is **U+0162**.\n\nAnswer: U+0162"}
+{"answer": "U+0162", "got": "U+0162", "item_id": "S36", "kind": "codepoint", "note": "cedilla", "pass": true, "response": "The word \"\u0162ar\u0103\" consists of the following characters:\n\n1. \u0162  \n2. a  \n3. r  \n4. \u0103\n\nWe are asked for the Unicode code point of letter number 1, which is \"\u0162\".\n\nThe character \"\u0162\" (Latin Capital Letter T with comma below) has the Unicode code point **U+0162**.\n\n\u2705 Answer: `U+0162`"}

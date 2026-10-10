@@ -1,6 +1,7 @@
 ---
 title: Braşov or Brașov? {{N_MODELS}} LLMs copy my wrong letter into a third of their answers
 published: true
+ai_disclosure_level: some_ai
 tags: devchallenge, kagglechallenge, ai, machinelearning
 cover_image: COVER_URL
 ---
@@ -42,9 +43,9 @@ I asked Claude Opus 5.5 the same question four times, about the same Romanian ne
 
 ## What I Benchmarked
 
-If you couldn't tell which answer was wrong, neither could the {{HUMAN_N}} Romanians I asked to compare twelve word pairs like these on their own screens: they got {{HUMAN_SD}} % right, what guessing gets. Even I, knowing what to look for, got {{HUMAN_AUTHOR_SD}} of 12. The models caught {{SEE_DIFF_K}} of the {{SEE_DIFF_N}} real differences. You can [take the two-minute test](https://danielbutnar.github.io/comma-below/human/test.html?from=dev) yourself.
+If you couldn't tell which answer was wrong, you're not alone. I asked {{HUMAN_N}} Romanians to compare twelve word pairs like these on their own screens, and they got {{HUMAN_SD}} % right, exactly what answering "same" every time gets. Then I found the flaw in my test: the page was marked as Romanian, and on a Romanian page fonts like Roboto and Segoe UI draw the cedilla ş with a comma, so on some screens the two words looked identical. On the same twelve pairs the models got {{SEE_PAIRS_PCT}} % right. I've fixed the page; you can [take the two-minute test](https://danielbutnar.github.io/comma-below/human/test.html?from=dev) yourself.
 
-Romanian has two letters with a comma underneath, **ș** and **ț** (U+0219, U+021B). The encodings Romanian computers used in the 1990s didn't have them, so people typed the Turkish **ş** and a **ţ** with a cedilla (U+015F, U+0163) instead. Unicode added the right letters in 1999. When I fetched the front pages of 35 Romanian sites on 30 September, {{CENSUS_WITH}} still had cedilla letters in Romanian words, the government's press releases among them.
+Romanian has two letters with a comma underneath, **ș** and **ț** (U+0219, U+021B). The encodings Romanian computers used in the 1990s didn't have them, so people typed the Turkish **ş** and a **ţ** with a cedilla (U+015F, U+0163) instead. Unicode added the right letters in 1999. When I fetched the front pages of 35 Romanian sites on 30 September, {{CENSUS_WITH}} still had cedilla letters in Romanian words, the government's press releases among them. {{LANG_RO}} of those mark their pages as Romanian, where those fonts draw the cedilla with a comma: the people who publish the wrong letter may never see it.
 
 To a computer they are different characters: `"Brașov" == "Braşov"` is `false`. The cedilla spelling is also all over the text that models learn from and that retrieval systems hand them. So I asked two things. Do models write the right letter? And what do they do when the text they read has the wrong one?
 
@@ -106,7 +107,7 @@ The text the model answers from sets the keyboard; the documents around it turn 
 
 ![Of three wrong spellings, only the cedilla survives: {{T13_CED_KEPT}} % of s and t letters came back with the cedilla, {{T13_DOT_KEPT}} % with a dot below, {{T13_LEG_KEPT}} % as mojibake](CHART_WRONG_URL)
 
-Why the cedilla? Before a fresh run, I wrote down a test that could fail. I typed the same summaries and document questions two more ways: with s and t with a dot below (Braṣov), letters that look almost exactly like the right ones and exist in Yoruba and in transliteration but not in Romanian, and as the mojibake that old Romanian pages and subtitles often showed (Braºov), which looks broken.
+Why the cedilla? Before a fresh run, I wrote down a test that could fail. I typed the same summaries and document questions two more ways: with s and t with a dot below (Braṣov), letters that look almost exactly like the right ones but aren't Romanian, and as the mojibake that old Romanian pages and subtitles often showed (Braºov), which looks broken.
 
 On {{T13_MODELS}} models, the cedilla came back in {{T13_CED_KEPT}} % of the s and t letters. The dot below came back in {{T13_DOT_KEPT}} % and the mojibake in {{T13_LEG_KEPT}} %. {{T13_MODELS_LOWER}} of the {{T13_MODELS}} models kept the dot less often than the cedilla, and none kept it more.
 
@@ -116,9 +117,9 @@ So my guess was wrong: the dot below looks just as right, and the models fixed i
 
 ![Of {{N_STEPS}} upgrades on the same prompts, the biggest drops were Claude Opus 4.8 to 5 ({{V_OPUS_48}} to {{V_OPUS_5}} % clean) and Sonnet 4.6 to 5 ({{V_SONNET_46}} to {{V_SONNET_5}} %)](CHART_UPGRADES_URL)
 
-Kaggle serves several versions of the same models, so I could compare them on identical prompts. Opus 4.8 kept {{V_OPUS_48}} % of its answers clean and Opus 5 {{V_OPUS_5}} %; Sonnet 4.6 {{V_SONNET_46}} % and Sonnet 5 {{V_SONNET_5}} %. Both drops survive a correction for the {{N_STEPS}} upgrades I compared. GPT Luna went the other way, from {{V_LUNA_56}} % to {{V_LUNA_6}} %.
+Kaggle serves several versions of the same models, so I could compare them on identical prompts. Opus 4.8 kept {{V_OPUS_48}} % of its answers clean and Opus 5 {{V_OPUS_5}} %; Sonnet 4.6 {{V_SONNET_46}} % and Sonnet 5 {{V_SONNET_5}} %. Pooling every run of the same prompts, both drops survive a correction for the {{N_STEPS}} upgrades I compared. GPT Luna went the other way, from {{V_LUNA_56}} % to {{V_LUNA_6}} %.
 
-These aren't one-run flukes. Opus 5 scored {{OPUS5_RUNS}}, from 30 September to 9 October, and the fresh run put both pairs of versions in the same order. Single answers do flip between identical runs ({{FLIP_R1}} % of model-and-prompt pairs in round one), but a model's overall rate barely moves: a median of {{RUN_SPREAD_MED}} points. So test every upgrade, and run it more than once.
+These aren't one-run flukes. Opus 5 scored {{OPUS5_RUNS}}, and the fresh run put both pairs of versions in the same order. Single answers do flip between identical runs ({{FLIP_R1}} % of model-and-prompt pairs in round one), but a model's overall rate barely moves: a median of {{RUN_SPREAD_MED}} points. So test every upgrade, and run it more than once.
 
 ### 5. One sentence stops the echo, and breaks Turkish
 
@@ -130,9 +131,13 @@ Then I remembered where the cedilla came from. It's the Turkish letter, and in T
 
 A few lines of code do better. The usual fix, swapping every ş for ș, broke {{FIX_NAIVE_PHRASE}} correct Turkish replies. Doing the same swap only in sentences without ı, ğ, ç, ö or ü changed {{FIX_TR_ALTERED}} of them and still fixed every Romanian answer.
 
+### What I'd measure next
+
+Whether the echo survives a real retrieval pipeline, where documents are cleaned and chunked before the model reads them, and whether other languages that inherited a look-alike letter from an old encoding echo it too.
+
 ## What I got wrong
 
-- **My predictions.** {{PRED_FAILED}} of the {{PRED_TOTAL}} failed and {{PRED_UNCLEAR}} more were mixed or too close to call. Most were directions, with thresholds I set when scoring; the look-alike test had its thresholds written down first, and {{T13_PRED_PHRASE}}. The full table is below.
+- **My predictions.** {{PRED_FAILED}} of the {{PRED_TOTAL}} failed and {{PRED_UNCLEAR}} more were mixed or too close to call. Most were directions, with thresholds I set when scoring; the dot-below and mojibake test had its thresholds written down first, and {{T13_PRED_PHRASE}}. The full table is below.
 - **My upload.** The Kaggle CLI reads task files with the system encoding, cp1250 on my laptop, so my first task file would have uploaded "Brașov" as "BraČ™ov". The task files are now pure ASCII and check a hash of their data before running.
 - **My first fix.** The `fix_romanian()` in the first version of this post broke Turkish, the same way the one-sentence rule does.
 
@@ -153,21 +158,22 @@ import re
 import unicodedata
 
 CEDILLA_TO_COMMA = str.maketrans("şŞţŢ", "șȘțȚ")
+T_ONLY = str.maketrans("ţŢ", "țȚ")  # Turkish has no ţ, so it is always wrong
 NOT_ROMANIAN = set("ıİğĞçÇöÖüÜ")  # letters Turkish uses and Romanian words don't
 
 def fix_romanian(text: str) -> str:
     text = unicodedata.normalize("NFC", text)  # "s" + combining cedilla -> "ş"
-    return re.sub(r"[^.!?\n]+", lambda m: m.group(0) if set(m.group(0)) & NOT_ROMANIAN
-                  else m.group(0).translate(CEDILLA_TO_COMMA), text)
+    return re.sub(r"[^.!?\n]+", lambda m: m.group(0).translate(
+        T_ONLY if set(m.group(0)) & NOT_ROMANIAN else CEDILLA_TO_COMMA), text)
 ```
 
-It would skip a Romanian sentence that quotes a name like Zürich. In my {{FIX_RO_N}} broken answers it never missed a letter.
+It would leave the ş in a Romanian sentence that quotes a name like Zürich. In my {{FIX_RO_N}} broken answers it never missed a letter.
 
-Want to know whether your model does it? Paste one of its answers below. Every cedilla letter turns red.
+Want to know whether your model does it? Paste one of its answers below: every cedilla letter turns red, except an ş in a sentence that looks Turkish.
 
 {{CHECKER_TAG}}
 
-Does your language have a pair like ş and ș? Tell me in the comments. I'd like to test it next.
+Does your language have a pair like ş and ș? Tell me in the comments.
 
 {% details All the numbers (the 15 first-round models) %}
 

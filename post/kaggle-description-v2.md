@@ -3,6 +3,7 @@ Romanian writes **ș** and **ț** with a comma below (U+0219, U+021B). In the 19
 The two look almost identical and are different characters: `==`, `grep`, SQL with a binary collation, site search, deduplication and URL slugs treat them as two words.
 
 **Write-up:** https://dev.to/danielbutnar/brasov-or-brasov-15-llms-spell-my-city-right-until-you-spell-it-wrong-first-75a
+
 **Code, raw answers, analysis and a claim checker:** https://github.com/danielbutnar/comma-below
 
 Every score is computed from Unicode code points after NFC normalization; there is no LLM judge. Answer keys were checked by a native Romanian speaker. Every task was first run against nine fake models with known behaviour and their scores asserted.
@@ -25,7 +26,7 @@ Every score is computed from Unicode code points after NFC normalization; there 
 
 Tasks 8–13 carry predictions in their descriptions, written and pushed before any model ran them.
 
-**Reading the leaderboard.** The overall score averages all 13 tasks, and several of them are controls where every model is near 100 % (Write, See, Fix). Task 8's own leaderboard ranks the models on the copying itself: the share of clean answers when the input has cedillas.
+**Reading the leaderboard.** Several tasks are controls where every model is near 100 % (Write, See, Fix), and the follow-up tasks 9–13 ran on fewer models, so read the overall score as a rough summary. Task 8's own leaderboard ranks the models on the copying itself: the share of clean answers when the input has cedillas.
 
 **Notes on method**
 

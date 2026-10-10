@@ -1,0 +1,36 @@
+{"answer": "false", "got": "false", "item_id": "S01", "kind": "same", "note": "comma vs cedilla", "pass": true, "response": "false"}
+{"answer": "false", "got": "false", "item_id": "S02", "kind": "same", "note": "comma vs cedilla", "pass": true, "response": "**False**"}
+{"answer": "false", "got": "false", "item_id": "S03", "kind": "same", "note": "comma vs cedilla", "pass": true, "response": "**false**"}
+{"answer": "false", "got": "false", "item_id": "S04", "kind": "same", "note": "comma vs cedilla", "pass": true, "response": "false"}
+{"answer": "false", "got": "false", "item_id": "S05", "kind": "same", "note": "comma vs cedilla", "pass": true, "response": "**false**"}
+{"answer": "false", "got": "false", "item_id": "S06", "kind": "same", "note": "comma vs cedilla", "pass": true, "response": "**False**"}
+{"answer": "true", "got": "false", "item_id": "S07", "kind": "same", "note": "both comma", "pass": false, "response": "false"}
+{"answer": "true", "got": "false", "item_id": "S08", "kind": "same", "note": "both comma", "pass": false, "response": "false"}
+{"answer": "true", "got": "false", "item_id": "S09", "kind": "same", "note": "both comma", "pass": false, "response": "false"}
+{"answer": "true", "got": "false", "item_id": "S10", "kind": "same", "note": "both cedilla", "pass": false, "response": "false"}
+{"answer": "true", "got": "false", "item_id": "S11", "kind": "same", "note": "both cedilla", "pass": false, "response": "false"}
+{"answer": "true", "got": "false", "item_id": "S12", "kind": "same", "note": "both cedilla", "pass": false, "response": "false"}
+{"answer": "false", "got": "false", "item_id": "S13", "kind": "same", "note": "control: visible difference", "pass": true, "response": "false"}
+{"answer": "false", "got": "false", "item_id": "S14", "kind": "same", "note": "control: visible difference", "pass": true, "response": "false"}
+{"answer": "true", "got": "false", "item_id": "S15", "kind": "same", "note": "control: ascii identical", "pass": false, "response": "false"}
+{"answer": "true", "got": "true", "item_id": "S16", "kind": "same", "note": "control: ascii identical", "pass": true, "response": "true"}
+{"answer": "true", "got": "true", "item_id": "S17", "kind": "detect", "note": "all cedilla", "pass": true, "response": "**True**"}
+{"answer": "true", "got": "true", "item_id": "S18", "kind": "detect", "note": "all cedilla", "pass": true, "response": "**True**\n\nThe sentence contains two cedilla letters that should be comma-below characters:\n- \"Timi**\u015f**oara\" \u2192 should be \"Timi**\u0219**oara\"\n- \"Bra**\u015f**ov\" \u2192 should be \"Bra**\u0219**ov\""}
+{"answer": "true", "got": "true", "item_id": "S19", "kind": "detect", "note": "all cedilla", "pass": true, "response": "True"}
+{"answer": "true", "got": "true", "item_id": "S20", "kind": "detect", "note": "one cedilla word", "pass": true, "response": "**True** \u2014 \"\u015etirile\" begins with **\u015e** (S with cedilla, U+015E) instead of the correct **\u0218** (S with comma below, U+0218). The rest of the sentence (\"\u021aara\") correctly uses the comma-below form."}
+{"answer": "true", "got": "true", "item_id": "S21", "kind": "detect", "note": "one cedilla word", "pass": true, "response": "**True** \u2014 \"\u015fi\" uses the cedilla form **\u015f** (U+015F) instead of the correct comma-below **\u0219** (U+0219)."}
+{"answer": "true", "got": "true", "item_id": "S22", "kind": "detect", "note": "one cedilla word", "pass": true, "response": "**True**\n\nThe sentence begins with \"\u015ecoala\" using **\u015e** (S with cedilla, U+015E) instead of the correct Romanian **\u0218** (S with comma below, U+0218)."}
+{"answer": "false", "got": "false", "item_id": "S23", "kind": "detect", "note": "clean", "pass": true, "response": "**False**"}
+{"answer": "false", "got": "false", "item_id": "S24", "kind": "detect", "note": "clean", "pass": true, "response": "False"}
+{"answer": "false", "got": "false", "item_id": "S25", "kind": "detect", "note": "clean", "pass": true, "response": "**False**"}
+{"answer": "false", "got": "false", "item_id": "S26", "kind": "detect", "note": "clean", "pass": true, "response": "**False**"}
+{"answer": "false", "got": "false", "item_id": "S27", "kind": "detect", "note": "clean", "pass": true, "response": "False"}
+{"answer": "false", "got": "false", "item_id": "S28", "kind": "detect", "note": "clean", "pass": true, "response": "false"}
+{"answer": "U+0219", "got": "U+0219", "item_id": "S29", "kind": "codepoint", "note": "comma", "pass": true, "response": "**U+0219**\n\nThat's the 4th letter \"\u0219\" \u2014 LATIN SMALL LETTER S WITH COMMA BELOW, the correct Romanian character (as opposed to the cedilla variant \u015f, U+015F)."}
+{"answer": "U+015F", "got": "U+015F", "item_id": "S30", "kind": "codepoint", "note": "cedilla", "pass": true, "response": "**U+015F**"}
+{"answer": "U+0219", "got": "U+0219", "item_id": "S31", "kind": "codepoint", "note": "comma", "pass": true, "response": "**U+0219**\n\nThat's \u27e8\u0219\u27e9 \u2014 LATIN SMALL LETTER S WITH COMMA BELOW, the third character in \"Ia\u0219i\" (I, a, \u0219, i)."}
+{"answer": "U+015F", "got": "U+015F", "item_id": "S32", "kind": "codepoint", "note": "cedilla", "pass": true, "response": "**U+015F**\n\nThe third character of \u201cIa\u015fi\u201d is **\u015f** (Latin small letter s with cedilla), which has the code point U+015F. (Note: the typographically correct Romanian letter is *\u0219* with a comma below, U+0219, but the character used in the word as written here is U+015F.)"}
+{"answer": "U+021B", "got": "U+021B", "item_id": "S33", "kind": "codepoint", "note": "comma", "pass": true, "response": "**U+021B**"}
+{"answer": "U+0163", "got": "U+0163", "item_id": "S34", "kind": "codepoint", "note": "cedilla", "pass": true, "response": "**U+0163**"}
+{"answer": "U+021A", "got": "U+021A", "item_id": "S35", "kind": "codepoint", "note": "comma", "pass": true, "response": "**U+021A**"}
+{"answer": "U+0162", "got": "U+0162", "item_id": "S36", "kind": "codepoint", "note": "cedilla", "pass": true, "response": "**U+0162**"}

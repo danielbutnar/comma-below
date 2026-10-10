@@ -311,6 +311,8 @@ def third_version_values(every: pd.DataFrame, v: dict):
         v["HUMAN_N"], v["HUMAN_SD"], v["HUMAN_WR"] = h["n"], h["sd_pct"], h["wr_pct"]
         v["HUMAN_SD_LO"], v["HUMAN_SD_HI"] = h["sd_ci"]
         v["HUMAN_AUTHOR_SD"] = h["author_sd"]
+        # version 1 of the page (the n above); 6 of its 12 pairs are identical, so all "same" scores exactly 50 %
+        assert v["HUMAN_SD"] == 50, "the post says the people scored exactly what answering 'same' every time gets"
 
     # reruns: each model's clean share on cedilla input, run by run (tasks 2 and 8, the same prompts)
     runs = every[every.task.isin(["echo", "echo4"]) & (every.variant == "cedilla")]
@@ -561,7 +563,8 @@ def predictions(every: pd.DataFrame) -> tuple[str, dict]:
         ro = 100 * tr[(tr.lang == "ro") & (tr.rule == "scoped")]["pass"].mean()
         v = "held" if ok["scoped"] >= 95 and ro >= 90 else "failed"
         add(10, "The scoped rule keeps Turkish intact and still fixes Romanian.",
-            f"Turkish {ok['scoped']:.0f} % correct (no rule: {ok['none']:.0f} %, full rule: {ok['rule']:.0f} %), "
+            # one decimal: the threshold is 95 %, and a rounded "95 %" next to "failed" would read as a contradiction
+            f"Turkish {ok['scoped']:.1f} % correct (no rule: {ok['none']:.0f} %, full rule: {ok['rule']:.0f} %), "
             f"Romanian {ro:.0f} %", v)
 
     lk = every[every.task == "lookalike"]
@@ -694,6 +697,13 @@ def r1_values(r1l, v):
     v["CENSUS_WITH"] = sum(1 for x in shares if x > 0)
     v["CENSUS_10"] = sum(1 for x in shares if x > 0.10)
     v["CENSUS_MAX"] = pct(max(shares))
+    # which of those sites mark their pages as Romanian (analysis/web_lang.py, fetched 10 Oct)
+    wl = ROOT / "analysis" / "web_lang.csv"
+    if wl.exists():
+        lang_rows = list(csv.DictReader(line for line in open(wl, encoding="utf-8") if not line.startswith("#")))
+        assert len(lang_rows) == v["CENSUS_WITH"] and not any(r["error"] for r in lang_rows), \
+            "the post counts the language of the same sites as the census"
+        v["LANG_RO"] = sum(r["html_lang"].lower().startswith("ro") for r in lang_rows)
     g = r1l[r1l.model == "grok-4.20-0309-reasoning"]
     v["GROK_W"] = pct(g[g.task == "write"]["pass"].mean())
     v["GROK_SEE"] = pct(g[(g.task == "see") & (g.note == "all cedilla")]["pass"].mean())

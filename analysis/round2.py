@@ -140,15 +140,24 @@ _TR_FUNCTION = {"ve", "bir", "için", "bu", "da", "de", "ile", "mi", "mı", "ço
 _FOLD = str.maketrans("ăâîșțşţĂÂÎȘȚŞŢ", "aaiststAAISTST")
 # Romanian words that turn up code-switched inside otherwise Turkish sentences
 _RO_WORDS = {"și", "așa", "oraș", "orașul", "orașului", "orașe"}
-# Romanian place names a reply may quote (either s letter is defensible inside a name)
+# Romanian place names and dishes a reply may quote (either s letter is defensible inside a name). The dishes
+# were added on 10 Oct: Turkish replies that offered papanași or mămăligă were counted as broken before.
 _NAMES = ("brasov", "rasnov", "bunesti", "sambures", "timisoara", "iasi", "bucuresti", "sighisoara", "mures",
-          "arges", "constanta", "pitesti", "cismigiu", "transfagarasan")
+          "arges", "constanta", "pitesti", "cismigiu", "transfagarasan",
+          "papanas", "mamalig", "ciorb", "sarmal", "cozonac", "mititei", "zacusc", "bulz", "placint", "tochitur",
+          "pastram", "tuica", "palinc")
+
+
+def _is_name(word: str) -> bool:
+    return word.casefold().translate(_FOLD).startswith(_NAMES)
 
 
 def _sentence_language(sentence: str, words: list) -> str:
+    """Vote on a sentence's language; quoted names and dishes don't vote (their ă would tip a Turkish sentence)."""
     low = [w.casefold() for w in words]
-    tr = sum(ch in _TR_ONLY for ch in sentence) + sum(w in _TR_FUNCTION for w in low)
-    ro = 2 * sum(ch in _RO_ONLY for ch in sentence) + sum(w in _RO_FUNCTION for w in low)
+    voting = [w for w in words if not _is_name(w)]
+    tr = sum(ch in _TR_ONLY for w in voting for ch in w) + sum(w in _TR_FUNCTION for w in low)
+    ro = 2 * sum(ch in _RO_ONLY for w in voting for ch in w) + sum(w in _RO_FUNCTION for w in low)
     return "tr" if tr > ro else ("ro" if ro > tr else "?")
 
 
@@ -166,7 +175,7 @@ def turkish_reply_words(response: str, prompt: str) -> dict:
         for w in ws:
             if not set(w) & set("șȘ"):
                 continue
-            if w.casefold().translate(_FOLD).startswith(_NAMES):
+            if _is_name(w):
                 out["name"].append(w)
             elif w.casefold() in _RO_WORDS:
                 out["ro"].append(w)

@@ -22,6 +22,7 @@ from analyze import load  # noqa: E402
 from round2 import ok_rows  # noqa: E402
 
 CEDILLA_TO_COMMA = str.maketrans("şŞţŢ", "șȘțȚ")
+T_ONLY = str.maketrans("ţŢ", "țȚ")  # Turkish has no ţ, so it is wrong in any sentence (since 10 Oct)
 NOT_ROMANIAN = set("ıİğĞçÇöÖüÜ")
 SENTENCE = re.compile(r"[^.!?\n]+")
 
@@ -31,10 +32,10 @@ def fix_naive(text: str) -> str:
 
 
 def fix_romanian(text: str) -> str:
-    """Swap the cedilla for the comma only in sentences without a letter Romanian never uses."""
+    """Swap the cedilla for the comma; in a sentence with a letter Romanian never uses, swap only ţ."""
     text = unicodedata.normalize("NFC", text)
-    return SENTENCE.sub(lambda m: m.group(0) if set(m.group(0)) & NOT_ROMANIAN
-                        else m.group(0).translate(CEDILLA_TO_COMMA), text)
+    return SENTENCE.sub(lambda m: m.group(0).translate(T_ONLY if set(m.group(0)) & NOT_ROMANIAN
+                                                       else CEDILLA_TO_COMMA), text)
 
 
 def has_cedilla(text: str) -> bool:
@@ -46,6 +47,8 @@ def self_test():
     assert fix_romanian(mixed) == "Vă așteptăm la Brașov! Teşekkür ederiz, görüşürüz.\nȘtiți unde e gara?"
     assert fix_naive(mixed).count("ş") == 0 and "Teșekkür" in fix_naive(mixed)
     assert fix_romanian("s" + chr(0x327) + "i") == "și"  # a decomposed cedilla is fixed too (NFC first)
+    # a Romanian sentence quoting Zürich keeps its ş (the known gap) but loses its ţ
+    assert fix_romanian("La Zürich şi la Constanţa.") == "La Zürich şi la Constanța."
 
 
 def main():

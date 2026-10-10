@@ -2,9 +2,10 @@
 
 Fetches the front page of each site once, decodes HTML entities, and counts
 comma-below (ș ț) versus cedilla (ş ţ) letters in the visible-ish text.
-Writes analysis/web_census.csv.
+Writes analysis/web_census.new.csv; with --update it replaces analysis/web_census.csv, the 30 September
+census the write-up quotes (a rerun sees different pages, and offline it would write error rows).
 
-Usage:  uv run --no-project python analysis/web_census.py
+Usage:  uv run --no-project python analysis/web_census.py [--update]
 """
 
 from __future__ import annotations
@@ -13,6 +14,7 @@ import csv
 import html
 import pathlib
 import re
+import sys
 import unicodedata
 import urllib.request
 
@@ -52,7 +54,7 @@ def text_of(raw: bytes, content_type: str) -> str:
 
 
 def main():
-    out = pathlib.Path(__file__).with_name("web_census.csv")
+    out = pathlib.Path(__file__).with_name("web_census.csv" if "--update" in sys.argv else "web_census.new.csv")
     rows = []
     for url in SITES:
         try:

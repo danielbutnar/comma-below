@@ -19,6 +19,7 @@ MODELS = {
     "claude-sonnet-5-default": ("Claude Sonnet 5", "Anthropic", "Claude Sonnet", 5.0, False, None),
     "claude-sonnet-5-5-default": ("Claude Sonnet 5.5", "Anthropic", "Claude Sonnet", 5.5, False, None),
     "claude-haiku-4-5-20251001": ("Claude Haiku 4.5", "Anthropic", "Claude Haiku", 4.5, False, None),
+    "claude-haiku-5-5": ("Claude Haiku 5.5", "Anthropic", "Claude Haiku", 5.5, False, None),
     "gemini-2.5-flash": ("Gemini 2.5 Flash", "Google", "Gemini Flash", 2.5, False, None),
     "gemini-3-flash-preview": ("Gemini 3 Flash", "Google", "Gemini Flash", 3.0, False, None),
     "gemini-3.5-flash": ("Gemini 3.5 Flash", "Google", "Gemini Flash", 3.5, False, None),
@@ -65,7 +66,7 @@ CORE = [
 ]
 
 # Product lines whose members are successive versions (other lines group sizes or modes).
-VERSION_LINES = {"Claude Opus", "Claude Sonnet", "Gemini Flash", "Gemini Pro", "Gemini Flash-Lite",
+VERSION_LINES = {"Claude Opus", "Claude Sonnet", "Claude Haiku", "Gemini Flash", "Gemini Pro", "Gemini Flash-Lite",
                  "GPT", "GPT Sol", "GPT Luna"}
 
 # Same model with reasoning on and off.

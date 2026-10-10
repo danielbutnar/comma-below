@@ -1,0 +1,36 @@
+{"answer": "false", "got": "false", "item_id": "S01", "kind": "same", "note": "comma vs cedilla", "pass": true, "response": "false"}
+{"answer": "false", "got": "false", "item_id": "S02", "kind": "same", "note": "comma vs cedilla", "pass": true, "response": "false"}
+{"answer": "false", "got": "false", "item_id": "S03", "kind": "same", "note": "comma vs cedilla", "pass": true, "response": "false"}
+{"answer": "false", "got": "false", "item_id": "S04", "kind": "same", "note": "comma vs cedilla", "pass": true, "response": "False"}
+{"answer": "false", "got": "false", "item_id": "S05", "kind": "same", "note": "comma vs cedilla", "pass": true, "response": "false"}
+{"answer": "false", "got": "false", "item_id": "S06", "kind": "same", "note": "comma vs cedilla", "pass": true, "response": "false"}
+{"answer": "true", "got": "false", "item_id": "S07", "kind": "same", "note": "both comma", "pass": false, "response": "false"}
+{"answer": "true", "got": "false", "item_id": "S08", "kind": "same", "note": "both comma", "pass": false, "response": "false"}
+{"answer": "true", "got": "false", "item_id": "S09", "kind": "same", "note": "both comma", "pass": false, "response": "false"}
+{"answer": "true", "got": "false", "item_id": "S10", "kind": "same", "note": "both cedilla", "pass": false, "response": "false"}
+{"answer": "true", "got": "false", "item_id": "S11", "kind": "same", "note": "both cedilla", "pass": false, "response": "false"}
+{"answer": "true", "got": "false", "item_id": "S12", "kind": "same", "note": "both cedilla", "pass": false, "response": "false"}
+{"answer": "false", "got": "false", "item_id": "S13", "kind": "same", "note": "control: visible difference", "pass": true, "response": "false"}
+{"answer": "false", "got": "false", "item_id": "S14", "kind": "same", "note": "control: visible difference", "pass": true, "response": "false"}
+{"answer": "true", "got": "false", "item_id": "S15", "kind": "same", "note": "control: ascii identical", "pass": false, "response": "false"}
+{"answer": "true", "got": "true", "item_id": "S16", "kind": "same", "note": "control: ascii identical", "pass": true, "response": "true"}
+{"answer": "true", "got": "true", "item_id": "S17", "kind": "detect", "note": "all cedilla", "pass": true, "response": "true"}
+{"answer": "true", "got": "true", "item_id": "S18", "kind": "detect", "note": "all cedilla", "pass": true, "response": "True"}
+{"answer": "true", "got": "true", "item_id": "S19", "kind": "detect", "note": "all cedilla", "pass": true, "response": "true"}
+{"answer": "true", "got": "true", "item_id": "S20", "kind": "detect", "note": "one cedilla word", "pass": true, "response": "True"}
+{"answer": "true", "got": "true", "item_id": "S21", "kind": "detect", "note": "one cedilla word", "pass": true, "response": "true"}
+{"answer": "true", "got": "true", "item_id": "S22", "kind": "detect", "note": "one cedilla word", "pass": true, "response": "True"}
+{"answer": "false", "got": "false", "item_id": "S23", "kind": "detect", "note": "clean", "pass": true, "response": "false"}
+{"answer": "false", "got": "false", "item_id": "S24", "kind": "detect", "note": "clean", "pass": true, "response": "False"}
+{"answer": "false", "got": "false", "item_id": "S25", "kind": "detect", "note": "clean", "pass": true, "response": "False"}
+{"answer": "false", "got": "false", "item_id": "S26", "kind": "detect", "note": "clean", "pass": true, "response": "false"}
+{"answer": "false", "got": "false", "item_id": "S27", "kind": "detect", "note": "clean", "pass": true, "response": "false"}
+{"answer": "false", "got": "false", "item_id": "S28", "kind": "detect", "note": "clean", "pass": true, "response": "false"}
+{"answer": "U+0219", "got": "U+0219", "item_id": "S29", "kind": "codepoint", "note": "comma", "pass": true, "response": "U+0219"}
+{"answer": "U+015F", "got": "U+015F", "item_id": "S30", "kind": "codepoint", "note": "cedilla", "pass": true, "response": "U+015F"}
+{"answer": "U+0219", "got": "U+0219", "item_id": "S31", "kind": "codepoint", "note": "comma", "pass": true, "response": "I need to find the 3rd letter in \"Ia\u0219i\" and determine its Unicode code point.\n\nThe word \"Ia\u0219i\" has these letters:\n1. I\n2. a\n3. \u015f\n4. i\n\nThe 3rd letter is \"\u015f\" (s with comma below).\n\nThe Unicode code point for \"\u015f\" is U+0219.\n\nU+0219"}
+{"answer": "U+015F", "got": "U+0219", "item_id": "S32", "kind": "codepoint", "note": "cedilla", "pass": false, "response": "U+0219"}
+{"answer": "U+021B", "got": "U+0163", "item_id": "S33", "kind": "codepoint", "note": "comma", "pass": false, "response": "U+0163"}
+{"answer": "U+0163", "got": "U+0163", "item_id": "S34", "kind": "codepoint", "note": "cedilla", "pass": true, "response": "I need to find the 4th letter in the word \"mul\u0163umesc\" and provide its Unicode code point.\n\nThe word \"mul\u0163umesc\" broken down by position:\n1. m\n2. u\n3. l\n4. \u0163\n5. u\n6. m\n7. e\n8. s\n9. c\n\nThe 4th letter is \"\u0163\" (t with comma below).\n\nThe Unicode code point for \"\u0163\" is U+0163.\n\nU+0163"}
+{"answer": "U+021A", "got": "U+0162", "item_id": "S35", "kind": "codepoint", "note": "comma", "pass": false, "response": "U+0162"}
+{"answer": "U+0162", "got": "U+0162", "item_id": "S36", "kind": "codepoint", "note": "cedilla", "pass": true, "response": "U+0162"}

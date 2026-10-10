@@ -1,0 +1,30 @@
+{"cedilla": 0, "chars": 21, "comma": 1, "item_id": "R01", "lookalike": 0, "pass": false, "pass_if_cedilla_ok": false, "response": "M\u0103n\u00e2nc pe\u0219te la cina.", "word_accuracy": 0.75}
+{"cedilla": 0, "chars": 20, "comma": 0, "item_id": "R02", "lookalike": 0, "pass": true, "pass_if_cedilla_ok": true, "response": "Am s\u0103rit peste gard.", "word_accuracy": 1.0}
+{"cedilla": 0, "chars": 27, "comma": 1, "item_id": "R03", "lookalike": 0, "pass": true, "pass_if_cedilla_ok": true, "response": "Pe\u0219tele din lac e proasp\u0103t.", "word_accuracy": 1.0}
+{"cedilla": 0, "chars": 33, "comma": 1, "item_id": "R04", "lookalike": 0, "pass": true, "pass_if_cedilla_ok": true, "response": "Trecem peste pod \u0219i mergem acas\u0103.", "word_accuracy": 1.0}
+{"cedilla": 0, "chars": 23, "comma": 1, "item_id": "R05", "lookalike": 0, "pass": true, "pass_if_cedilla_ok": true, "response": "Fata mea are \u0219apte ani.", "word_accuracy": 1.0}
+{"cedilla": 0, "chars": 36, "comma": 1, "item_id": "R06", "lookalike": 0, "pass": false, "pass_if_cedilla_ok": false, "response": "Spal\u0103-te pe fa\u021ba \u00eenainte de culcare.", "word_accuracy": 0.8333333333333334}
+{"cedilla": 0, "chars": 30, "comma": 1, "item_id": "R07", "lookalike": 0, "pass": true, "pass_if_cedilla_ok": true, "response": "\u00cen fa\u021ba casei e un nuc b\u0103tr\u00e2n.", "word_accuracy": 1.0}
+{"cedilla": 0, "chars": 32, "comma": 1, "item_id": "R08", "lookalike": 0, "pass": true, "pass_if_cedilla_ok": true, "response": "Fata a venit acas\u0103 de la \u0219coal\u0103.", "word_accuracy": 1.0}
+{"cedilla": 0, "chars": 25, "comma": 0, "item_id": "R09", "lookalike": 0, "pass": true, "pass_if_cedilla_ok": true, "response": "Am pus masa \u00een buc\u0103t\u0103rie.", "word_accuracy": 1.0}
+{"cedilla": 0, "chars": 24, "comma": 1, "item_id": "R10", "lookalike": 0, "pass": true, "pass_if_cedilla_ok": true, "response": "Sunt dou\u0103 c\u0103r\u021bi pe mas\u0103.", "word_accuracy": 1.0}
+{"cedilla": 0, "chars": 39, "comma": 1, "item_id": "R11", "lookalike": 0, "pass": true, "pass_if_cedilla_ok": true, "response": "Mama preg\u0103te\u0219te o mas\u0103 mare de Cr\u0103ciun.", "word_accuracy": 1.0}
+{"cedilla": 0, "chars": 31, "comma": 3, "item_id": "R12", "lookalike": 0, "pass": true, "pass_if_cedilla_ok": true, "response": "\u021aara noastr\u0103 are mun\u021bi frumo\u0219i.", "word_accuracy": 1.0}
+{"cedilla": 0, "chars": 44, "comma": 3, "item_id": "R13", "lookalike": 0, "pass": false, "pass_if_cedilla_ok": false, "response": "Muntii F\u0103g\u0103ra\u0219 sunt cei mai \u00eenal\u021bi din \u021bar\u0103.", "word_accuracy": 0.875}
+{"cedilla": 0, "chars": 33, "comma": 2, "item_id": "R14", "lookalike": 0, "pass": true, "pass_if_cedilla_ok": true, "response": "Casa e la \u0219ase kilometri de ora\u0219.", "word_accuracy": 1.0}
+{"cedilla": 0, "chars": 19, "comma": 2, "item_id": "R15", "lookalike": 0, "pass": true, "pass_if_cedilla_ok": true, "response": "S\u0103 \u0219tii c\u0103 nu \u0219tiu.", "word_accuracy": 1.0}
+{"cedilla": 0, "chars": 23, "comma": 2, "item_id": "R16", "lookalike": 0, "pass": true, "pass_if_cedilla_ok": true, "response": "\u0218i el vine, \u0219i ea vine.", "word_accuracy": 1.0}
+{"cedilla": 0, "chars": 48, "comma": 1, "item_id": "R17", "lookalike": 0, "pass": true, "pass_if_cedilla_ok": true, "response": "\u0218coala \u00eencepe luni, pe cincisprezece septembrie.", "word_accuracy": 1.0}
+{"cedilla": 0, "chars": 36, "comma": 1, "item_id": "R18", "lookalike": 0, "pass": true, "pass_if_cedilla_ok": true, "response": "Pe drum spre Bra\u0219ov am v\u0103zut un urs.", "word_accuracy": 1.0}
+{"cedilla": 0, "chars": 26, "comma": 0, "item_id": "R19", "lookalike": 0, "pass": true, "pass_if_cedilla_ok": true, "response": "M\u0103 doare g\u00e2tul de la frig.", "word_accuracy": 1.0}
+{"cedilla": 0, "chars": 21, "comma": 1, "item_id": "R20", "lookalike": 0, "pass": true, "pass_if_cedilla_ok": true, "response": "C\u0103r\u021bile sunt pe raft.", "word_accuracy": 1.0}
+{"cedilla": 0, "chars": 29, "comma": 0, "item_id": "R21", "lookalike": 0, "pass": true, "pass_if_cedilla_ok": true, "response": "Tat\u0103l lui e pescar la Tulcea.", "word_accuracy": 1.0}
+{"cedilla": 0, "chars": 27, "comma": 1, "item_id": "R22", "lookalike": 0, "pass": true, "pass_if_cedilla_ok": true, "response": "Am cump\u0103rat p\u00e2ine \u0219i lapte.", "word_accuracy": 1.0}
+{"cedilla": 0, "chars": 49, "comma": 2, "item_id": "R23", "lookalike": 0, "pass": true, "pass_if_cedilla_ok": true, "response": "S\u0103 ne vedem m\u00e2ine la ora \u0219apte \u00een Pia\u021ba Sfatului.", "word_accuracy": 1.0}
+{"cedilla": 0, "chars": 22, "comma": 1, "item_id": "R24", "lookalike": 0, "pass": true, "pass_if_cedilla_ok": true, "response": "Nu-mi place s\u0103 a\u0219tept.", "word_accuracy": 1.0}
+{"cedilla": 0, "chars": 27, "comma": 2, "item_id": "R25", "lookalike": 0, "pass": true, "pass_if_cedilla_ok": true, "response": "Ia\u0219i e un ora\u0219 din Moldova.", "word_accuracy": 1.0}
+{"cedilla": 0, "chars": 36, "comma": 0, "item_id": "R26", "lookalike": 0, "pass": true, "pass_if_cedilla_ok": true, "response": "Suntem \u00een Rom\u00e2nia de dou\u0103 s\u0103pt\u0103m\u00e2ni.", "word_accuracy": 1.0}
+{"cedilla": 0, "chars": 33, "comma": 0, "item_id": "R27", "lookalike": 0, "pass": true, "pass_if_cedilla_ok": true, "response": "Re\u00eentoarcerea acas\u0103 a fost lung\u0103.", "word_accuracy": 1.0}
+{"cedilla": 0, "chars": 26, "comma": 1, "item_id": "R28", "lookalike": 0, "pass": true, "pass_if_cedilla_ok": true, "response": "A r\u0103mas un gest ne\u00een\u021beles.", "word_accuracy": 1.0}
+{"cedilla": 0, "chars": 27, "comma": 0, "item_id": "R29", "lookalike": 0, "pass": true, "pass_if_cedilla_ok": true, "response": "Sticla e pe jum\u0103tate goal\u0103.", "word_accuracy": 1.0}
+{"cedilla": 0, "chars": 34, "comma": 1, "item_id": "R30", "lookalike": 0, "pass": true, "pass_if_cedilla_ok": true, "response": "C\u00e2nd ajungi la Timi\u0219oara, sun\u0103-m\u0103.", "word_accuracy": 1.0}

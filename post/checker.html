@@ -45,8 +45,8 @@ mark{background:var(--badbg);color:var(--bad);font-weight:700;border-bottom:2px 
 
 <div class="verdict" id="verdict" aria-live="polite"></div>
 <div class="out" id="out" hidden></div>
-<div class="row" id="fixRow" hidden><button id="fix">Fix it (Romanian only)</button><span class="hint" id="fixMsg" aria-live="polite"></span></div>
-<p class="note" id="fixNote" hidden>The fix swaps ş ţ for ș ț sentence by sentence and skips sentences with ı, ğ, ç, ö or ü, so Turkish keeps its ş. It's the <code>fix_romanian()</code> from the post.</p>
+<div class="row" id="fixRow" hidden><button id="fix">Fix it (Romanian only)</button></div>
+<p class="note" id="fixNote" hidden>The fix swaps ş ţ for ș ț sentence by sentence. In a sentence with ı, ğ, ç, ö or ü it leaves ş alone, so Turkish written that way keeps its ş; ţ is always swapped, because Turkish has no ţ. It's the <code>fix_romanian()</code> from the post.</p>
 
 <script>
 // Letters, by code point, so nothing depends on how this file was saved.
@@ -56,7 +56,8 @@ var FIX = {"ş":"ș","Ş":"Ș","ţ":"ț","Ţ":"Ț"};
 var NOT_ROMANIAN = /[ıİğĞçÇöÖüÜ]/;  // letters Turkish uses and Romanian never does
 function fixRomanian(text){
   return text.normalize("NFC").replace(/[^.!?\n]+/g, function(sentence){
-    return NOT_ROMANIAN.test(sentence) ? sentence : sentence.replace(/[şŞţŢ]/g, function(c){return FIX[c];});
+    // in a sentence that looks Turkish only ţ is swapped: Turkish has no ţ
+    return sentence.replace(NOT_ROMANIAN.test(sentence) ? /[ţŢ]/g : /[şŞţŢ]/g, function(c){return FIX[c];});
   });
 }
 function toCedilla(s){return s.replace(/ș/g,"ş").replace(/Ș/g,"Ş").replace(/ț/g,"ţ").replace(/Ț/g,"Ţ");}
@@ -64,7 +65,7 @@ function toCedilla(s){return s.replace(/ș/g,"ş").replace(/Ș/g,"Ş").replace(/
 // Task 8, prompt Q02 of the benchmark, typed with cedillas.
 var TEXT = "Drumul Transfăgărășan se închide în fiecare an la sfârșitul lunii octombrie, iar redeschiderea are loc, de obicei, la începutul lui iulie. Autoritățile recomandă turiștilor să verifice starea drumului înainte de plecare, deoarece ninsorile pot apărea și în septembrie.";
 var PROMPT = "Answer the question using only the text below. Answer in Romanian, in one sentence.\n\nText:\n" + toCedilla(TEXT) + "\n\nQuestion: When does the road usually close, and when does it reopen?";
-// A real answer to the same kind of input (Claude Opus 5, first round).
+// An example written for this page, in the style of the answers that kept every cedilla (not a model's answer).
 var SAMPLE = toCedilla("Primăria Brașov anunță închiderea Pieței Sfatului pentru traficul auto în weekend, între orele 8 și 20, din cauza târgului de toamnă. Șoferii sunt îndrumați să parcheze pe strada Mureșenilor sau lângă Gara Brașov.");
 
 var $ = function(id){return document.getElementById(id);};
@@ -87,13 +88,15 @@ function check(){
   if (!s.trim()){ $("verdict").textContent = ""; $("verdict").className = "verdict"; out.hidden = true; $("fixRow").hidden = true; $("fixNote").hidden = true; return; }
   var buf = "", nTr = 0;
   function flush(){ if (buf){ out.appendChild(document.createTextNode(buf)); buf = ""; } }
-  // sentence by sentence, like the fix: in a sentence with ı ğ ç ö ü the cedilla is Turkish and right
+  // sentence by sentence, like the fix: in a sentence with ı ğ ç ö ü an ş may be Turkish, so it is skipped;
+  // ţ is always wrong, because Turkish has no ţ
   var parts = s.match(/[^.!?\n]+|[.!?\n]+/g) || [];
   for (var part of parts){
     var turkish = NOT_ROMANIAN.test(part);
     for (var ch of part){
-      if (CED[ch] && !turkish){ flush(); var m = document.createElement("mark"); m.textContent = ch; m.title = CED[ch] + " (wrong in Romanian)"; out.appendChild(m); nCed++; }
-      else if (CED[ch]){ flush(); var t = document.createElement("span"); t.className = "tr"; t.textContent = ch; t.title = CED[ch] + " (Turkish sentence: right here)"; out.appendChild(t); nTr++; }
+      var skip = turkish && (ch === "ş" || ch === "Ş");
+      if (CED[ch] && !skip){ flush(); var m = document.createElement("mark"); m.textContent = ch; m.title = CED[ch] + " (wrong in Romanian)"; out.appendChild(m); nCed++; }
+      else if (CED[ch]){ flush(); var t = document.createElement("span"); t.className = "tr"; t.textContent = ch; t.title = CED[ch] + " (skipped: the sentence looks Turkish)"; out.appendChild(t); nTr++; }
       else if (COM[ch]){ flush(); var o = document.createElement("span"); o.className = "okl"; o.textContent = ch; o.title = COM[ch]; out.appendChild(o); nCom++; }
       else buf += ch;
     }
@@ -102,7 +105,7 @@ function check(){
   out.hidden = false;
   var v = $("verdict");
   var decomposed = raw !== s ? " Some letters were typed as two code points; shown here combined." : "";
-  var turkishNote = nTr ? " " + nTr + " ş/ţ in Turkish sentences are right there and left alone." : "";
+  var turkishNote = nTr ? " Skipped " + nTr + " ş in " + (nTr === 1 ? "a sentence that looks" : "sentences that look") + " Turkish (ı ğ ç ö ü): check " + (nTr === 1 ? "it" : "them") + " by eye." : "";
   if (nCed){
     v.className = "verdict bad";
     v.textContent = nCed + (nCed === 1 ? " letter has" : " letters have") + " a cedilla (ş ţ), marked below. " + nCom + " use the comma below (ș ț)." + turkishNote + decomposed;
@@ -118,10 +121,11 @@ $("sample").onclick = function(){ $("t").value = SAMPLE; check(); };
 $("clear").onclick = function(){ $("t").value = ""; check(); $("t").focus(); };
 $("fix").onclick = function(){
   var fixed = fixRomanian($("t").value);
-  var msg = $("fixMsg");
-  $("t").value = fixed; check();
-  function selectIt(){ $("t").focus(); $("t").select(); msg.textContent = "Fixed text is in the box, selected. Press Ctrl+C (⌘C on a Mac)."; }
-  if (navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(fixed).then(function(){ msg.textContent = "Fixed in the box and copied."; }, selectIt); } else selectIt();
+  $("t").value = fixed; check();   // check() hides the fix row, so the confirmation goes into the verdict
+  var v = $("verdict");
+  function say(text){ v.textContent += " " + text; }
+  function selectIt(){ $("t").focus(); $("t").select(); say("Fixed: the text in the box is selected. Press Ctrl+C (⌘C on a Mac)."); }
+  if (navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(fixed).then(function(){ say("Fixed and copied."); }, selectIt); } else selectIt();
 };
 </script>
 </body>
