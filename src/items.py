@@ -3,8 +3,12 @@
 All Romanian text here is written in correct orthography (comma-below ș ț).
 Cedilla variants and diacritic-free variants are *generated* from it by
 `to_cedilla()` and `strip_diacritics()`, never typed by hand, so the gold and
-the corrupted inputs cannot drift apart. `check_items()` asserts this file
-contains no cedilla letters at all.
+the corrupted inputs cannot drift apart. `check_items()` asserts that the gold
+lists (WRITE, ECHO, FIX, SEE_*, RESTORE) contain no cedilla letters and that
+TURKISH contains no comma-below letters. Elsewhere cedilla letters appear only on
+purpose: in TURKISH (where ş is correct), in the prompts and rules that name them
+(FIX_LEVELS L3, ECHO_RULE, TR_RULE_SCOPED, CODE_PROMPTS), in the CODE_TESTS inputs,
+and in the translation tables, comments and checks.
 """
 
 from __future__ import annotations
@@ -286,7 +290,7 @@ CODE_TESTS = [
 # Plus an idempotence test added in build: f(f(x)) == f(x) on the paragraph.
 
 # ---------------------------------------------------------------------------
-# Round 2 (tasks 8-10)
+# Round 2 (tasks 8-13)
 # ---------------------------------------------------------------------------
 
 # Task 8 · ECHO, FOUR INPUTS — the 22 Echo prompts as clean, cedilla, ASCII (typed
@@ -425,8 +429,9 @@ def check_items() -> None:
     import sys
 
     src = inspect.getsource(sys.modules[__name__])
-    # The only legal cedilla letters in this file are inside COMMA_TO_CEDILLA,
-    # FIX_LEVELS L3, CODE_PROMPTS and CODE_TESTS inputs (intentional).
+    # The only legal cedilla letters in this file are inside COMMA_TO_CEDILLA, FIX_LEVELS L3,
+    # ECHO_RULE, TR_RULE_SCOPED, CODE_PROMPTS and CODE_TESTS inputs, TURKISH, comments and
+    # the checks below (intentional).
     bad = []
     for name in ("WRITE", "ECHO", "FIX", "SEE_WORDS", "SEE_SENTENCES", "SEE_CODEPOINT", "RESTORE"):
         blob = repr(globals()[name])

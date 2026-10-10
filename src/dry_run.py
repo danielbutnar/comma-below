@@ -10,9 +10,16 @@ Fake models answer from the gold data and then apply a corruption:
   normalizer - the gold answer with every cedilla letter turned into the comma letter
                (right for Romanian, wrong for Turkish)
   legacyreader - repairs every wrong form except the old mojibake, which it reads as the cedilla
-The expected scores are asserted, so a scoring bug fails loudly.
+  flaky    - fails the first call for each prompt with a 429, so the retry is tested
+  picky    - rejects max_completion_tokens and checks the 8,192-token cap, so the fallback is tested
+  thinker  - the gold answer after a <think> block that contains cedilla letters
+Tasks 1-7 run against seven of them (perfect, cedilla, strip, mirror, flaky, picky, thinker),
+tasks 8-12 add sticky and normalizer (nine), and task 13 adds legacyreader (ten).
+The expected scores are asserted, so a scoring bug fails loudly. The fake models answer in the
+format the prompt asks for, so the parsers are not tested on wordy answers (docs/next-version.md).
 
-Usage:  uv run --no-project --with pandas --with-editable ../../_reference/kaggle-benchmarks python src/dry_run.py
+Usage:  uv run --no-project --with pandas --with kaggle-benchmarks==0.6.1 python src/dry_run.py [-8- -9- ...]
+        (a fragment of a task name runs only the matching tasks)
 """
 
 from __future__ import annotations
