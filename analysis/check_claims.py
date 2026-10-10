@@ -642,7 +642,8 @@ def predictions(every: pd.DataFrame) -> tuple[str, dict, str]:
         v = "failed" if "failed" in both else "inconclusive" if "inconclusive" in both else "held"
         add(10, "The scoped rule keeps Turkish intact and still fixes Romanian.",
             # one decimal: the threshold is 95 %, and a rounded "95 %" would hide how close it came
-            f"Turkish {ok['scoped']:.1f} % correct (no rule: {ok['none']:.0f} %, full rule: {ok['rule']:.0f} %), "
+            f"Turkish {ok['scoped']:.1f} % correct (bar set when scoring: 95 %; no rule: {ok['none']:.0f} %, "
+            f"full rule: {ok['rule']:.0f} %), "
             f"Romanian {ro:.0f} %", v)
 
     lk = every[every.task == "lookalike"]
