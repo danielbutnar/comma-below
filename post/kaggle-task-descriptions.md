@@ -8,23 +8,20 @@ Paste one block into each task's Description field on Kaggle:
 
 Each block is the first cell of that task's notebook, generated from src/build.py by
 post/task_descriptions.py. The pre-registered predictions are word for word as pushed before the runs;
-only the layout differs (they, and task 13's five inputs, are shown as lists). The notes under "Added
-after the runs" were written after the runs and are not part of the pushed text.
+only the layout differs (they, and task 13's five inputs, are shown as lists, and lines wrapped inside a
+paragraph are joined, because Kaggle shows every line break). The notes under "Added after the runs" were
+written after the runs and are not part of the pushed text.
 
 ## Romanian Comma Below 1: Write
 https://www.kaggle.com/benchmarks/tasks/danielbutnar/romanian-comma-below-1-write
 
-Part of **Comma Below**, a benchmark on one Romanian letter pair: ș ț (s and t with a comma below,
-U+0219 and U+021B, the correct Romanian letters) versus ş ţ (s and t with a cedilla, U+015F and U+0163),
-a legacy encoding error that still fills the Romanian web. They look almost identical and are different
-characters: search, sorting, spell-check and screen readers treat them differently.
+Part of **Comma Below**, a benchmark on one Romanian letter pair: ș ț (s and t with a comma below, U+0219 and U+021B, the correct Romanian letters) versus ş ţ (s and t with a cedilla, U+015F and U+0163), a legacy encoding error that still fills the Romanian web. They look almost identical and are different characters: search, sorting, spell-check and screen readers treat them differently.
 
 **This task:** English prompts ask for Romanian text (translations with ASCII place names, single words, capitals, JSON, JavaScript, HTML, longer copy). Does the model write the correct letters?
 
 **Scoring:** an item passes when the answer has zero cedilla or look-alike letters and every required word (for example *Timișoara*) appears code-point exact (case-insensitive); items without required words must contain at least one comma-below letter. Score = share of items passed. Every check is done on Unicode code points after NFC normalization. No LLM judge.
 
-This source file is ASCII-only on purpose (Romanian letters are escapes) and verifies a SHA-256 of its
-data before running, so no editor, CLI or notebook conversion can silently swap the letters under test.
+This source file is ASCII-only on purpose (Romanian letters are escapes) and verifies a SHA-256 of its data before running, so no editor, CLI or notebook conversion can silently swap the letters under test.
 
 Write-up: https://dev.to/danielbutnar/brasov-or-brasov-15-llms-spell-my-city-right-until-you-spell-it-wrong-first-75a
 
@@ -33,17 +30,13 @@ Code: https://github.com/danielbutnar/comma-below/blob/main/tasks/romanian-comma
 ## Romanian Comma Below 2: Echo
 https://www.kaggle.com/benchmarks/tasks/danielbutnar/romanian-comma-below-2-echo
 
-Part of **Comma Below**, a benchmark on one Romanian letter pair: ș ț (s and t with a comma below,
-U+0219 and U+021B, the correct Romanian letters) versus ş ţ (s and t with a cedilla, U+015F and U+0163),
-a legacy encoding error that still fills the Romanian web. They look almost identical and are different
-characters: search, sorting, spell-check and screen readers treat them differently.
+Part of **Comma Below**, a benchmark on one Romanian letter pair: ș ț (s and t with a comma below, U+0219 and U+021B, the correct Romanian letters) versus ş ţ (s and t with a cedilla, U+015F and U+0163), a legacy encoding error that still fills the Romanian web. They look almost identical and are different characters: search, sorting, spell-check and screen readers treat them differently.
 
 **This task:** the same Romanian guest messages and news paragraphs arrive twice: once typed correctly and once typed with cedilla letters. The model replies to the guest, summarizes the paragraph, or answers a question from it (retrieval style), always in Romanian. Does it copy the user's wrong letters?
 
 **Scoring:** a reply passes when it has zero cedilla or look-alike letters and at least one comma-below letter. Score = pass rate on the **cedilla** inputs; the clean inputs are the control (saved in the results file). Every check is done on Unicode code points after NFC normalization. No LLM judge.
 
-This source file is ASCII-only on purpose (Romanian letters are escapes) and verifies a SHA-256 of its
-data before running, so no editor, CLI or notebook conversion can silently swap the letters under test.
+This source file is ASCII-only on purpose (Romanian letters are escapes) and verifies a SHA-256 of its data before running, so no editor, CLI or notebook conversion can silently swap the letters under test.
 
 Write-up: https://dev.to/danielbutnar/brasov-or-brasov-15-llms-spell-my-city-right-until-you-spell-it-wrong-first-75a
 
@@ -52,17 +45,13 @@ Code: https://github.com/danielbutnar/comma-below/blob/main/tasks/romanian-comma
 ## Romanian Comma Below 3: Fix
 https://www.kaggle.com/benchmarks/tasks/danielbutnar/romanian-comma-below-3-fix
 
-Part of **Comma Below**, a benchmark on one Romanian letter pair: ș ț (s and t with a comma below,
-U+0219 and U+021B, the correct Romanian letters) versus ş ţ (s and t with a cedilla, U+015F and U+0163),
-a legacy encoding error that still fills the Romanian web. They look almost identical and are different
-characters: search, sorting, spell-check and screen readers treat them differently.
+Part of **Comma Below**, a benchmark on one Romanian letter pair: ș ț (s and t with a comma below, U+0219 and U+021B, the correct Romanian letters) versus ş ţ (s and t with a cedilla, U+015F and U+0163), a legacy encoding error that still fills the Romanian web. They look almost identical and are different characters: search, sorting, spell-check and screen readers treat them differently.
 
 **This task:** six Romanian texts typed with cedilla letters, each with one ordinary typo, and three instructions: a plain *proofread*, *correct the spelling and the diacritics*, and an explicit description of the cedilla problem. Does the model repair the letters, and does it need to be told?
 
 **Scoring:** the rewritten text (the paragraph closest to the answer key; a changelog after it is ignored) passes when it has zero cedilla or look-alike letters and contains every gold word that has a comma-below letter. The typo fix is recorded separately. Score = share of answers passed. Every check is done on Unicode code points after NFC normalization. No LLM judge.
 
-This source file is ASCII-only on purpose (Romanian letters are escapes) and verifies a SHA-256 of its
-data before running, so no editor, CLI or notebook conversion can silently swap the letters under test.
+This source file is ASCII-only on purpose (Romanian letters are escapes) and verifies a SHA-256 of its data before running, so no editor, CLI or notebook conversion can silently swap the letters under test.
 
 Write-up: https://dev.to/danielbutnar/brasov-or-brasov-15-llms-spell-my-city-right-until-you-spell-it-wrong-first-75a
 
@@ -71,17 +60,13 @@ Code: https://github.com/danielbutnar/comma-below/blob/main/tasks/romanian-comma
 ## Romanian Comma Below 4: See
 https://www.kaggle.com/benchmarks/tasks/danielbutnar/romanian-comma-below-4-see
 
-Part of **Comma Below**, a benchmark on one Romanian letter pair: ș ț (s and t with a comma below,
-U+0219 and U+021B, the correct Romanian letters) versus ş ţ (s and t with a cedilla, U+015F and U+0163),
-a legacy encoding error that still fills the Romanian web. They look almost identical and are different
-characters: search, sorting, spell-check and screen readers treat them differently.
+Part of **Comma Below**, a benchmark on one Romanian letter pair: ș ț (s and t with a comma below, U+0219 and U+021B, the correct Romanian letters) versus ş ţ (s and t with a cedilla, U+015F and U+0163), a legacy encoding error that still fills the Romanian web. They look almost identical and are different characters: search, sorting, spell-check and screen readers treat them differently.
 
 **This task:** can the model perceive the difference? Three probes: are two strings identical (8 differ only by comma vs cedilla or visibly, 8 are identical), does a sentence contain cedilla letters (6 yes, 6 no), and which code point sits at a given position (4 comma, 4 cedilla).
 
 **Scoring:** exact answer match (true/false, or U+XXXX). Score = accuracy over all 36 items; a coin flip scores about 0.5 on the first two probes. Every check is done on Unicode code points after NFC normalization. No LLM judge.
 
-This source file is ASCII-only on purpose (Romanian letters are escapes) and verifies a SHA-256 of its
-data before running, so no editor, CLI or notebook conversion can silently swap the letters under test.
+This source file is ASCII-only on purpose (Romanian letters are escapes) and verifies a SHA-256 of its data before running, so no editor, CLI or notebook conversion can silently swap the letters under test.
 
 **Added after the runs** (not part of the text pushed with the task):
 
@@ -94,17 +79,13 @@ Code: https://github.com/danielbutnar/comma-below/blob/main/tasks/romanian-comma
 ## Romanian Comma Below 5: Restore
 https://www.kaggle.com/benchmarks/tasks/danielbutnar/romanian-comma-below-5-restore
 
-Part of **Comma Below**, a benchmark on one Romanian letter pair: ș ț (s and t with a comma below,
-U+0219 and U+021B, the correct Romanian letters) versus ş ţ (s and t with a cedilla, U+015F and U+0163),
-a legacy encoding error that still fills the Romanian web. They look almost identical and are different
-characters: search, sorting, spell-check and screen readers treat them differently.
+Part of **Comma Below**, a benchmark on one Romanian letter pair: ș ț (s and t with a comma below, U+0219 and U+021B, the correct Romanian letters) versus ş ţ (s and t with a cedilla, U+015F and U+0163), a legacy encoding error that still fills the Romanian web. They look almost identical and are different characters: search, sorting, spell-check and screen readers treat them differently.
 
 **This task:** 30 Romanian sentences typed without diacritics; the model puts them back. Several sentences only differ by context (*peste* over / *pește* fish, *fata* girl / *fața* face, *masa* / *masă*).
 
 **Scoring:** a sentence passes when every word matches the gold letter for letter (case and punctuation ignored). Score = share of sentences passed. The results file also records whether the sentence would pass if cedilla letters were accepted, which separates language knowledge from encoding. Every check is done on Unicode code points after NFC normalization. No LLM judge.
 
-This source file is ASCII-only on purpose (Romanian letters are escapes) and verifies a SHA-256 of its
-data before running, so no editor, CLI or notebook conversion can silently swap the letters under test.
+This source file is ASCII-only on purpose (Romanian letters are escapes) and verifies a SHA-256 of its data before running, so no editor, CLI or notebook conversion can silently swap the letters under test.
 
 **Added after the runs** (not part of the text pushed with the task):
 
@@ -117,17 +98,13 @@ Code: https://github.com/danielbutnar/comma-below/blob/main/tasks/romanian-comma
 ## Romanian Comma Below 6: Code
 https://www.kaggle.com/benchmarks/tasks/danielbutnar/romanian-comma-below-6-code
 
-Part of **Comma Below**, a benchmark on one Romanian letter pair: ș ț (s and t with a comma below,
-U+0219 and U+021B, the correct Romanian letters) versus ş ţ (s and t with a cedilla, U+015F and U+0163),
-a legacy encoding error that still fills the Romanian web. They look almost identical and are different
-characters: search, sorting, spell-check and screen readers treat them differently.
+Part of **Comma Below**, a benchmark on one Romanian letter pair: ș ț (s and t with a comma below, U+0219 and U+021B, the correct Romanian letters) versus ş ţ (s and t with a cedilla, U+015F and U+0163), a legacy encoding error that still fills the Romanian web. They look almost identical and are different characters: search, sorting, spell-check and screen readers treat them differently.
 
 **This task:** the model writes `fix_romanian(text)`, a Python function that repairs cedilla letters. Two prompt phrasings (one names every letter, one only gives the goal). Hidden tests cover lowercase and uppercase, decomposed forms (s + U+0327), text that is already correct, French ç that must not change, whitespace and emoji, and idempotence.
 
 **Scoring:** share of the 14 hidden tests passed, averaged over the two prompts. The code runs in a subprocess with a 30 s timeout. Every check is done on Unicode code points after NFC normalization. No LLM judge.
 
-This source file is ASCII-only on purpose (Romanian letters are escapes) and verifies a SHA-256 of its
-data before running, so no editor, CLI or notebook conversion can silently swap the letters under test.
+This source file is ASCII-only on purpose (Romanian letters are escapes) and verifies a SHA-256 of its data before running, so no editor, CLI or notebook conversion can silently swap the letters under test.
 
 **Added after the runs** (not part of the text pushed with the task):
 
@@ -141,17 +118,13 @@ Code: https://github.com/danielbutnar/comma-below/blob/main/tasks/romanian-comma
 ## Romanian Comma Below 7: Echo With a Rule
 https://www.kaggle.com/benchmarks/tasks/danielbutnar/romanian-comma-below-7-echo-with-a-rule
 
-Part of **Comma Below**, a benchmark on one Romanian letter pair: ș ț (s and t with a comma below,
-U+0219 and U+021B, the correct Romanian letters) versus ş ţ (s and t with a cedilla, U+015F and U+0163),
-a legacy encoding error that still fills the Romanian web. They look almost identical and are different
-characters: search, sorting, spell-check and screen readers treat them differently.
+Part of **Comma Below**, a benchmark on one Romanian letter pair: ș ț (s and t with a comma below, U+0219 and U+021B, the correct Romanian letters) versus ş ţ (s and t with a cedilla, U+015F and U+0163), a legacy encoding error that still fills the Romanian web. They look almost identical and are different characters: search, sorting, spell-check and screen readers treat them differently.
 
 **This task:** the cedilla inputs of task 2 (Echo) again, with one added sentence in the system prompt: *Use correct Romanian orthography: write ș and ț with a comma below, never ş or ţ with a cedilla, even if the input uses them.* Does the obvious fix work?
 
 **Scoring:** same as Echo: an answer passes when it has zero cedilla or look-alike letters and at least one comma-below letter. Score = pass rate; compare with the cedilla column of task 2. Every check is done on Unicode code points after NFC normalization. No LLM judge.
 
-This source file is ASCII-only on purpose (Romanian letters are escapes) and verifies a SHA-256 of its
-data before running, so no editor, CLI or notebook conversion can silently swap the letters under test.
+This source file is ASCII-only on purpose (Romanian letters are escapes) and verifies a SHA-256 of its data before running, so no editor, CLI or notebook conversion can silently swap the letters under test.
 
 **Added after the runs** (not part of the text pushed with the task):
 
@@ -164,10 +137,7 @@ Code: https://github.com/danielbutnar/comma-below/blob/main/tasks/romanian-comma
 ## Romanian Comma Below 8: Echo, Four Inputs
 https://www.kaggle.com/benchmarks/tasks/danielbutnar/romanian-comma-below-8-echo-four-inputs
 
-Part of **Comma Below**, a benchmark on one Romanian letter pair: ș ț (s and t with a comma below,
-U+0219 and U+021B, the correct Romanian letters) versus ş ţ (s and t with a cedilla, U+015F and U+0163),
-a legacy encoding error that still fills the Romanian web. They look almost identical and are different
-characters: search, sorting, spell-check and screen readers treat them differently.
+Part of **Comma Below**, a benchmark on one Romanian letter pair: ș ț (s and t with a comma below, U+0219 and U+021B, the correct Romanian letters) versus ş ţ (s and t with a cedilla, U+015F and U+0163), a legacy encoding error that still fills the Romanian web. They look almost identical and are different characters: search, sorting, spell-check and screen readers treat them differently.
 
 **This task:** task 2's 22 prompts (guest replies, news summaries, retrieval-style answers) under four inputs: typed correctly, typed with cedilla letters, typed without any diacritics (ASCII), and typed with cedilla plus task 7's one-sentence rule in the system prompt. Run on every model Kaggle serves, so model generations and sizes can be compared on identical items.
 
@@ -180,8 +150,7 @@ Pre-registered predictions (written before any run):
 
 **Scoring:** an answer passes when it has zero cedilla or look-alike letters and at least one comma-below letter. Score = pass rate on the **cedilla** inputs (as in task 2). The results file also records, for every answer, how each s/t word of the source was spelled (comma, cedilla, or no diacritic). Every check is done on Unicode code points after NFC normalization. No LLM judge.
 
-This source file is ASCII-only on purpose (Romanian letters are escapes) and verifies a SHA-256 of its
-data before running, so no editor, CLI or notebook conversion can silently swap the letters under test.
+This source file is ASCII-only on purpose (Romanian letters are escapes) and verifies a SHA-256 of its data before running, so no editor, CLI or notebook conversion can silently swap the letters under test.
 
 **Added after the runs** (not part of the text pushed with the task):
 
@@ -196,10 +165,7 @@ Code: https://github.com/danielbutnar/comma-below/blob/main/tasks/romanian-comma
 ## Romanian Comma Below 9: Contagion
 https://www.kaggle.com/benchmarks/tasks/danielbutnar/romanian-comma-below-9-contagion
 
-Part of **Comma Below**, a benchmark on one Romanian letter pair: ș ț (s and t with a comma below,
-U+0219 and U+021B, the correct Romanian letters) versus ş ţ (s and t with a cedilla, U+015F and U+0163),
-a legacy encoding error that still fills the Romanian web. They look almost identical and are different
-characters: search, sorting, spell-check and screen readers treat them differently.
+Part of **Comma Below**, a benchmark on one Romanian letter pair: ș ț (s and t with a comma below, U+0219 and U+021B, the correct Romanian letters) versus ş ţ (s and t with a cedilla, U+015F and U+0163), a legacy encoding error that still fills the Romanian web. They look almost identical and are different characters: search, sorting, spell-check and screen readers treat them differently.
 
 **This task:** four Romanian news paragraphs as documents and one question about one of them, answered in Romanian. Five conditions per question: everything clean; the target clean and one or all three other documents typed with cedilla; the target typed with cedilla and the others clean; everything typed with cedilla. When the target is clean, any cedilla letter in the answer came from somewhere else.
 
@@ -211,8 +177,7 @@ Pre-registered predictions (written before any run):
 
 **Scoring:** an answer passes when it has zero cedilla or look-alike letters and at least one comma-below letter. Score = pass rate over all 40 items. Every cedilla word in an answer is traced to the target document, another document, or neither. Every check is done on Unicode code points after NFC normalization. No LLM judge.
 
-This source file is ASCII-only on purpose (Romanian letters are escapes) and verifies a SHA-256 of its
-data before running, so no editor, CLI or notebook conversion can silently swap the letters under test.
+This source file is ASCII-only on purpose (Romanian letters are escapes) and verifies a SHA-256 of its data before running, so no editor, CLI or notebook conversion can silently swap the letters under test.
 
 Write-up: https://dev.to/danielbutnar/brasov-or-brasov-15-llms-spell-my-city-right-until-you-spell-it-wrong-first-75a
 
@@ -221,10 +186,7 @@ Code: https://github.com/danielbutnar/comma-below/blob/main/tasks/romanian-comma
 ## Romanian Comma Below 10: Turkish Guests
 https://www.kaggle.com/benchmarks/tasks/danielbutnar/romanian-comma-below-10-turkish-guests
 
-Part of **Comma Below**, a benchmark on one Romanian letter pair: ș ț (s and t with a comma below,
-U+0219 and U+021B, the correct Romanian letters) versus ş ţ (s and t with a cedilla, U+015F and U+0163),
-a legacy encoding error that still fills the Romanian web. They look almost identical and are different
-characters: search, sorting, spell-check and screen readers treat them differently.
+Part of **Comma Below**, a benchmark on one Romanian letter pair: ș ț (s and t with a comma below, U+0219 and U+021B, the correct Romanian letters) versus ş ţ (s and t with a cedilla, U+015F and U+0163), a legacy encoding error that still fills the Romanian web. They look almost identical and are different characters: search, sorting, spell-check and screen readers treat them differently.
 
 **This task:** the cedilla letter is wrong in Romanian and right in Turkish (*teşekkür*, *şehir*). Eight Turkish guest messages are answered with no rule, with task 7's rule (*never ş or ţ*), and with a rule scoped to Romanian; six Romanian messages typed with cedilla are answered under both rules. Does the fix for Romanian break Turkish?
 
@@ -236,8 +198,7 @@ Pre-registered predictions (written before any run):
 
 **Scoring:** a Turkish reply passes when its Turkish words contain the Turkish ş and never the comma-below ș (Romanian place names such as Brașov are left out of the count: either spelling is defensible there); a Romanian reply passes when it has zero cedilla or look-alike letters and at least one comma-below letter. Score = pass rate over all 36 items. Every check is done on Unicode code points after NFC normalization. No LLM judge.
 
-This source file is ASCII-only on purpose (Romanian letters are escapes) and verifies a SHA-256 of its
-data before running, so no editor, CLI or notebook conversion can silently swap the letters under test.
+This source file is ASCII-only on purpose (Romanian letters are escapes) and verifies a SHA-256 of its data before running, so no editor, CLI or notebook conversion can silently swap the letters under test.
 
 **Added after the runs** (not part of the text pushed with the task):
 
@@ -251,10 +212,7 @@ Code: https://github.com/danielbutnar/comma-below/blob/main/tasks/romanian-comma
 ## Romanian Comma Below 11: Other Look-Alikes
 https://www.kaggle.com/benchmarks/tasks/danielbutnar/romanian-comma-below-11-other-look-alikes
 
-Part of **Comma Below**, a benchmark on one Romanian letter pair: ș ț (s and t with a comma below,
-U+0219 and U+021B, the correct Romanian letters) versus ş ţ (s and t with a cedilla, U+015F and U+0163),
-a legacy encoding error that still fills the Romanian web. They look almost identical and are different
-characters: search, sorting, spell-check and screen readers treat them differently.
+Part of **Comma Below**, a benchmark on one Romanian letter pair: ș ț (s and t with a comma below, U+0219 and U+021B, the correct Romanian letters) versus ş ţ (s and t with a cedilla, U+015F and U+0163), a legacy encoding error that still fills the Romanian web. They look almost identical and are different characters: search, sorting, spell-check and screen readers treat them differently.
 
 **This task:** the Echo design outside Romanian. Six English news paragraphs with accented names (Zürich, Café Müller, Málaga) are summarized or used to answer a question, typed four ways: correctly; with Cyrillic look-alike letters (а с е о р for a c e o p) in every word; with Cyrillic look-alikes only inside the accented names; and as mojibake in the same names (UTF-8 read as Windows-1252, *ZÃ¼rich*), which looks broken.
 
@@ -268,8 +226,7 @@ Version 2 note: version 1 had only the dense Cyrillic variant (about a third of 
 
 **Scoring:** a clean or Cyrillic-input answer passes when it contains no Cyrillic letter; a mojibake-input answer passes when it contains no mojibake marker (Ã or Â). Score = pass rate over all 48 items. Every check is done on Unicode code points after NFC normalization. No LLM judge.
 
-This source file is ASCII-only on purpose (Romanian letters are escapes) and verifies a SHA-256 of its
-data before running, so no editor, CLI or notebook conversion can silently swap the letters under test.
+This source file is ASCII-only on purpose (Romanian letters are escapes) and verifies a SHA-256 of its data before running, so no editor, CLI or notebook conversion can silently swap the letters under test.
 
 **Added after the runs** (not part of the text pushed with the task):
 
@@ -282,10 +239,7 @@ Code: https://github.com/danielbutnar/comma-below/blob/main/tasks/romanian-comma
 ## Romanian Comma Below 12: Turns
 https://www.kaggle.com/benchmarks/tasks/danielbutnar/romanian-comma-below-12-turns
 
-Part of **Comma Below**, a benchmark on one Romanian letter pair: ș ț (s and t with a comma below,
-U+0219 and U+021B, the correct Romanian letters) versus ş ţ (s and t with a cedilla, U+015F and U+0163),
-a legacy encoding error that still fills the Romanian web. They look almost identical and are different
-characters: search, sorting, spell-check and screen readers treat them differently.
+Part of **Comma Below**, a benchmark on one Romanian letter pair: ș ț (s and t with a comma below, U+0219 and U+021B, the correct Romanian letters) versus ş ţ (s and t with a cedilla, U+015F and U+0163), a legacy encoding error that still fills the Romanian web. They look almost identical and are different characters: search, sorting, spell-check and screen readers treat them differently.
 
 **This task:** two news summaries in one chat. The second summary is scored: after a first text typed with cedilla, is the summary of a clean second text still written with cedilla? After a clean first text, is a cedilla second text copied less than in task 2?
 
@@ -296,8 +250,7 @@ Pre-registered predictions (written before any run):
 
 **Scoring:** the second summary passes when it has zero cedilla or look-alike letters and at least one comma-below letter. Score = pass rate of the second summaries over all 18 conversations. Every check is done on Unicode code points after NFC normalization. No LLM judge.
 
-This source file is ASCII-only on purpose (Romanian letters are escapes) and verifies a SHA-256 of its
-data before running, so no editor, CLI or notebook conversion can silently swap the letters under test.
+This source file is ASCII-only on purpose (Romanian letters are escapes) and verifies a SHA-256 of its data before running, so no editor, CLI or notebook conversion can silently swap the letters under test.
 
 Write-up: https://dev.to/danielbutnar/brasov-or-brasov-15-llms-spell-my-city-right-until-you-spell-it-wrong-first-75a
 
@@ -306,10 +259,7 @@ Code: https://github.com/danielbutnar/comma-below/blob/main/tasks/romanian-comma
 ## Romanian Comma Below 13: Other Wrong Letters
 https://www.kaggle.com/benchmarks/tasks/danielbutnar/romanian-comma-below-13-other-wrong-letters
 
-Part of **Comma Below**, a benchmark on one Romanian letter pair: ș ț (s and t with a comma below,
-U+0219 and U+021B, the correct Romanian letters) versus ş ţ (s and t with a cedilla, U+015F and U+0163),
-a legacy encoding error that still fills the Romanian web. They look almost identical and are different
-characters: search, sorting, spell-check and screen readers treat them differently.
+Part of **Comma Below**, a benchmark on one Romanian letter pair: ș ț (s and t with a comma below, U+0219 and U+021B, the correct Romanian letters) versus ş ţ (s and t with a cedilla, U+015F and U+0163), a legacy encoding error that still fills the Romanian web. They look almost identical and are different characters: search, sorting, spell-check and screen readers treat them differently.
 
 **This task:** task 8's 16 prompts where models reuse the source's words (6 news summaries and 10 questions about a document, built on 8 source texts), with the source typed five ways:
 
@@ -333,8 +283,7 @@ Answers that comment on the encoding are flagged and reported with and without; 
 
 **Scoring:** an answer passes when it has no cedilla, dot-below, mojibake (º ª þ Þ) or look-alike (ã ǎ) letters and at least one comma-below letter. Score = pass rate on the three wrong-letter inputs without a rule (a, b, c). The results file records, for every answer, each s/t and ă letter of the source's words as written (slot counts), the word-level forms as in task 8, the wrong-form words and which of them were copied from the input, and the words with which an answer comments on the encoding. Every check is done on Unicode code points after NFC normalization. No LLM judge.
 
-This source file is ASCII-only on purpose (Romanian letters are escapes) and verifies a SHA-256 of its
-data before running, so no editor, CLI or notebook conversion can silently swap the letters under test.
+This source file is ASCII-only on purpose (Romanian letters are escapes) and verifies a SHA-256 of its data before running, so no editor, CLI or notebook conversion can silently swap the letters under test.
 
 **Added after the runs** (not part of the text pushed with the task):
 

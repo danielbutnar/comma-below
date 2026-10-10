@@ -17,6 +17,8 @@ Thirteen tasks, every score computed from Unicode code points (after NFC). No LL
 
 ## What it found
 
+Numbers from the runs up to 10 October 2026; the Kaggle leaderboard may include later runs.
+
 ![Typed with the cedilla, a third of the answers keep it: 99 % clean typed correctly, 96 % without diacritics, 68 % with the cedilla, 95 % with the cedilla and one sentence in the system prompt](post/chart-hero-v2.png)
 
 - **The keyboard echo.** 43 models, the same 22 Romanian prompts typed four ways (task 8): 99 % of the

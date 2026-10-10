@@ -30,8 +30,9 @@ Paste one block into each task's Description field on Kaggle:
 
 Each block is the first cell of that task's notebook, generated from src/build.py by
 post/task_descriptions.py. The pre-registered predictions are word for word as pushed before the runs;
-only the layout differs (they, and task 13's five inputs, are shown as lists). The notes under "Added
-after the runs" were written after the runs and are not part of the pushed text.
+only the layout differs (they, and task 13's five inputs, are shown as lists, and lines wrapped inside a
+paragraph are joined, because Kaggle shows every line break). The notes under "Added after the runs" were
+written after the runs and are not part of the pushed text.
 """
 
 # The one-line descriptions in the task code (@kbench.task(description=...)) were typed in ASCII, which
@@ -125,6 +126,13 @@ def listify(what: str) -> str:
     return "\n\n".join(out)
 
 
+def unwrap(md: str) -> str:
+    """Join lines wrapped inside a paragraph: Kaggle shows every line break. Lists and headings stay as they are."""
+    paras = md.split("\n\n")
+    keep = re.compile(r"^(- |\* |#|\||\d+\. )")
+    return "\n\n".join(p if any(keep.match(line) for line in p.split("\n")) else " ".join(p.split("\n")) for p in paras)
+
+
 def words_of(text: str) -> list[str]:
     return re.sub(r"^- ", "", text, flags=re.M).split()
 
@@ -133,7 +141,8 @@ def block(slug: str, t: dict) -> str:
     what = listify(t["what"])
     assert words_of(what) == t["what"].split(), f"{slug}: the task text changed"
     md = build.MARKDOWN.format(title=t["title"], what=what, how=t["how"]).strip()
-    body = md.split("\n", 1)[1].strip()  # drop the "# title" line
+    body = unwrap(md.split("\n", 1)[1].strip())  # drop the "# title" line; same words, no mid-sentence breaks
+    assert body.split() == md.split("\n", 1)[1].split(), f"{slug}: unwrapping changed the words"
     notes = list(NOTES.get(slug, []))
     desc = short_description(t["body"])
     fixed = desc

@@ -181,7 +181,15 @@ Does your model do it? Send it the prompt in step 1 below and paste its answer: 
 
 {{CHECKER_TAG}}
 
-Next I'd like to know whether the echo survives a real retrieval pipeline, which cleans and chunks documents first, and whether other languages with a look-alike letter from an old encoding echo it too. Does yours have a pair like ş and ș? Tell me in the comments.
+## What I'd Measure Next
+
+Whether the echo survives a real retrieval pipeline, which cleans and chunks documents first, and whether other languages with a look-alike letter from an old encoding echo it too. Does yours have a pair like ş and ș? Tell me in the comments.
+
+## My Benchmark
+
+{% cta https://www.kaggle.com/benchmarks/danielbutnar/romanian-comma-below %} Romanian Comma Below on Kaggle {% endcta %}
+
+Thirteen tasks, with every model answer in the run outputs. This post's numbers come from the runs up to 10 October; runs added to the leaderboard after that aren't in them. Read task 8's leaderboard, not the overall score, which averages different tasks for different models. It scores clean answers to cedilla input from each model's latest run and counts an empty answer as a failure, so Qwen 3 Next Thinking shows {{QWEN_T_KAGGLE}}% and Grok 4.5 and 4.6, whose calls all returned errors, 0%.
 
 {% details All the numbers (the 15 first-round models) %}
 
@@ -190,11 +198,5 @@ Task scores in %. Echo with cedilla is the mean of every run on the same prompts
 {{TABLE}}
 
 {% enddetails %}
-
-## My Benchmark
-
-{% cta https://www.kaggle.com/benchmarks/danielbutnar/romanian-comma-below %} Romanian Comma Below on Kaggle {% endcta %}
-
-Thirteen tasks, with every model answer in the run outputs. Read task 8's leaderboard, not the overall score, which averages different tasks for different models. It scores clean answers to cedilla input from each model's latest run and counts an empty answer as a failure, so Qwen 3 Next Thinking shows {{QWEN_T_KAGGLE}}% and Grok 4.5 and 4.6, whose calls all returned errors, 0%.
 
 The task builder, the fake models that test the scorer, the analysis and a script that re-checks this post's numbers against the raw answers are on [GitHub](https://github.com/danielbutnar/comma-below). Every input is generated from correctly spelled text in `src/items.py`, so testing another letter pair or language is a small change. Built with [kaggle-benchmarks](https://pypi.org/project/kaggle-benchmarks/); the checker runs on [LiveCodes](https://livecodes.io). I used Claude as a coding and editing assistant.
