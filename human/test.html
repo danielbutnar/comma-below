@@ -9,13 +9,15 @@
   @media (prefers-color-scheme: dark) { :root { --bg: #17161a; --fg: #f1eee6; --muted: #a9a398; --line: #3a3832; --accent: #7fb0ff; --ok: #6fd39b; --bad: #ff8a80; } }
   * { box-sizing: border-box; }
   body { margin: 0; background: var(--bg); color: var(--fg);
-         font: 17px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+         font: 17px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+         font-feature-settings: "locl" 0; }   /* after font, which resets it */
   main { max-width: 34rem; margin: 0 auto; padding: 20px 16px 40px; }
   h1, h2 { font-size: 1.35rem; line-height: 1.25; margin: 0 0 .5rem; }
   p { margin: .5rem 0; }
   .muted { color: var(--muted); font-size: .9rem; }
   .langs { display: flex; gap: .5rem; justify-content: flex-end; margin-bottom: .75rem; }
-  .langs button { min-height: 36px; padding: 0 .75rem; font-size: .9rem; }
+  .langs button { min-height: 44px; padding: 0 .75rem; font-size: .9rem; }
+  .langs button[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); font-weight: 600; }
   button { font: inherit; color: var(--fg); background: transparent; border: 1.5px solid var(--line); border-radius: 10px;
            min-height: 52px; padding: 0 1rem; cursor: pointer; }
   button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
@@ -28,12 +30,15 @@
   .pick { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; margin: 1.5rem 0; }
   .pick button { min-height: 64px; }
   .pick .word { font-size: var(--size, 18px); }
+  .stack .pick { grid-template-columns: 1fr; }   /* ?size= above 22: two words side by side overflow a small phone */
   .progress { color: var(--muted); font-size: .9rem; margin-top: 1rem; }
   .code { font: 600 1.05rem/1.4 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; padding: .75rem; border: 1.5px dashed var(--line);
           border-radius: 10px; user-select: all; -webkit-user-select: all; word-break: break-all; margin: .75rem 0; }
   .big { font-size: 2rem; font-weight: 700; margin: .25rem 0; }
   .ok { color: var(--ok); } .bad { color: var(--bad); }
   .hidden { display: none; }
+  #question:focus, #done h2:focus { outline: none; }
+  a { color: var(--accent); }
   table { border-collapse: collapse; margin: .75rem 0; }
   td { padding: .2rem .75rem .2rem 0; }
 </style>
@@ -55,7 +60,7 @@
     </div>
   </section>
   <section id="trial" class="hidden" aria-live="polite">
-    <p id="question"></p>
+    <p id="question" tabindex="-1"></p>
     <div class="pair" id="pair"></div>
     <div class="choices" id="sd">
       <button type="button" data-answer="same" data-t="same"></button>
@@ -76,6 +81,7 @@
     <p data-t="send"></p>
     <div class="code" id="code"></div>
     <p data-t="reveal"></p>
+    <p class="muted"><span data-t="more"></span> <a data-t="writeup" href="https://dev.to/danielbutnar/brasov-or-brasov-15-llms-spell-my-city-right-until-you-spell-it-wrong-first-75a"></a> · <a data-t="source" href="https://github.com/danielbutnar/comma-below"></a></p>
   </section>
 </main>
 <script>
@@ -94,47 +100,54 @@ const PRACTICE = ["Brasov", "Brașov", "diff"];
 const T = {
   ro: { title: "Test de 2 minute: vezi diferența?", intro1: "Vei vedea perechi de cuvinte. Spune dacă sunt identice, literă cu literă, sau diferite. La final, câteva perechi în care alegi cuvântul scris corect.",
         intro2: "Citește ca de obicei: fără zoom și fără să apropii telefonul.", privacy: "Anonim. Nu se trimite și nu se salvează nimic; la final primești un cod scurt pe care i-l trimiți lui Daniel.",
+        privacyDev: "Răspunsurile rămân în pagină; nu se trimite și nu se salvează nimic. La final primești un cod scurt (scorul, dacă citești în română, tipul de dispozitiv, mărimea ecranului și timpul). Dacă îl lași într-un comentariu, e public, sub numele tău de pe DEV.",
         reads: "Citești în română?", yes: "Da", no: "Nu", same: "Identice", diff: "Diferite", next: "Mai departe",
         qSD: "Sunt identice, literă cu literă?", qWR: "Care e scris corect în română?", practice: "Exemplu:",
         practiceOk: "Corect: diferite. Unul are s fără semn. De aici încolo nu mai primești răspunsul.", practiceBad: "Erau diferite: unul are s fără semn. De aici încolo nu mai primești răspunsul.",
         doneTitle: "Gata, mulțumesc!", sdScore: "Identice sau diferite", wrScore: "Scris corect", chance: "La întâmplare ai nimeri jumătate.",
         send: "Trimite-i lui Daniel acest cod (doar codul):", sendDev: "Dacă vrei, lasă codul într-un comentariu sub articol:",
-        reveal: "Diferența: ș cu virgulă dedesubt e litera română corectă. ş cu sedilă e litera turcească, folosită din greșeală în română din anii '90, când calculatoarele nu aveau litera corectă.",
-        of: "din" },
+        reveal: "Diferența: ș și ț cu virgulă dedesubt sunt literele românești corecte. ş și ţ cu sedilă sunt înlocuitori din anii '90 (ş e litera turcească), când calculatoarele nu aveau literele corecte.",
+        more: "Ce au făcut modelele:", writeup: "articolul", source: "codul și datele", of: "din" },
   de: { title: "2-Minuten-Test: Sehen Sie den Unterschied?", intro1: "Sie sehen Wortpaare. Sagen Sie, ob sie Buchstabe für Buchstabe gleich oder verschieden sind. Am Ende wählen Sie bei einigen Paaren das richtig geschriebene Wort.",
         intro2: "Lesen Sie wie gewohnt: ohne Zoom und ohne das Handy näher heranzuholen.", privacy: "Anonym. Nichts wird gesendet oder gespeichert; am Ende erhalten Sie einen kurzen Code für Daniel.",
+        privacyDev: "Ihre Antworten bleiben auf dieser Seite; nichts wird gesendet oder gespeichert. Am Ende erhalten Sie einen kurzen Code (Ergebnis, ob Sie Rumänisch lesen, Gerätetyp, Bildschirmgröße und Zeit). Wenn Sie ihn in einem Kommentar posten, ist er öffentlich, unter Ihrem DEV-Namen.",
         reads: "Lesen Sie Rumänisch?", yes: "Ja", no: "Nein", same: "Gleich", diff: "Verschieden", next: "Weiter",
         qSD: "Buchstabe für Buchstabe gleich?", qWR: "Welches ist richtiges Rumänisch?", practice: "Beispiel:",
         practiceOk: "Richtig: verschieden. Eines hat ein s ohne Zeichen. Ab jetzt gibt es keine Auflösung mehr.", practiceBad: "Die beiden waren verschieden: Eines hat ein s ohne Zeichen. Ab jetzt gibt es keine Auflösung mehr.",
         doneTitle: "Fertig, vielen Dank!", sdScore: "Gleich oder verschieden", wrScore: "Richtig geschrieben", chance: "Mit Raten trifft man die Hälfte.",
         send: "Schicken Sie Daniel diesen Code (nur den Code):", sendDev: "Wenn Sie möchten, posten Sie den Code in einem Kommentar unter dem Artikel:",
-        reveal: "Der Unterschied: ș mit Komma darunter ist der richtige rumänische Buchstabe. ş mit Cedille ist der türkische, der seit den 90ern aus Versehen fürs Rumänische benutzt wird, weil Computer den richtigen nicht hatten.",
-        of: "von" },
+        reveal: "Der Unterschied: ș und ț mit Komma darunter sind die richtigen rumänischen Buchstaben. ş und ţ mit Cedille sind Notlösungen aus den 90ern (ş ist türkisch), als Computer die richtigen nicht hatten.",
+        more: "Was die Modelle gemacht haben:", writeup: "der Artikel", source: "Code und Daten", of: "von" },
   en: { title: "2-minute test: can you see the difference?", intro1: "You will see pairs of words. Say whether they are the same, letter for letter, or different. At the end, a few pairs where you pick the correctly spelled word.",
         intro2: "Read as you normally do: no zoom, and don't bring the phone closer.", privacy: "Anonymous. Nothing is sent or saved; at the end you get a short code to send to Daniel.",
+        privacyDev: "Your answers stay on this page; nothing is sent or saved. At the end you get a short code (your score, whether you read Romanian, device type, screen size and time taken). If you post it in a comment, it is public, under your DEV name.",
         reads: "Do you read Romanian?", yes: "Yes", no: "No", same: "Same", diff: "Different", next: "Next",
         qSD: "Same, letter for letter?", qWR: "Which one is correct Romanian?", practice: "Example:",
         practiceOk: "Right: different. One has an s with no mark. From now on there are no answers.", practiceBad: "They were different: one has an s with no mark. From now on there are no answers.",
         doneTitle: "Done, thank you!", sdScore: "Same or different", wrScore: "Spelled right", chance: "Guessing gets half of them.",
         send: "Send Daniel this code (just the code):", sendDev: "If you like, post your code in a comment under the article:",
-        reveal: "The difference: ș with a comma below is the correct Romanian letter. ş with a cedilla is the Turkish one, used by mistake for Romanian since the 1990s, when computers didn't have the right letter.",
-        of: "of" }
+        reveal: "The difference: ș and ț with a comma below are the correct Romanian letters. ş and ţ with a cedilla are 1990s stand-ins (ş is Turkish), from when Romanian computers didn't have the right letters.",
+        more: "What the models did:", writeup: "the write-up", source: "code and data", of: "of" }
 };
 const params = new URLSearchParams(location.search);
 const fromDev = params.get("from") === "dev";
 let lang = fromDev ? "en" : "ro";
 const $ = id => document.getElementById(id);
+// In the texts, ş and ţ are marked English like the words (see wordSpan), so the reveal shows them with a cedilla.
+function latin(c) { const s = document.createElement("span"); s.lang = "en"; s.textContent = c; return s; }
 function paint() {
   document.documentElement.lang = lang;
+  document.title = T[lang].title;
   document.querySelectorAll("[data-t]").forEach(el => {
-    const key = el.dataset.t === "send" && fromDev ? "sendDev" : el.dataset.t;
-    el.textContent = T[lang][key];
+    const key = fromDev && (el.dataset.t === "send" || el.dataset.t === "privacy") ? el.dataset.t + "Dev" : el.dataset.t;
+    el.replaceChildren(...T[lang][key].split(/([şţŞŢ])/).map((part, i) => i % 2 ? latin(part) : part));
   });
   document.querySelectorAll("[data-lang]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.lang === lang)));
 }
 document.querySelectorAll("[data-lang]").forEach(b => b.addEventListener("click", () => { lang = b.dataset.lang; paint(); }));
 const size = (() => { const s = parseInt(params.get("size"), 10); return s >= 12 && s <= 40 ? s : 18; })();
 document.documentElement.style.setProperty("--size", size + "px");
+if (size > 22) document.documentElement.classList.add("stack");
 
 function shuffle(a) {
   const r = new Uint32Array(a.length); crypto.getRandomValues(r);
@@ -170,10 +183,13 @@ function render() {
   } else return finish();
   lockUntil = performance.now() + 350;
   progress();
-  const first = document.querySelector("#trial button:not(.hidden):not([disabled])"); if (first) first.focus({ preventScroll: true });
+  // Focus the question, not an answer, so Enter can't answer "same" by default; in "which is right" steps the
+  // first word (left and right are drawn at random).
+  (step < sdOrder.length ? $("question") : $("wr").querySelector("button")).focus({ preventScroll: true });
 }
 document.querySelectorAll("[data-reads]").forEach(b => b.addEventListener("click", () => {
   reads = b.dataset.reads; started = Date.now();
+  document.querySelector(".langs").classList.add("hidden");   // the question and feedback don't switch mid-test
   $("intro").classList.add("hidden"); $("trial").classList.remove("hidden"); render();
 }));
 document.querySelectorAll("#sd button").forEach(b => b.addEventListener("click", () => {
@@ -195,6 +211,7 @@ $("wr").addEventListener("click", e => {
 });
 function finish() {
   $("trial").classList.add("hidden"); $("done").classList.remove("hidden");
+  const h = $("done").querySelector("h2"); h.tabIndex = -1; h.focus();
   $("sdScore").textContent = `${sdRight}/${sdOrder.length}`; $("wrScore").textContent = `${wrRight}/${wrOrder.length}`;
   const ua = navigator.userAgent, ipad = /Mac/.test(ua) && navigator.maxTouchPoints > 1;   // iPadOS reports a Mac
   const os = /iPhone|iPod/.test(ua) ? "ios" : /iPad/.test(ua) || ipad ? "ipados" : /Android/.test(ua) ? "android"

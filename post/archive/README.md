@@ -1,0 +1,3 @@
+# Earlier drafts
+
+Earlier versions of the write-up and the scripts that built them, kept for history. `post.md` and `post-dev.md` are the first version, as published on DEV on 1 October 2026 (15 models); `post-v2.md` and `post-v2-dev.md` are an unpublished second draft; `kaggle-description.md` is an earlier benchmark description (the current one is `post/kaggle-description-v2.md`). Their numbers are out of date. The current write-up is `post/post-v3.md`, which `post/finalize3.py` turns into `post/post-v3-dev.md`, the text on DEV. The charts and cover these drafts point to stay in `post/`, where the first published version linked them.

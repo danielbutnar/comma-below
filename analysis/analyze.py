@@ -1,11 +1,13 @@
 """Turn downloaded Kaggle run outputs into tables for the write-up.
 
-Reads results/raw/<task>/<version>/<model>/<run_id>/<task>__<model>.jsonl,
-keeps the newest version and run per task and model, and writes:
-  results/items.csv      one row per model x item (all tasks)
+Reads results/raw/<task>/<version>/<model>/<run_id>/<task>__<model>.jsonl (in sorted order, so every
+machine gets the same rows in the same order) and keeps the newest version of each task. load() is what
+the other scripts use. Run on its own, this writes the Round 1 tables (tasks 1-7, newest run per model):
+  results/items.csv      one row per model x item
   results/summary.csv    one row per model, all headline metrics
   results/summary.md     the same as a Markdown table
-Usage:  uv run --no-project --with pandas python analysis/analyze.py
+  results/echo_runs.csv  task 2 pass rates per model and run
+Usage:  uv run --no-project --with pandas --with tabulate python analysis/analyze.py
 """
 
 from __future__ import annotations
@@ -20,6 +22,7 @@ RAW = ROOT / "results" / "raw"
 OUT = ROOT / "results"
 
 
+ROUND1 = {"write", "echo", "fix", "see", "restore", "code", "rule"}  # tasks 1-7
 SHORT = {"8-echo-four-inputs": "echo4", "9-contagion": "contagion", "10-turkish-guests": "turkish",
          "11-other-look-alikes": "lookalike", "12-turns": "turns", "13-other-wrong-letters": "wrong"}
 
@@ -30,11 +33,14 @@ def short_name(task: str) -> str:
     return SHORT.get(tail, task.rsplit("-", 1)[-1])
 
 
-def load(all_runs: bool = False) -> pd.DataFrame:
-    """Rows from the newest task version; the newest run per model, or every run."""
+def load(all_runs: bool = False, tasks: set[str] | None = None) -> pd.DataFrame:
+    """Rows from the newest task version; the newest run per model, or every run. `tasks`: short names to keep."""
     files: dict[tuple[str, str], list[tuple[int, int, pathlib.Path]]] = {}
-    for f in RAW.glob("romanian-comma-below-*/*/*/*/*.jsonl"):
+    # sorted level by level, so every machine reads the rows in the same order (the order of the committed tables)
+    for f in sorted(RAW.glob("romanian-comma-below-*/*/*/*/*.jsonl"), key=lambda p: p.parts):
         task, version, model, run_id = f.parts[-5], f.parts[-4], f.parts[-3], f.parts[-2]
+        if tasks is not None and short_name(task) not in tasks:
+            continue
         rank = (int(version) if version.isdigit() else 0, int(run_id) if run_id.isdigit() else 0)
         files.setdefault((task, model), []).append((*rank, f))
     if not files:
@@ -138,14 +144,14 @@ def summarize(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def main():
-    df = load()
+    df = load(tasks=ROUND1)
     if df.empty:
         print("no results downloaded yet")
         return
     df.drop(columns=[c for c in ("code",) if c in df and df[c].dtype == object], errors="ignore")
     df.to_csv(OUT / "items.csv", index=False, encoding="utf-8", lineterminator="\n")
     summary = summarize(df)
-    runs = echo_runs(load(all_runs=True))
+    runs = echo_runs(load(all_runs=True, tasks=ROUND1))
     runs.to_csv(OUT / "echo_runs.csv", index=False, encoding="utf-8", lineterminator="\n")
     full = runs[runs["count_cedilla"] >= 20]  # runs where nearly every cedilla item completed
     agg = full.groupby("model")["mean_cedilla"].agg(["mean", "min", "max", "count"]).reset_index()

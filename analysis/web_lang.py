@@ -3,9 +3,11 @@
 On a page marked Romanian (lang="ro"), fonts with a Romanian localized-forms rule (Segoe UI, Roboto, Noto Sans and
 Open Sans among them) draw the cedilla ş ţ with a comma, so the wrong letter looks right to the site's own readers.
 Reads analysis/web_census.csv (the 30 September census; the same 29 sites the post counts), fetches each front page
-once and writes analysis/web_lang.csv with the language the page declares on its <html> tag.
+once and writes the language the page declares on its <html> tag to analysis/web_lang.new.csv; with --update it
+replaces analysis/web_lang.csv, the 10 October snapshot the post quotes (a rerun sees different pages, and offline
+it would write error rows, which check_claims.py refuses).
 
-Usage:  uv run --no-project python analysis/web_lang.py
+Usage:  uv run --no-project python analysis/web_lang.py [--update]
 """
 
 from __future__ import annotations
@@ -14,6 +16,7 @@ import csv
 import datetime
 import pathlib
 import re
+import sys
 import urllib.request
 
 HERE = pathlib.Path(__file__).parent
@@ -46,7 +49,8 @@ def main():
             error = repr(e)[:120]
         rows.append({"url": url, "html_lang": lang, "error": error})
         print(rows[-1])
-    with (HERE / "web_lang.csv").open("w", newline="\n", encoding="utf-8") as fh:
+    out = HERE / ("web_lang.csv" if "--update" in sys.argv else "web_lang.new.csv")
+    with out.open("w", newline="\n", encoding="utf-8") as fh:
         fh.write(f"# fetched {datetime.date.today().isoformat()}\n")
         w = csv.DictWriter(fh, fieldnames=list(rows[0]))
         w.writeheader()

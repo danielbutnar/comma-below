@@ -134,11 +134,11 @@ models: 14 | answers: 504
   ro rule    pass % 100.0 [100.0, 100.0] n=84
   ro scoped  pass %  98.8 [96.4, 100.0] n=84
   tr none    n=112 | outcomes % {'correct': 100.0}
-  tr rule    n=112 | outcomes % {'correct': 68.8, 'turkish_with_comma': 14.3, 'no_s': 9.8, 'romanian': 7.1}
-  tr scoped  n=112 | outcomes % {'correct': 93.8, 'romanian': 3.6, 'no_s': 1.8, 'turkish_with_comma': 0.9}
-  words: Turkish with ș: ['Akșamları', 'Anlayıșınız', 'akșam', 'bașlattım', 'hoș', 'iyileștiğinde', 'iș', 'ișlemini', 'kesinleștirmek', 'kișilik', 'kolaylaștırmak', 'koșullarını', 'muhteșem', 'olușan', 'olușturabiliriz', 'papanași', 'paylașırsanız', 'teșekkür', 'ulașabilirsiniz', 'ulaștırabiliriz', 'varıș', 'yaklașık', 'yokuș', 'yürüyüș', 'çalıșma', 'çalıșıyorlar', 'İș', 'Șarap', 'Șarj', 'Șehir', 'șarap', 'șaraplarını', 'șehir', 'șifalar', 'șișe']
-         Romanian: ['așteptăm', 'cățelușă', 'liniștite', 'orașul', 'papanași', 'priveliște', 'românești', 'șederii', 'și']
-         names: ['Brașov', 'Bunești', 'Râșnov', 'Sâmbureștiului'] | unknown: ['olușturabiliriz']
+  tr rule    n=112 | outcomes % {'correct': 70.5, 'turkish_with_comma': 13.4, 'no_s': 9.8, 'romanian': 6.2}
+  tr scoped  n=112 | outcomes % {'correct': 94.6, 'romanian': 2.7, 'no_s': 1.8, 'turkish_with_comma': 0.9}
+  words: Turkish with ș: ['Akșamları', 'Anlayıșınız', 'akșam', 'bașlattım', 'hoș', 'iyileștiğinde', 'iș', 'ișlemini', 'kesinleștirmek', 'kișilik', 'kolaylaștırmak', 'koșullarını', 'muhteșem', 'olușan', 'olușturabiliriz', 'paylașırsanız', 'teșekkür', 'ulașabilirsiniz', 'ulaștırabiliriz', 'varıș', 'yaklașık', 'yokuș', 'yürüyüș', 'çalıșma', 'çalıșıyorlar', 'İș', 'Șarap', 'Șarj', 'Șehir', 'șarap', 'șaraplarını', 'șehir', 'șifalar', 'șișe']
+         Romanian: ['așteptăm', 'cățelușă', 'liniștite', 'orașul', 'priveliște', 'românești', 'șederii', 'și']
+         names: ['Brașov', 'Bunești', 'Râșnov', 'Sâmbureștiului', 'papanași'] | unknown: ['olușturabiliriz']
 lang                      ro                tr              
 rule                    rule     scoped   none   rule scoped
 Claude Haiku 4.5       100.0      100.0  100.0   75.0   75.0

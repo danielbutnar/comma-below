@@ -1,7 +1,12 @@
 """Recompute the numbers the post quotes, and check the post against them.
 
-  --values   write results/post_values.json (the {{NAME}} numbers that post/finalize2.py fills in)
-  (default)  check post/post-v2-dev.md: every claim below must appear with the recomputed number
+  --values   write results/post_values.json (the {{NAME}} numbers that post/finalize3.py fills in)
+  (default)  check post/post-v3-dev.md: every number in it must be a recomputed value, and every quote
+             must be in the data
+
+A few numbers need the run traces (results/raw/**/*.run.json: DeepSeek-R1's reasoning and the cost),
+which stay on Kaggle and are not in the repo. Without them those values are kept from the committed
+results/post_values.json, and the script says which.
 
 Usage:  uv run --no-project --with pandas --with numpy python analysis/check_claims.py [--values]
 """
@@ -27,15 +32,42 @@ from round2 import ok_rows  # noqa: E402
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 EXCLUDE_R1 = {"grok-4.6", "grok-4.5-0708", "gpt-oss-120b"}
+VALUES = ROOT / "results" / "post_values.json"
 
 
 def pct(x) -> int:
     return int(round(100 * float(x)))
 
 
+def holm(st: pd.DataFrame, alpha: float = 0.05) -> pd.DataFrame:
+    """The version steps that survive a Holm-Bonferroni correction over all of them, smallest p first."""
+    m, keep = len(st), []
+    for i, r in enumerate(st.sort_values("p").itertuples()):
+        if r.p > alpha / (m - i):
+            break
+        keep.append(r.Index)
+    return st.loc[keep]
+
+
+def have_traces() -> bool:
+    """The run traces (*.run.json) stay on Kaggle; a clone of the repo has only the answers (*.jsonl)."""
+    return next((ROOT / "results" / "raw").glob("*/*/*/*/*.run.json"), None) is not None
+
+
+def keep_committed(v: dict, keys: tuple[str, ...], kept: list[str]):
+    """Without the run traces, take these values from the committed post_values.json."""
+    old = json.loads(VALUES.read_text(encoding="utf-8")) if VALUES.exists() else {}
+    for k in keys:
+        if k in old:
+            v[k] = old[k]
+            kept.append(k)
+
+
 def values() -> dict:
-    every = ok_rows(load(all_runs=True))
-    latest = ok_rows(load())
+    raw_every, raw_latest = load(all_runs=True), load()  # raw: as the tasks scored them on Kaggle
+    every = ok_rows(raw_every)
+    latest = ok_rows(raw_latest)
+    kept: list[str] = []
     r1e = every[~every.model.isin(EXCLUDE_R1)]
     r1l = latest[~latest.model.isin(EXCLUDE_R1)]
     v: dict[str, object] = {}
@@ -52,6 +84,7 @@ def values() -> dict:
     n_copied = sum(len(x) for x in ce.cedilla_words_copied)
     v["R1_COPIED"] = pct(n_copied / n_words)
     r1_values(r1l, v)
+    see_final_values(r1l, v)
     v["GROK_ECHO"] = pct(ce[ce.model == "grok-4.20-0309-reasoning"]["pass"].mean())
 
     # Round 2, task 8
@@ -92,8 +125,19 @@ def values() -> dict:
         sp = sp[sp["count"] >= 2]
         rng = 100 * (sp["max"] - sp["min"])
         v["RUN_SPREAD_MED"], v["RUN_SPREAD_MAX"], v["RUN_SPREAD_N"] = f"{rng.median():.0f}", f"{rng.max():.0f}", len(sp)
+        # the same on round one's identical task 2 runs only (3 per model), the base of FLIP_R1: the
+        # numbers above mix models with 2 runs and models with 4, and a range grows with the number of runs
+        r1 = every[(every.task == "echo") & (every.variant == "cedilla")].groupby(["model", "run_id"])["pass"].mean()
+        sp1 = r1.groupby("model").agg(["min", "max", "count"])
+        rng1 = 100 * (sp1["max"] - sp1["min"])[sp1["count"] >= 2]
+        v["RUN_SPREAD_R1_MED"], v["RUN_SPREAD_R1_MAX"] = int(round(rng1.median())), int(round(rng1.max()))
         q = e4[(e4.model == "qwen3-next-80b-a3b-thinking") & (e4.variant == "cedilla")]
         v["QWEN_T_N"] = len(q)
+        # Kaggle's task 8 score counts an empty answer (the token cap ran out while thinking) as a failure
+        qk = raw_latest[(raw_latest.task == "echo4") & (raw_latest.model == "qwen3-next-80b-a3b-thinking")
+                        & (raw_latest.variant == "cedilla") & raw_latest["error"].isna()]
+        if len(qk):
+            v["QWEN_T_KAGGLE"] = pct(qk["pass"].mean())
         r2small = every[every.task.isin(["contagion", "turkish", "lookalike", "turns"])]
         v["N_R2_SMALL"] = r2small.model.nunique()
         # where the cedilla words in task 8 answers come from: exact copies, inflected or joined forms, new words
@@ -141,14 +185,8 @@ def values() -> dict:
             v["N_STEPS_DOWN"] = int(((st.p < 0.05) & (st.change < 0)).sum())
             v["N_STEPS_UP"] = int(((st.p < 0.05) & (st.change > 0)).sum())
             # Holm-Bonferroni over the version steps
-            m = len(st)
-            surv = []
-            for i, r in enumerate(st.sort_values("p").itertuples()):
-                if r.p <= 0.05 / (m - i):
-                    surv.append(f"{r.older} → {r.newer.replace('Claude ', '').replace('Gemini ', '')} "
-                                f"({r.change:+.0f} points)")
-                else:
-                    break
+            surv = [f"{r.older} → {r.newer.replace('Claude ', '').replace('Gemini ', '')} ({r.change:+.0f} points)"
+                    for r in holm(st).itertuples()]
             v["STEPS_HOLM"] = (", ".join(surv[:-1]) + " and " + surv[-1]) if len(surv) > 1 else (surv[0] if surv else "none")
             v["N_STEPS_HOLM"] = len(surv)
             for r in st_all.itertuples():
@@ -204,6 +242,11 @@ def values() -> dict:
             v[f"N_TR_{key}_BROKE"] = int(x.groupby("model").outcome.apply(lambda s: (s != "correct").any()).sum())
         v["N_TR_BROKE"] = v["N_TR_RULE_BROKE"]
         v["N_TR_SCOPED_BROKE"] = v["N_TR_SCOPED_BROKE"]
+        # the same replies as task 10 scored them on Kaggle: its name list has the places, not the dishes and
+        # villages the word-level reading above also treats as names, so 4 replies fail there and count here
+        tk = raw_every[(raw_every.task == "turkish") & (raw_every.lang == "tr") & raw_every["error"].isna()]
+        v["TR_RULE_KAGGLE"] = f"{100 * tk[tk.rule == 'rule']['pass'].mean():.1f}"
+        v["TR_SCOPED_KAGGLE"] = f"{100 * tk[tk.rule == 'scoped']['pass'].mean():.1f}"
         ro = tr[tr.lang == "ro"]
         v["RO_RULE"] = pct(ro[ro.rule == "rule"]["pass"].mean())
         v["RO_SCOPED"] = pct(ro[ro.rule == "scoped"]["pass"].mean())
@@ -227,6 +270,8 @@ def values() -> dict:
         v["DS_NR_N"], v["DS_NR_TALK"], v["DS_NR_COPIED"] = len(nr), int(nr.talks.sum()), int(nr.copied.sum())
         v["DS_RU_N"], v["DS_RU_TALK"] = len(ru), int(ru.talks.sum())
         v["DS_RU_TALK_COPIED"] = int((ru.talks & ru.copied).sum())
+    elif not have_traces():
+        keep_committed(v, ("DS_NR_N", "DS_NR_TALK", "DS_NR_COPIED", "DS_RU_N", "DS_RU_TALK", "DS_RU_TALK_COPIED"), kept)
     if len(e4):
         c8 = e4[e4.variant == "cedilla"]
         says = c8.response.fillna("").str.contains(r"sedil|cedil|diacritic|ortograf|virgul|comma below|encoding", case=False)
@@ -238,26 +283,38 @@ def values() -> dict:
     jj = pd.concat([see_m.rename("see"), ech_m.rename("echo")], axis=1).dropna()
     v["SPOT_COPY_RHO"] = f"{_sp(jj.see, jj.echo):.2f}"
 
-    v["PREDICTIONS"], counts = predictions(every)
+    v["PREDICTIONS"], counts, v["PRED_NOTE"] = predictions(every)
     v.update({"PRED_" + k.upper().replace(" ", "_"): n for k, n in counts.items()})
     third_version_values(every, v)
 
     # cost of everything downloaded (all tasks, pilots, reruns)
     import costs  # noqa: E402
-    total = 0.0
-    for f in (ROOT / "results" / "raw").glob("*/*/*/*/*.run.json"):
-        d = json.loads(f.read_text(encoding="utf-8"))
-        for m in costs.requests(d):
-            total += (int(m.get("inputTokensCostNanodollars", 0) or 0) + int(m.get("outputTokensCostNanodollars", 0) or 0)) / 1e9
-    v["COST"] = f"{total:.2f}"
+    if have_traces():
+        total = 0.0
+        for f in (ROOT / "results" / "raw").glob("*/*/*/*/*.run.json"):
+            d = json.loads(f.read_text(encoding="utf-8"))
+            for m in costs.requests(d):
+                total += (int(m.get("inputTokensCostNanodollars", 0) or 0) + int(m.get("outputTokensCostNanodollars", 0) or 0)) / 1e9
+        v["COST"] = f"{total:.2f}"
+    else:
+        keep_committed(v, ("COST",), kept)
+    if kept:
+        print("no run traces (results/raw/**/*.run.json, not in the repo): kept from the committed "
+              f"results/post_values.json: {', '.join(kept)}")
+
+    try:
+        import extras  # noqa: E402  (analysis/extras.py: values for the post's newer paragraphs)
+    except ImportError:
+        extras = None
+    if extras is not None:
+        extras.add(v, every, latest)
     return v
 
 
 def third_version_values(every: pd.DataFrame, v: dict):
     """Numbers new in the third version of the post: own words, the fixes, run-to-run flips, word pairs."""
     import own_words as OW  # noqa: E402
-    from fix_check import fix_naive, fix_romanian  # noqa: E402
-    from round2 import turkish_outcomes  # noqa: E402
+    from fix_check import fix_naive, fix_romanian, is_hos, romanian_base, turkish_base  # noqa: E402
 
     # the model's own new words follow the copied cedilla (tasks 2 and 8, answers to cedilla input)
     a = OW.answers(every)
@@ -271,18 +328,18 @@ def third_version_values(every: pd.DataFrame, v: dict):
     if haiku:
         v["HAIKU_ALL"], v["HAIKU_SOME"] = f"{haiku[0]} of {haiku[1]}", f"{haiku[2]} of {haiku[3]}"
 
-    # fixes in code, measured on the models' answers
+    # fixes in code, measured on the models' answers (analysis/fix_check.py prints the same numbers)
     tr = every[every.task == "turkish"]
     if len(tr):
-        tt, _ = turkish_outcomes(tr)
         # the bot's own correct Turkish replies (no rule), the same base as chart-fixes
-        tt = tt[(tt.rule == "none") & (tt.outcome == "correct")]
+        tt = turkish_base(every)
         tr_text = tt.response.fillna("").map(lambda r: unicodedata.normalize("NFC", r))
         v["FIX_TR_N"] = len(tt)
         v["FIX_NAIVE_ALTERED"] = int(sum(fix_naive(r) != r for r in tr_text))
         v["FIX_TR_ALTERED"] = int(sum(fix_romanian(r) != r for r in tr_text))
-    ced = every[((every.task == "echo4") & (every.variant == "cedilla")) | ((every.task == "turkish") & (every.lang == "ro"))]
-    with_ced = ced[ced.response.fillna("").map(lambda r: any(c in unicodedata.normalize("NFC", r) for c in "şŞţŢ"))]
+        # of those, short greetings with "hoş" (Hoş geldiniz) and no ı ğ ç ö ü to mark them as Turkish
+        v["FIX_TR_HOS"] = int(sum(fix_romanian(r) != r and is_hos(r) for r in tr_text))
+    with_ced = romanian_base(every)
     v["FIX_RO_N"] = len(with_ced)
     v["FIX_RO_LEFT"] = int(sum(any(c in fix_romanian(r) for c in "şŞţŢ") for r in with_ced.response.fillna("")))
 
@@ -489,16 +546,24 @@ def verdict_vs(value: float, threshold: float, higher_is_held: bool, margin: flo
     return "held" if (value >= threshold) == higher_is_held else "failed"
 
 
-def predictions(every: pd.DataFrame) -> tuple[str, dict]:
+def predictions(every: pd.DataFrame) -> tuple[str, dict, str]:
     """The Round 2 predictions as written in the task descriptions, each scored against the data.
 
     The predictions were written as directions before the runs; the thresholds that turn a result into
     "held" or "failed" were set when scoring, and a result within 5 points of its threshold (or a rank
-    correlation over fewer than 10 models) counts as inconclusive. Returns the table and the counts.
+    correlation over fewer than 10 models) counts as inconclusive. Each prediction is scored on the data it
+    names (task 9's and task 12's second predictions on task 2). Version steps count when they survive the
+    Holm correction the post uses. Returns the table, the counts, and a sentence naming the verdicts that
+    rest on little data (rank correlations get a permutation p-value for it).
     """
-    from round2 import perm_trend, purity, spearman, turkish_outcomes  # noqa: E402
+    from round2 import perm_spearman, perm_trend, purity, turkish_outcomes  # noqa: E402
 
     rows, verdicts = [], []
+    thin = {}  # what the note under the table needs
+
+    def names(models) -> str:
+        n = sorted({M.name(m) for m in models})
+        return " and ".join(n) if len(n) <= 2 else ", ".join(n[:-1]) + " and " + n[-1]
 
     def add(task, text, result, verdict):
         verdicts.append(verdict)
@@ -518,16 +583,18 @@ def predictions(every: pd.DataFrame) -> tuple[str, dict]:
         pts = [(M.line(m), M.version(m), 100 * g[g.variant == "cedilla"]["pass"].mean()) for m, g in e4.groupby("model")]
         rho, p = perm_trend(pts)
         steps_f = ROOT / "results" / "round2_version_steps.csv"
-        dn = up = n_steps = 0
+        dn = up = dn0 = up0 = n_steps = 0
         if steps_f.exists():
             st = pd.read_csv(steps_f)
             st = st[st.kind == "version"]
             n_steps = len(st)
-            dn, up = int(((st.p < 0.05) & (st.change < 0)).sum()), int(((st.p < 0.05) & (st.change > 0)).sum())
+            dn0, up0 = int(((st.p < 0.05) & (st.change < 0)).sum()), int(((st.p < 0.05) & (st.change > 0)).sum())
+            hs = holm(st)  # the correction the post's text uses for the same steps
+            dn, up = int((hs.change < 0).sum()), int((hs.change > 0).sum())
         v = "inconclusive" if dn == up == 0 else "held" if up == 0 else "failed" if dn == 0 else "mixed"
         add(8, "Newer versions in a family copy the cedilla at least as often as older ones.",
-            f"of {n_steps} upgrades, {dn} copied more and {up} copied less (p < 0.05); no overall trend "
-            f"(rank correlation {rho:+.2f})", v)
+            f"of {n_steps} upgrades, {dn} copied more and {up or 'none'} copied less after a correction for multiple tests "
+            f"({dn0} and {up0} at p < 0.05 before it); no overall trend (rank correlation {rho:+.2f})", v)
         n90 = int((per["cedilla+rule"] >= 90).sum())
         add(8, "The one-sentence rule lifts cedilla input to at least 90 % for most models.",
             f"{n90} of {len(per)} models at 90 % or more", verdict_vs(100 * n90 / len(per), 50, True))
@@ -538,16 +605,20 @@ def predictions(every: pd.DataFrame) -> tuple[str, dict]:
         n90 = int((per["clean-3"] >= 90).sum())
         add(9, "With a clean target, answers stay clean for most models even when the other three documents are cedilla.",
             f"{n90} of {len(per)} models at 90 % or more", verdict_vs(100 * n90 / len(per), 50, True))
-        if len(e4):
+        e2 = every[(every.task == "echo") & (every.variant == "cedilla")]  # task 2, as registered
+        if len(e2):
             whole = {}
-            for m, g in e4[(e4.variant == "cedilla") & (~e4["pass"].astype(bool))].groupby("model"):
+            for m, g in e2[~e2["pass"].astype(bool)].groupby("model"):
                 pur = [x for x in (purity(r) for r in g.response) if not np.isnan(x)]
                 whole[m] = np.mean([x == 1.0 for x in pur]) if pur else np.nan
             j = pd.concat([pd.Series(whole, name="whole"), (100 - per["clean-3"]).rename("infected")], axis=1).dropna()
-            r = spearman(j.whole, j.infected) if len(j) >= 5 else np.nan
+            r, p = perm_spearman(j.whole, j.infected) if len(j) >= 5 else (np.nan, np.nan)
             v = "too early" if np.isnan(r) else "inconclusive" if len(j) < 10 else ("held" if r >= 0.3 else "failed")
-            add(9, "The models that rewrite whole answers in cedilla are the ones whose clean-target answers get infected.",
-                f"rank correlation {r:+.2f} over {len(j)} models", v)
+            hit = j.index[j.infected > 0]
+            add(9, "The models that rewrote whole answers in cedilla in task 2 are the ones whose clean-target answers "
+                   "get infected.",
+                f"rank correlation {r:+.2f} over {len(j)} models; only {names(hit)} had infected answers", v)
+            thin["k9"] = (v, p)
         a, b = 100 * k9[k9.cond == "cedilla-0"]["pass"].mean(), 100 * k9[k9.cond == "cedilla-3"]["pass"].mean()
         add(9, "A cedilla target is copied less when the other documents are clean.",
             f"{a:.0f} % vs {b:.0f} % clean answers", verdict_vs(a - b, 0, True))
@@ -561,9 +632,10 @@ def predictions(every: pd.DataFrame) -> tuple[str, dict]:
         add(10, "Task 7's rule makes some models write Turkish with the Romanian comma letter.",
             f"{bad.model.nunique()} of {tt.model.nunique()} models, {len(bad)} replies", "held" if len(bad) else "failed")
         ro = 100 * tr[(tr.lang == "ro") & (tr.rule == "scoped")]["pass"].mean()
-        v = "held" if ok["scoped"] >= 95 and ro >= 90 else "failed"
+        both = (verdict_vs(ok["scoped"], 95, True), verdict_vs(ro, 90, True))
+        v = "failed" if "failed" in both else "inconclusive" if "inconclusive" in both else "held"
         add(10, "The scoped rule keeps Turkish intact and still fixes Romanian.",
-            # one decimal: the threshold is 95 %, and a rounded "95 %" next to "failed" would read as a contradiction
+            # one decimal: the threshold is 95 %, and a rounded "95 %" would hide how close it came
             f"Turkish {ok['scoped']:.1f} % correct (no rule: {ok['none']:.0f} %, full rule: {ok['rule']:.0f} %), "
             f"Romanian {ro:.0f} %", v)
 
@@ -579,10 +651,14 @@ def predictions(every: pd.DataFrame) -> tuple[str, dict]:
             per = lk.groupby(["model", "variant"])["pass"].mean().unstack()
             ced = e4[e4.variant == "cedilla"].groupby("model")["pass"].mean()
             j = pd.concat([per["cyrillic-names"].rename("cy"), ced.rename("ced")], axis=1).dropna()
-            r = spearman(j.cy, j.ced) if len(j) >= 5 else np.nan
+            r, p = perm_spearman(j.cy, j.ced) if len(j) >= 5 else (np.nan, np.nan)
             v = "too early" if np.isnan(r) else "inconclusive" if len(j) < 10 else ("held" if r >= 0.3 else "failed")
+            cn = lk[(lk.variant == "cyrillic-names") & lk.model.isin(j.index)]
+            kept = cn[~cn["pass"].astype(bool)]
             add(11, "The models that copy the Romanian cedilla most also copy the look-alikes most.",
-                f"rank correlation {r:+.2f} over {len(j)} models", v)
+                f"rank correlation {r:+.2f} over {len(j)} models, resting on the {len(kept)} of {len(cn)} answers "
+                f"that kept a look-alike ({kept.model.nunique()} models)", v)
+            thin["lk"] = (v, p)
 
     tu = every[every.task == "turns"]
     if len(tu) and tu.model.nunique() >= 5:
@@ -590,16 +666,21 @@ def predictions(every: pd.DataFrame) -> tuple[str, dict]:
         n_inf = int((cc.second_cedilla > 0).sum())
         inf = 100 * n_inf / len(cc)
         inf_first = 100 * (cc[cc.first_cedilla > 0].second_cedilla > 0).mean()
+        who = cc[cc.second_cedilla > 0].model
+        by = ("" if not len(who) else f", both {names(who)}" if n_inf == 2 and who.nunique() == 1
+              else f", all {names(who)}" if who.nunique() == 1 else f", from {names(who)}")
+        v = "held" if inf > 0 and inf_first > inf else "failed"
         add(12, "A cedilla first text infects some clean second summaries, mostly after a cedilla first summary.",
-            f"{inf:.0f} % infected ({n_inf} of {len(cc)} conversations); "
-            f"{inf_first:.0f} % when the first summary was itself in cedilla",
-            "held" if inf > 0 and inf_first > inf else "failed")
-        if len(e4):
+            f"{inf:.0f} % infected ({n_inf} of {len(cc)} conversations{by}); "
+            f"{inf_first:.0f} % when the first summary was itself in cedilla", v)
+        thin["turns"] = (v, n_inf, len(cc), by.replace(", both ", ", both from ").replace(", all ", ", all from "))
+        e2 = every[(every.task == "echo") & (every.variant == "cedilla")]
+        if len(e2):  # "copied less than in task 2", as registered
             ms = set(tu.model)
-            base = 100 * e4[(e4.variant == "cedilla") & (e4.kind == "summary") & (e4.model.isin(ms))]["pass"].mean()
+            base = 100 * e2[(e2.kind == "summary") & (e2.model.isin(ms))]["pass"].mean()
             prot = 100 * tu[tu.cond == "clean>cedilla"]["pass"].mean()
             add(12, "A clean first text does not protect a cedilla second text much.",
-                f"{prot:.0f} % clean after a clean first text, {base:.0f} % on its own (task 8 summaries)",
+                f"{prot:.0f} % clean after a clean first text, {base:.0f} % on its own (the same models' task 2 summaries)",
                 verdict_vs(prot - base, 15, False))
 
     w = every[every.task == "wrong"]
@@ -633,11 +714,20 @@ def predictions(every: pd.DataFrame) -> tuple[str, dict]:
     head = "| Task | Prediction | Result | |\n| --- | --- | --- | --- |"
     counts = {k: verdicts.count(k) for k in ("held", "failed", "mixed", "inconclusive", "too early")}
     counts["total"] = len(verdicts)
-    return head + "\n" + "\n".join(rows), counts
+
+    # one sentence for under the table: the verdicts that rest on little data
+    note = ""
+    if {"k9", "lk", "turns"} <= set(thin):
+        (v9, p9), (v11, p11), (v12, n_inf, n_cc, by) = thin["k9"], thin["lk"], thin["turns"]
+        which = "of the predictions that held" if v9 == v11 == v12 == "held" else "of these verdicts"
+        note = (f"Three {which} rest on very little: the rank correlations in tasks 9 and 11 could be chance "
+                f"(permutation p = {p9:.2f} and {p11:.2f}), and the infection in task 12 is {n_inf} of {n_cc} "
+                f"conversations{by}.")
+    return head + "\n" + "\n".join(rows), counts, note
 
 
 # (claim name, text that must appear in the post, with {} for the recomputed value key). The third
-# version fills every number from post_values.json, so this list is empty; sentences whose truth
+# version fills every number from post_values.json, so this list is short; sentences whose truth
 # depends on the data are guarded by asserts in third_version_values() instead.
 CLAIMS: list[tuple[str, str]] = [
     ("dose-response", "{K9_LOWER} of the {N_K9} models moved that way, none the other"),
@@ -732,6 +822,40 @@ def r1_values(r1l, v):
     v["CODE_P"] = f"{p:.2f}"
 
 
+_SEE_PATTERN = {"codepoint": (re.compile(r"U\+([0-9A-Fa-f]{4,6})"), lambda x: "U+" + x.upper().rjust(4, "0")),
+                "bool": (re.compile(r"\b(true|false|yes|no)\b", re.I), lambda x: "true" if x.lower() in ("true", "yes") else "false")}
+
+
+def see_final(response: str, kind: str) -> str | None:
+    """A See reply's final answer: the last "Answer: ...", else the first line if it holds one (replies that
+    answer first and explain after), else the last U+XXXX or true/false. The task on Kaggle takes the first
+    one anywhere in the reply, so a reply that lists every letter's code point before giving the right one
+    counts as wrong there. (Taking the last one alone misreads the answer-first replies: "no visible
+    differences" would turn a "true" into "false".)"""
+    pat, norm = _SEE_PATTERN["codepoint" if kind == "codepoint" else "bool"]
+    t = response or ""
+    for line in reversed(re.findall(r"answer\s*[:*]*\s*\**\s*(.*)", t, re.I)):
+        m = pat.search(line)
+        if m:
+            return norm(m.group(1))
+    m = pat.search(next((line for line in t.splitlines() if line.strip()), ""))
+    if m:
+        return norm(m.group(1))
+    found = pat.findall(t)
+    return norm(found[-1]) if found else None
+
+
+def see_final_values(r1l: pd.DataFrame, v: dict):
+    """Task 4 (See) for the two models whose replies give the answer last: the score in the post's table
+    (first match, as on Kaggle) and the score on each reply's final answer."""
+    see = r1l[r1l.task == "see"]
+    for m, key in (("deepseek-r1-0528", "SEE_DS"), ("gemini-3.5-flash-lite", "SEE_FL")):
+        d = see[see.model == m]
+        if len(d):
+            v[f"{key}_TABLE"] = pct(d["pass"].astype(float).mean())
+            v[f"{key}_FINAL"] = pct(np.mean([see_final(r, k) == a for r, k, a in zip(d.response, d.kind, d.answer)]))
+
+
 def check(v: dict) -> int:
     post = (ROOT / "post" / "post-v3-dev.md").read_text(encoding="utf-8")
     bad = 0
@@ -740,8 +864,14 @@ def check(v: dict) -> int:
         print("FAIL  number not in post_values.json:", problem)
     every = load(all_runs=True)
     plain = post.replace("**", "")
-    _, thinks = deepseek_reasoning()
+    traces = have_traces()
+    _, thinks = deepseek_reasoning() if traces else (None, [])
     for fragment in THINK_QUOTES:
+        if not traces:  # the reasoning is only in the run traces; the post can still be checked
+            bad += fragment not in plain
+            print(f"{'SKIP' if fragment in plain else 'FAIL'}  reasoning quote: {fragment[:60]}  "
+                  "(needs the run traces, not in the repo)" + ("" if fragment in plain else "  (not in the post)"))
+            continue
         found = any(fragment in t for t in thinks)
         ok = found and fragment in plain
         bad += not ok

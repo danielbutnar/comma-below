@@ -1,4 +1,5 @@
-"""Every number quoted in the post, computed from the downloaded runs.
+"""Round 1 numbers (tasks 1-7, the 15 first-round models), computed from the downloaded runs. The post's
+current numbers come from analysis/check_claims.py --values (results/post_values.json).
 
 Usage:  uv run --no-project --with pandas python analysis/post_stats.py > results/post_stats.txt
 """
@@ -14,7 +15,7 @@ import pandas as pd
 
 sys.path.insert(0, "analysis")
 sys.path.insert(0, "src")
-from analyze import load  # noqa: E402
+from analyze import ROUND1, load  # noqa: E402
 from scoring import census  # noqa: E402
 
 EXCLUDE = {"grok-4.6", "grok-4.5-0708", "gpt-oss-120b"}
@@ -26,8 +27,8 @@ def ok_rows(df):
 
 
 def main():
-    latest = ok_rows(load())
-    every = ok_rows(load(all_runs=True))
+    latest = ok_rows(load(tasks=ROUND1))
+    every = ok_rows(load(all_runs=True, tasks=ROUND1))
     print("models:", latest.model.nunique(), sorted(latest.model.unique()))
 
     # ---- Echo (all runs) ----
