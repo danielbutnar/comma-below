@@ -1,3 +1,5 @@
+**To compare models, use [task 8's leaderboard](https://www.kaggle.com/benchmarks/tasks/danielbutnar/romanian-comma-below-8-echo-four-inputs)**: the overall score averages different tasks for different models.
+
 Romanian writes **ș** and **ț** with a comma below (U+0219, U+021B). In the 1990s the common encodings had no such letters, so Romanian text used the look-alike **ş** and **ţ** with a cedilla (U+015F, U+0163). On 30 September 2026, 29 of 35 Romanian front pages I checked (government, National Bank, Brașov city hall, rail operator, news sites) still had cedilla letters in Romanian words.
 
 The two look almost identical and are different characters: `==`, `grep`, SQL with a binary collation, site search, deduplication and URL slugs treat them as two words.
