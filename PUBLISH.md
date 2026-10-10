@@ -16,7 +16,7 @@ so this comes first.
 5. Check that these load:
    - https://danielbutnar.github.io/comma-below/human/test.html
    - https://danielbutnar.github.io/comma-below/post/checker.html
-   - https://raw.githubusercontent.com/danielbutnar/comma-below/main/post/chart-hero.png
+   - https://raw.githubusercontent.com/danielbutnar/comma-below/main/post/chart-hero-v2.png
 
 ## 2. DEV: edit the existing post (10 minutes)
 

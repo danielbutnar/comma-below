@@ -164,8 +164,9 @@ def values() -> dict:
         words_a = e4[e4.variant == "ascii"]
         v["E4_WORD_CED"] = f"{100 * words_c.st_cedilla.sum() / words_c.st_total.sum():.0f}"
         v["E4_WORD_ASCII"] = f"{100 * words_a.st_ascii.sum() / words_a.st_total.sum():.1f}"
-        # per-model values used in the findings: task 8 only, every run (the same basis as the charts)
-        by = (e4[e4.variant == "cedilla"].groupby("model")["pass"].mean() * 100).rename("cedilla").to_frame()
+        # per-model values used in the findings: every run of the same 22 prompts (task 8, plus tasks 2 and 7
+        # for the round one models), the basis of the version test, the upgrades chart and the results table
+        by = t.set_index("model")[["cedilla"]]
         named = {"OPUS_45": "claude-opus-4-5-20251101", "OPUS_48": "claude-opus-4-8-default", "OPUS_5": "claude-opus-5-default",
                  "OPUS_55": "claude-opus-5-5-default", "SONNET_45": "claude-sonnet-4-5-20250929",
                  "SONNET_46": "claude-sonnet-4-6-default", "SONNET_5": "claude-sonnet-5-default",
@@ -198,7 +199,7 @@ def values() -> dict:
         v["E4_MISSING_NOTE"] = (f" {' and '.join(missing)}'s runs of the four-way test failed, so that test has "
                                 f"{len(served)} models." if missing else "")
         labs = {}
-        for m in tested:
+        for m in sorted(tested, key=lambda m: (M.line(m), M.version(m), M.name(m))):  # Opus 5 before Opus 5.5
             labs.setdefault(M.lab(m), []).append(M.name(m))
         order = ["Anthropic", "Google", "OpenAI", "xAI", "DeepSeek", "Alibaba", "Zhipu"]
         v["MODELS_LINE"] = " ".join(f"**{lab}:** {', '.join(labs[lab])}." for lab in order if lab in labs)
@@ -302,12 +303,8 @@ def values() -> dict:
         print("no run traces (results/raw/**/*.run.json, not in the repo): kept from the committed "
               f"results/post_values.json: {', '.join(kept)}")
 
-    try:
-        import extras  # noqa: E402  (analysis/extras.py: values for the post's newer paragraphs)
-    except ImportError:
-        extras = None
-    if extras is not None:
-        extras.add(v, every, latest)
+    import extras  # noqa: E402  (analysis/extras.py: values for the post's newer paragraphs)
+    extras.add(v, every, latest)
     return v
 
 
@@ -323,7 +320,9 @@ def third_version_values(every: pd.DataFrame, v: dict):
     v["ALLNONE_PCT"] = pct(k / n)
     for g, key in (("all", "OWN_ALL"), ("some", "OWN_SOME"), ("none", "OWN_NONE")):
         c, t = s[g][0], s[g][1]
-        v[f"{key}_K"], v[f"{key}_N"], v[f"{key}_PCT"] = c, t, pct(c / t) if t else "n/a"
+        share = 100 * c / t if t else float("nan")  # one decimal under 10 %, as the keyboard chart prints it
+        v[f"{key}_K"], v[f"{key}_N"] = c, t
+        v[f"{key}_PCT"] = ("n/a" if not t else f"{share:.1f}" if 0 < share < 10 else pct(c / t))
     haiku = s.get("within", {}).get("claude-haiku-4-5-20251001")
     if haiku:
         v["HAIKU_ALL"], v["HAIKU_SOME"] = f"{haiku[0]} of {haiku[1]}", f"{haiku[2]} of {haiku[3]}"
@@ -742,6 +741,8 @@ THINK_QUOTES = [
 
 QUOTES = [
     ("claude-opus-5-default", "îndrumaţi"),
+    ("claude-opus-5-default", "Şoferii sunt îndrumaţi să parcheze pe strada Mureşenilor sau lângă Gara Braşov."),
+    ("gpt-oss-120b", "Șoferii sunt rugaţi să parcheze pe strada Mureșenilor și lângă Gara Brașov."),
     ("claude-opus-4-6-default", "îndrumaţi"),
     ("gpt-5.6-luna", "îndrumaţi"),
     ("gemini-3.7-flash", "muhteșem dağ manzaralı"),

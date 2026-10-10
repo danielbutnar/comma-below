@@ -2,7 +2,7 @@
 
 Visible = outside {% details %} blocks, code blocks and liquid tags; image links and bare URLs don't
 count, link text does. Table cells count. Usage:
-  uv run --no-project python post/wordcount.py post/post-v2-dev.md [--max 2300]
+  uv run --no-project python post/wordcount.py post/post-v3-dev.md [--max 2300]
 """
 
 from __future__ import annotations

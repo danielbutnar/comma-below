@@ -9,6 +9,7 @@ Usage (prints these values only):  uv run --no-project --with pandas --with nump
 
 from __future__ import annotations
 
+import math
 import csv
 import difflib
 import json
@@ -26,7 +27,6 @@ import models as M  # noqa: E402
 import own_words as OW  # noqa: E402
 import task13 as T13  # noqa: E402
 from analyze import load  # noqa: E402
-from human_summary import wilson  # noqa: E402
 from round2 import mcnemar, ok_rows, spearman  # noqa: E402
 from scoring import visible, words  # noqa: E402
 
@@ -39,6 +39,17 @@ TALK = re.compile(r"cedill|comma[- ]below|virgul|diacritic|encoding|unicode|orth
 # a gpt-oss-120b answer to my correctly typed text (task 8, Q01-E07), checked against the data below
 OSS_EXAMPLE = "Șoferii sunt rugaţi să parcheze pe strada Mureșenilor și lângă Gara Brașov."
 
+
+
+def wilson(k: int, n: int, z: float = 1.96) -> tuple[float, float]:
+    """95 % Wilson interval for k of n, in %."""
+    if n == 0:
+        return (math.nan, math.nan)
+    p = k / n
+    d = 1 + z * z / n
+    c = p + z * z / (2 * n)
+    h = z * math.sqrt(p * (1 - p) / n + z * z / (4 * n * n))
+    return (100 * (c - h) / d, 100 * (c + h) / d)
 
 def pct(x) -> int:
     return int(round(100 * float(x)))
@@ -125,7 +136,7 @@ def add(v: dict, every: pd.DataFrame, latest: pd.DataFrame) -> None:
     t = pd.read_csv(ROOT / "results" / "round2_echo4_models.csv")
     t = t[t.model.isin(set(e4.model))]
     top = t[t.cedilla >= t.cedilla.max() - 0.01].sort_values("name")
-    by = c4.groupby("model")["pass"].mean() * 100  # the basis of the V_* keys: task 8 only, every run
+    by = t.set_index("model")["cedilla"]  # the basis of the V_* keys: every run of the same 22 prompts
     nxt = []
     for m in top.model:
         newer = sorted((M.version(x), x) for x in by.index if M.line(x) == M.line(m) and M.version(x) > M.version(m))

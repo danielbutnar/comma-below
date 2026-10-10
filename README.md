@@ -17,12 +17,12 @@ Thirteen tasks, every score computed from Unicode code points (after NFC). No LL
 
 ## What it found
 
-![Typed with the cedilla, a third of the answers keep it: 99 % clean typed correctly, 96 % without diacritics, 68 % with the cedilla, 95 % with the cedilla and one sentence in the system prompt](post/chart-hero.png)
+![Typed with the cedilla, a third of the answers keep it: 99 % clean typed correctly, 96 % without diacritics, 68 % with the cedilla, 95 % with the cedilla and one sentence in the system prompt](post/chart-hero-v2.png)
 
 - **The keyboard echo.** 43 models, the same 22 Romanian prompts typed four ways (task 8): 99 % of the
   answers came back clean when typed correctly, 96 % without diacritics, 68 % with the cedilla. When an
   answer kept all of my cedillas, 95 % of the new ș/ț words the model chose itself had the cedilla too;
-  when it kept only some, 10 %.
+  when it kept only some, 9.5 %.
 - **Only the cedilla echoes.** On 28 models (task 13), 38 % of the cedilla letters came back, against
   0.9 % for a dot below (Braṣov) and 1.4 % for old mojibake (Braºov).
 - **One sentence fixes most of it, and breaks Turkish.** A system-prompt rule lifts cedilla input to 95 %

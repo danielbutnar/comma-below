@@ -1,16 +1,15 @@
 ---
-title: Braşov or Brașov? {{N_MODELS}} LLMs copy my wrong letter into a third of their answers
+title: Braşov or Brașov? I typed my wrong letter to {{N_MODELS}} LLMs, and a third of the answers kept it
 published: true
 ai_disclosure_level: some_ai
 tags: devchallenge, kagglechallenge, ai, machinelearning
+description: "Typed with the old cedilla letters, {{N_MODELS}} LLMs kept them in a third of their answers, even in words they chose themselves. A Kaggle benchmark with 13 tasks and no LLM judge."
 cover_image: COVER_URL
 ---
 
 *This is a submission for the [Kaggle Benchmarking Challenge](https://dev.to/challenges/kaggle-2026-09-23)*
 
-**Braşov** or **Brașov**? The second one is right. Brașov, the city I live in, is spelled with an s with a comma below. The first one has an s with a cedilla, a stand-in from the 1990s, when Romanian computers didn't have the right letter. Language models know the difference. They don't always act on it. Give them text typed with the old letter and a third of their answers copy it, most of them all the way, down to words I never wrote. I call it the **keyboard echo**. To a search box or a database, Braşov and Brașov are two different words.
-
-I asked Claude Opus 5.5 the same question four times, about the same Romanian news paragraph, typed four different ways. Three answers are spelled right. Which one isn't?
+Brașov, the city I live in, is spelled with an s with a comma below. Its 1990s stand-in, ş, has a cedilla instead, and to a search box, a database or Ctrl+F the two are different words. I asked Claude Opus 5.5 the same question four times, about one Romanian news paragraph typed four different ways. Three answers are spelled right. Which one isn't?
 
 > **A.** Festivalul a avut loc la Sighișoara, iar biletele pentru ediția de anul viitor se vor pune în vânzare în decembrie.
 >
@@ -22,7 +21,7 @@ I asked Claude Opus 5.5 the same question four times, about the same Romanian ne
 
 {% details The answer %}
 
-**B.** *Sighişoara* and *ediţia* carry the cedilla, because the paragraph I gave it did.
+**B.** *Sighişoara* and *ediţia* carry the cedilla, because the paragraph I gave it did. A, C and D are the same characters. The question was "Where did the festival take place, and when do next year's tickets go on sale?" (In Sighișoara; in December.)
 
 | Answer | My paragraph was typed |
 | --- | --- |
@@ -33,23 +32,24 @@ I asked Claude Opus 5.5 the same question four times, about the same Romanian ne
 
 {% enddetails %}
 
+Models know the right letter. Hand them text typed with the old one and a third of their answers keep it. Most of those keep every one, and then use it in words I never wrote, as if they had switched to my keyboard. I call it the **keyboard echo**.
+
 **TL;DR**
 
-- **The keyboard echo: a third of the answers keep my wrong letter.** I gave {{N_MODELS}} models the same 22 Romanian prompts, typed four ways. Typed correctly or without any diacritics, {{E4_ASCII}} to {{E4_CLEAN}} % of the answers came back clean. Typed with the cedilla letters, {{E4_CED}} %. When an answer copies all of my cedillas, the model's own new words get them too.
-- **Newer can be worse.** Claude Opus 4.8 kept {{V_OPUS_48}} % of its answers clean, Opus 5 {{V_OPUS_5}} %, run after run.
-- **One sentence in the system prompt fixes most of it, and breaks Turkish**, where the cedilla letter is right. A short function that leaves Turkish sentences alone fixed every broken answer.
+- **A third of the answers keep my wrong letter.** Same 22 prompts, {{N_MODELS}} models: typed correctly, {{E4_CLEAN}}% of answers came back clean; without diacritics, {{E4_ASCII}}%; with the cedilla letters, {{E4_CED}}%. Every model did it at least once.
+- **The model's own words follow**, but only for a familiar wrong letter: a dot below and old mojibake get repaired.
+- **Newer can be worse, at two labs.** The three cleanest models were each followed by a version that kept {{OLDER3_NEXT}} of its answers clean.
+- **One sentence in the system prompt fixes most of it, and breaks Turkish**, where the cedilla is right. A few lines of code fixed every Romanian answer and changed {{FIX_TR_ALTERED}} of {{FIX_TR_N}} Turkish replies.
 
-![Typed with the cedilla, a third of the answers keep it. {{N_MODELS}} models, the same 22 prompts typed four ways: {{E4_CLEAN}} % of answers clean when typed correctly, {{E4_ASCII}} % without diacritics, {{E4_CED}} % with the cedilla, {{E4_RULE}} % with the cedilla and one sentence in the system prompt](CHART_HERO_URL)
+![Typed with the cedilla, a third of the answers keep it. {{N_MODELS}} models, the same 22 Romanian prompts. Share of clean answers (with ș or ț, and no cedilla or look-alike letter): typed correctly {{E4_CLEAN}}%, without diacritics {{E4_ASCII}}%, with the cedilla letters {{E4_CED}}%, with the cedilla letters plus one system-prompt sentence {{E4_RULE}}%. Typed correctly, gpt-oss-120b and gpt-oss-20b kept 82% clean; typed with the cedilla, the best were {{TOP_NAMES}} at {{E4_MAX}}%, the lowest gpt-oss-120b at 32%.](CHART_HERO_URL)
 
 ## What I Benchmarked
 
-If you couldn't tell which answer was wrong, you're not alone. I asked {{HUMAN_N}} Romanians to compare twelve word pairs like these on their own screens, and they got {{HUMAN_SD}} % right, exactly what answering "same" every time gets. Then I found the flaw in my test: the page was marked as Romanian, and on a Romanian page fonts like Roboto and Segoe UI draw the cedilla ş with a comma, so on some screens the two words looked identical. On the same twelve pairs the models got {{SEE_PAIRS_PCT}} % right. I've fixed the page; you can [take the two-minute test](https://danielbutnar.github.io/comma-below/human/test.html?from=dev) yourself.
+Romanian has two letters with a comma underneath, **ș** and **ț** (U+0219, U+021B). The encodings of the 1990s didn't have them, so people typed the Turkish **ş** and a **ţ** with a cedilla (U+015F, U+0163) instead. Unicode added the right letters in 1999, yet when I fetched the front pages of {{CENSUS_OK}} Romanian sites on 30 September, {{CENSUS_WITH}} still had cedilla letters, the government's press releases among them. On a page marked as Romanian, as {{LANG_RO}} of those were, fonts like Roboto and Segoe UI even draw ş with a comma, so the people who publish the wrong letter may never see it.
 
-Romanian has two letters with a comma underneath, **ș** and **ț** (U+0219, U+021B). The encodings Romanian computers used in the 1990s didn't have them, so people typed the Turkish **ş** and a **ţ** with a cedilla (U+015F, U+0163) instead. Unicode added the right letters in 1999. When I fetched the front pages of 35 Romanian sites on 30 September, {{CENSUS_WITH}} still had cedilla letters in Romanian words, the government's press releases among them. {{LANG_RO}} of those mark their pages as Romanian, where those fonts draw the cedilla with a comma: the people who publish the wrong letter may never see it.
+To a computer they are different characters: `"Brașov" == "Braşov"` is `false`. The cedilla spelling is all over the text models learn from and that retrieval hands them. So I asked two things. Do models write the right letter? And what do they do when the text they read has the wrong one?
 
-To a computer they are different characters: `"Brașov" == "Braşov"` is `false`. The cedilla spelling is also all over the text that models learn from and that retrieval systems hand them. So I asked two things. Do models write the right letter? And what do they do when the text they read has the wrong one?
-
-Every prompt comes in versions that differ only in how the letters are typed. A script, not an LLM, scores each answer by its Unicode code points after NFC normalization. I tested it first on fake models (one that copies its input scores 0 %, one that fixes everything 100 %) and checked the answer keys as a native speaker. For round two I wrote my predictions into each task's description on Kaggle before running it. {{PRED_FAILED}} of the {{PRED_TOTAL}} failed.
+The main test has 22 prompts: 6 messages from guests to a Brașov guesthouse's booking assistant, 6 news paragraphs to summarize, and 10 questions about those paragraphs (the quiz is one). Each went out four ways: typed correctly, without diacritics, with the cedilla letters, and with the cedilla letters plus one sentence in the system prompt asking for the comma below. An answer is **clean** when it has at least one ș or ț and no cedilla or look-alike letter. A script, not an LLM, checks that by Unicode code point. I tested it on fake models first (one that copies its input scores 0%, one that fixes everything 100%) and checked the answer keys as a native speaker. Twelve more tasks on [Kaggle Benchmarks](https://www.kaggle.com/benchmarks/danielbutnar/romanian-comma-below) probe the edges, and for round two I wrote my predictions into each task's notebook before its first run.
 
 {% details The 13 tasks %}
 
@@ -62,18 +62,18 @@ Every prompt comes in versions that differ only in how the letters are typed. A 
 | 5 | Restore | Diacritics where only context decides (*peste* / *pește*) |
 | 6 | Code | Write `fix_romanian(text)`; 14 hidden tests |
 | 7 | Echo + rule | Echo's cedilla inputs plus one system-prompt sentence |
-| 8 | Echo, four inputs | Correct, cedilla, no diacritics, cedilla + rule; every model |
-| 9 | Contagion | Four documents; some of the other three typed with cedillas |
-| 10 | Turkish guests | Turkish, where ş is correct, under three rules |
+| 8 | Echo, four inputs | The main test: correct, cedilla, no diacritics, cedilla + rule; every model |
+| 9 | Contagion | Four documents and a question about one; the target and 0, 1 or 3 of the others typed with cedillas |
+| 10 | Turkish guests | Turkish, where ş is correct: no rule, the full rule, the rule scoped to Romanian |
 | 11 | Other look-alikes | English with Cyrillic look-alikes or mojibake |
 | 12 | Turns | Does a cedilla first text change the second summary? |
-| 13 | Other wrong letters | Task 8's summaries with a dot below (ṣ) or old mojibake (º) instead of the cedilla |
+| 13 | Other wrong letters | Task 8's summaries and document questions with a dot below (ṣ) or old mojibake (º) instead of the cedilla |
 
 {% enddetails %}
 
 ## Models Tested
 
-**{{N_MODELS_ALL}} models.** Round one (30 September – 1 October) ran 15 models on the first seven tasks. Round two (8–11 October) ran the four-way test on every model Kaggle would serve and the follow-up tests on {{N_R2_MIN}} to {{N_T13}} of them.{{E4_MISSING_NOTE}} I picked the lineup for two comparisons: versions of the same model on identical prompts (Claude Opus 4.5 to 5.5, Gemini Flash 2.5 to 3.8, GPT-5.4 to GPT-6.1), and the same model with reasoning on and off (Grok 4.20, Qwen 3 Next). Everything ran on Kaggle's model proxy with default settings and an 8,192-token cap, for ${{COST}} of the free quota. Qwen 3 Next Thinking mostly ran out of tokens before answering.
+**{{N_MODELS_ALL}} models.** Round one (30 September – 1 October) ran 15 models on tasks 1–7. Round two (8–10 October) ran the main test on every model Kaggle served, {{N_MODELS}} of them (GPT-6 Astra's runs failed), and the follow-ups on {{N_R2_MIN}} to {{N_T13}}. The lineup lets me compare versions of one model on identical prompts (Claude Opus 4.5 to 5.5, Gemini Flash 2.5 to 3.8, GPT-5.4 to GPT-6.1) and reasoning on and off (Grok 4.20, Qwen 3 Next). Everything ran on Kaggle's model proxy with default settings and an 8,192-token cap, for ${{COST}} of the free quota.
 
 {% details Full model list %}
 
@@ -85,63 +85,71 @@ Every prompt comes in versions that differ only in how the letters are typed. A 
 
 ### 1. Models restore missing diacritics but keep wrong ones
 
-Many Romanians type without diacritics at all ("Brasov"). Given the 22 prompts that way, the models put the letters back: {{E4_ASCII}} % of answers came back clean. Given the same prompts with cedillas, {{E4_CED}} % did.
+Many Romanians type without diacritics ("Brasov"), and the models put them back: {{E4_ASCII}}% of those answers came back clean, against {{E4_CED}}% for the same prompts typed with cedillas.
 
-They can tell. The same 15 first-round models wrote ș and ț correctly from English prompts ({{R1_WRITE}} %), spotted the cedilla in every sentence typed with it, and fixed {{R1_FIX_L2}} % of answers when told to correct the diacritics. If anything they see differences that aren't there: shown two identical words with the letter, they called them different a third of the time. They just don't fix it unless asked, and they never mention it: not one of the {{N_CED_ALL}} answers to text typed with cedillas did.
+They can tell. The 15 first-round models wrote ș and ț correctly from English prompts ({{R1_WRITE}}%), spotted the cedilla in every sentence typed entirely with it, and fixed {{R1_FIX_L2}}% of answers when told to correct the diacritics (only {{R1_PROOF}}% when told to "proofread"). They just don't fix it unprompted, and they don't remark on it: not one of the {{N_CED_ALL}} answers to text typed with cedillas did, though my prompts asked for short answers.
 
-DeepSeek-R1 shows its reasoning, so I could check whether it even notices. Without the rule, it mentioned the letters in {{DS_NR_TALK}} of {{DS_NR_N}} answers. With the rule, in {{DS_RU_TALK}} of {{DS_RU_N}}, and {{DS_RU_TALK_COPIED}} of those still came out with cedillas. In one, it planned "proper Romanian orthography with ș/ț commas below, not cedillas" and then answered: "Autorităţile recomandă turiştilor să verifice starea drumului înainte de plecare." Both letters carry the cedilla. Reasoning didn't help Grok 4.20 either: {{V_GROK_R}} % clean with it, {{V_GROK_NR}} % without.
+Two models bring the old letter themselves. gpt-oss-120b and gpt-oss-20b put a cedilla into {{OSS_CLEAN_IN}}% of their answers to correctly typed text, sometimes next to the right letter: "{{OSS_EXAMPLE}}" For the rest, the cedilla almost only comes out when my text puts it there.
+
+DeepSeek-R1 shows its reasoning, so I could check whether it notices. Without the one-sentence rule, its reasoning mentioned the letters in {{DS_NR_TALK}} of {{DS_NR_N}} answers. With the rule, in {{DS_RU_TALK}} of {{DS_RU_N}}, mostly by repeating it, and {{DS_RU_TALK_COPIED}} of those answers still came out with cedillas. In one, it planned for "proper Romanian orthography with ș/ț commas below, not cedillas" and answered "Autorităţile recomandă turiştilor să verifice starea drumului înainte de plecare." Reasoning didn't help Grok 4.20 either ({{V_GROK_R}}% clean with it, {{V_GROK_NR}}% without). Qwen 3 Next Thinking ran out of tokens on {{QWEN_T_EMPTY}} answers but kept {{QWEN_T_DONE_K}} of the {{QWEN_T_DONE_N}} it finished clean, too few to compare with the Instruct version's {{QWEN_I_CLEAN}}%.
 
 ### 2. The keyboard echo: the model's own words get my cedilla too
 
-![When an answer kept all of my cedillas, {{OWN_ALL_PCT}} % of the new ș/ț words the model chose itself had the cedilla too; when it kept only some, {{OWN_SOME_PCT}} %](CHART_KEYBOARD_URL)
+Answers from a document copy the most, because they reuse my words: {{E4_RAG}}% came back clean, summaries {{KIND_SUM}}%, guest replies {{E4_REPLY}}%. And it's mostly all or nothing: {{ALLNONE_PCT}}% of the answers that kept any of my cedillas kept all of them.
 
-Summaries and answers from a document reuse my words, so they copy the most: answers from a document came back clean only {{E4_RAG}} % of the time, guest replies {{E4_REPLY}} %. And it's mostly all or nothing: {{ALLNONE_PCT}} % of the answers that kept one of my cedillas kept all of them.
+What surprised me were the words the model added itself. They can't be copied, so their spelling shows which keyboard the model is typing on. Claude Opus 5 summarized a city-hall notice that asked drivers (*rugați*, "asked") to park elsewhere:
 
-What surprised me were the words the model added itself. They can't be copied, so their spelling shows which keyboard the model is typing on. In answers that kept all of my cedillas, {{OWN_ALL_PCT}} % of the new ș/ț words had the cedilla too; in answers that kept only some, {{OWN_SOME_PCT}} %. The gap holds inside each of the {{WITHIN_N}} with enough words of both kinds to check, and in a fresh run on {{T13_MODELS}} models, where I had written it down as a prediction: {{T13_OWN_ALL_K}} of {{T13_OWN_ALL_N}} new words against {{T13_OWN_SOME_K}} of {{T13_OWN_SOME_N}}.
+> Şoferii sunt **îndrumaţi** să parcheze pe strada Mureşenilor sau lângă Gara Braşov.
 
-That is the keyboard echo: the model picks up my keyboard and types the whole answer on it. Claude Opus 5 rewrote a city-hall notice that said *rugați* ("asked") as *îndrumaţi* ("directed"), a word my text didn't have, cedilla included. Opus 4.6 and GPT-5.6 Luna made the same move.
+*Îndrumaţi* ("directed") isn't in my text. The model chose it, and typed it on my keyboard. Claude Opus 4.6 and GPT-5.6 Luna made the same move.
 
-The text the model answers from sets the keyboard; the documents around it turn the echo up or down. I put each question's document among three others and typed 0, 1 or 3 of the others with cedillas. Around a clean document, the neighbours hardly mattered: at least {{K9_CLEAN_MIN}} % of answers stayed clean at every level, and only {{K9_CLEAN_MOVERS}} slipped at all. Around a cedilla document, they did: {{K9_CED0}} % of answers came back clean with three clean neighbours, {{K9_CED3}} % with three cedilla ones, and {{K9_LOWER}} of the {{N_K9}} models moved that way, none the other. In a chat, a cedilla first message rarely changed the next answer.
+![When an answer kept all my cedillas, {{OWN_ALL_PCT}}% of the new ș/ț words it added had the cedilla too ({{OWN_ALL_K}} of {{OWN_ALL_N}}); when it kept some of them, {{OWN_SOME_PCT}}% ({{OWN_SOME_K}} of {{OWN_SOME_N}}); when it kept none, {{OWN_NONE_PCT}}%. A new word is one not in my text and not an inflection of a word in it. Tasks 2 and 8.](CHART_KEYBOARD_URL)
 
-### 3. Only the cedilla echoes: a dot below and mojibake get repaired
+The gap holds inside each of the {{WITHIN_N}} with enough words of both kinds ({{OWN_WITHIN_NAMES}}), and in a fresh run on {{T13_MODELS}} models, where I had written it down as a prediction: {{T13_OWN_ALL_K}} of {{T13_OWN_ALL_N}} new words against {{T13_OWN_SOME_K}} of {{T13_OWN_SOME_N}}. You could argue that an answer from a document should quote it as written, but a quote doesn't explain the cedilla on a word the model wrote itself. That is the keyboard echo: the model picks up my keyboard and types the whole answer on it.
 
-![Of three wrong spellings, only the cedilla survives: {{T13_CED_KEPT}} % of s and t letters came back with the cedilla, {{T13_DOT_KEPT}} % with a dot below, {{T13_LEG_KEPT}} % as mojibake](CHART_WRONG_URL)
+The document the model answers from sets the keyboard; the documents around it turn the echo up or down. I put each question's document among three others and typed 0, 1 or 3 of the others with cedillas. Around a clean document, at least {{K9_CLEAN_MIN}}% of answers stayed clean at every level, and only {{K9_CLEAN_MOVERS}} slipped at all. Around a cedilla document, {{K9_CED0}}% came back clean with three clean neighbours and {{K9_CED3}}% with three cedilla ones; {{K9_LOWER}} of the {{N_K9}} models moved that way, none the other.
 
-Why the cedilla? Before a fresh run, I wrote down a test that could fail. I typed the same summaries and document questions two more ways: with s and t with a dot below (Braṣov), letters that look almost exactly like the right ones but aren't Romanian, and as the mojibake that old Romanian pages and subtitles often showed (Braºov), which looks broken.
+In a chat, a cedilla first text changed the next answer in only {{T12_INF_N}} of {{T12_INF_TOTAL}} conversations. Both times it was {{T12_MODEL}} writing *{{T12_WORD}}* ("urged"), a word in neither text, with the cedilla: once where the clean text said *{{T12_SRC_WORD}}*, once repeating its own first summary.
 
-On {{T13_MODELS}} models, the cedilla came back in {{T13_CED_KEPT}} % of the s and t letters. The dot below came back in {{T13_DOT_KEPT}} % and the mojibake in {{T13_LEG_KEPT}} %. {{T13_MODELS_LOWER}} of the {{T13_MODELS}} models kept the dot less often than the cedilla, and none kept it more.
+### 3. Only the familiar wrong letter sticks
 
-So my guess was wrong: the dot below looks just as right, and the models fixed it. Of the three wrong spellings they keep only the cedilla, the one real Romanian text is full of, and the right letter in Turkish. This test can't tell which of those two makes it stick.
+![Of three wrong spellings, only the cedilla survives. {{T13_MODELS}} models, the same 16 summaries and document questions. Of the ș and ț letters in words the answers reused from my text, {{T13_CED_KEPT}}% came back with the cedilla (Braşov), {{T13_DOT_KEPT}}% with a dot below (Braṣov) and {{T13_LEG_KEPT}}% as old mojibake (Braºov).](CHART_WRONG_URL)
 
-### 4. An upgrade can make it worse: Claude Opus 5 kept {{V_OPUS_5}} % clean, Opus 4.8 kept {{V_OPUS_48}} %
+Why the cedilla? My first guess was that it looks right, so a model sees nothing to fix. Then any near-twin would echo too. Before a fresh run on {{T13_MODELS}} models, I wrote down a test that could prove the guess wrong, and predicted it would: the same summaries and questions typed with a dot below (Braṣov), which looks almost right but isn't Romanian, and as the mojibake old Romanian pages showed (Braºov), which looks broken.
 
-![Of {{N_STEPS}} upgrades on the same prompts, the biggest drops were Claude Opus 4.8 to 5 ({{V_OPUS_48}} to {{V_OPUS_5}} % clean) and Sonnet 4.6 to 5 ({{V_SONNET_46}} to {{V_SONNET_5}} %)](CHART_UPGRADES_URL)
+Of the letters that should be ș or ț, the cedilla came back in {{T13_CED_KEPT}}%, the dot below in {{T13_DOT_KEPT}}% and the mojibake in {{T13_LEG_KEPT}}%. {{T13_MODELS_LOWER}} of the {{T13_MODELS}} models kept the dot less often than the cedilla, and none kept it more. So looks aren't it.
 
-Kaggle serves several versions of the same models, so I could compare them on identical prompts. Opus 4.8 kept {{V_OPUS_48}} % of its answers clean and Opus 5 {{V_OPUS_5}} %; Sonnet 4.6 {{V_SONNET_46}} % and Sonnet 5 {{V_SONNET_5}} %. Pooling every run of the same prompts, both drops survive a correction for the {{N_STEPS}} upgrades I compared. GPT Luna went the other way, from {{V_LUNA_56}} % to {{V_LUNA_6}} %.
+What sticks seems to be what's familiar: the cedilla fills real Romanian text, and ş is a real Turkish letter. When an answer kept one of the two cedilla letters and fixed the other, it kept the ş in {{ST_S_ONLY}} answers and the ţ, which Turkish doesn't have, in {{ST_T_ONLY}}. English points the same way: the mojibake that fills the English web (ZÃ¼rich) came back in {{LK_MOJI_COPIED_RAG}}% of answers from an English document, rare Cyrillic look-alikes in {{LK_CYR_COPIED_RAG}}%. I didn't measure how common each spelling is, so this is a pattern, not a proof.
 
-These aren't one-run flukes. Opus 5 scored {{OPUS5_RUNS}}, and the fresh run put both pairs of versions in the same order. Single answers do flip between identical runs ({{FLIP_R1}} % of model-and-prompt pairs in round one), but a model's overall rate barely moves: a median of {{RUN_SPREAD_MED}} points. So test every upgrade, and run it more than once.
+### 4. Newer can be worse: Opus 4.8 kept {{V_OPUS_48}}% clean, Opus 5 {{V_OPUS_5}}%
+
+![Of {{N_STEPS}} upgrades on the same prompts, {{N_STEPS_HOLM}} copied my cedillas far more often, and none far less: Claude Opus 4.8 {{V_OPUS_48}}% to Opus 5 {{V_OPUS_5}}%, Claude Sonnet 4.6 {{V_SONNET_46}}% to Sonnet 5 {{V_SONNET_5}}%. The other changes, among them GPT Sol 5.6 to 6 ({{V_SOL_56}}% to {{V_SOL_6}}%) and GPT Luna 5.6 to 6 ({{V_LUNA_56}}% to {{V_LUNA_6}}%), don't survive a correction for all {{N_STEPS}} comparisons.](CHART_UPGRADES_URL)
+
+Kaggle serves several versions of the same models, so I compared {{N_STEPS}} upgrades on identical prompts. The three cleanest models, Claude Opus 4.8, Claude Sonnet 4.6 and GPT-5.6 Sol ({{V_OPUS_48}}%), are each the older half of a pair: Opus 5, Sonnet 5 and GPT-6 Sol kept {{OLDER3_NEXT}}. The two Claude drops survive a correction for the {{N_STEPS}} comparisons; GPT Sol's doesn't, and neither does GPT Luna's rise ({{V_LUNA_56}}% to {{V_LUNA_6}}%).
+
+They aren't flukes. Opus 5 scored {{OPUS5_RUNS}}. Single answers do flip between identical runs ({{FLIP_R1}}% of model-and-prompt pairs in round one), and a model's rate moved a median of {{RUN_SPREAD_R1_MED}} points between identical runs ({{RUN_SPREAD_R1_MAX}} at most), against drops of almost 40. So test every upgrade, and run it more than once.
 
 ### 5. One sentence stops the echo, and breaks Turkish
 
-![Romanian answers clean and Turkish replies intact under each fix: a Romanian-only swap in code cleans every Romanian answer and changes {{FIX_TR_ALTERED}} of {{FIX_TR_N}} Turkish replies](CHART_FIXES_URL)
+![A Romanian-only swap in code cleans every Romanian answer and changes {{FIX_TR_ALTERED}} of {{FIX_TR_N}} Turkish replies. Romanian answers clean and Turkish replies still correct: no fix {{T13_CED_CLEAN}}% and {{TR_NONE}}%; one sentence in the system prompt {{T13_FULL}}% and {{TR_RULE}}%; the same sentence for Romanian only {{T13_SCOPED}}% and {{TR_SCOPED}}%; swapping every ş for ș in code 100% and 0%; swapping only outside Turkish-looking sentences 100% and 96%.](CHART_FIXES_URL)
 
-One sentence in the system prompt, *"Use correct Romanian orthography: write ș and ț with a comma below, never ş or ţ with a cedilla, even if the input uses them."*, lifted clean answers on cedilla input from {{E4_CED}} % to {{E4_RULE}} % (on the harder summaries and document questions in the chart, from {{T13_CED_CLEAN}} % to {{T13_FULL}} %).
+In the main test, one sentence in the system prompt, *"Use correct Romanian orthography: write ș and ț with a comma below, never ş or ţ with a cedilla, even if the input uses them."*, lifted clean answers on cedilla input from {{E4_CED}}% to {{E4_RULE}}%. (The chart uses the fresh run: {{T13_CED_CLEAN}}% to {{T13_FULL}}%.)
 
-Then I remembered where the cedilla came from. It's the Turkish letter, and in Turkish it's correct. A guesthouse bot in Brașov gets Turkish guests too, so I sent the same bot eight messages in Turkish. Without the rule, {{TR_NONE}} % of the replies were correct. With it, {{TR_RULE}} % were: some switched to Romanian, some avoided the letter, some spelled Turkish with the Romanian one. Gemini 3.7 Flash offered a honeymoon couple a "**muhteșem** dağ manzaralı" room and a "**Șarap** tadımı". Adding "this applies to Romanian only" brought Turkish back to {{TR_SCOPED}} %. (A script sorted the replies by language; I checked every flagged word by hand. No native speaker checked the Turkish.)
+But ş is the Turkish letter, and in Turkish it's correct. A guesthouse in Brașov gets Turkish guests too, so I sent the booking assistant eight messages in Turkish. Without the rule, {{TR_NONE}}% of replies were correct. With it, {{TR_RULE}}%: {{TR_RULE_COMMA}}% spelled Turkish with the Romanian ș, {{TR_RULE_RO}}% switched to Romanian, and {{TR_RULE_NOS}}% avoided ş altogether, which no reply did without the rule. Gemini 3.7 Flash offered a honeymoon couple a "**muhteșem** dağ manzaralı" room (a magnificent mountain view) and a "**Șarap** tadımı" (wine tasting). Adding "this applies to Romanian only" brought Turkish back to {{TR_SCOPED}}%. (A script sorted the replies by language and I checked every flagged word, but no native speaker checked the Turkish.)
 
-A few lines of code do better. The usual fix, swapping every ş for ș, broke {{FIX_NAIVE_PHRASE}} correct Turkish replies. Doing the same swap only in sentences without ı, ğ, ç, ö or ü changed {{FIX_TR_ALTERED}} of them and still fixed every Romanian answer.
-
-### What I'd measure next
-
-Whether the echo survives a real retrieval pipeline, where documents are cleaned and chunked before the model reads them, and whether other languages that inherited a look-alike letter from an old encoding echo it too.
+Code does better. The usual fix, swapping every ş for ș, broke {{FIX_NAIVE_PHRASE}} correct Turkish replies. Swapping only in sentences without ı, ğ, ç, ö or ü fixed every Romanian answer and changed {{FIX_TR_ALTERED}} of the {{FIX_TR_N}} Turkish replies, {{FIX_TR_HOS}} of them greetings like "Hoş geldiniz" that have none of those letters.
 
 ## What I got wrong
 
-- **My predictions.** {{PRED_FAILED}} of the {{PRED_TOTAL}} failed and {{PRED_UNCLEAR}} more were mixed or too close to call. Most were directions, with thresholds I set when scoring; the dot-below and mojibake test had its thresholds written down first, and {{T13_PRED_PHRASE}}. The full table is below.
-- **My upload.** The Kaggle CLI reads task files with the system encoding, cp1250 on my laptop, so my first task file would have uploaded "Brașov" as "BraČ™ov". The task files are now pure ASCII and check a hash of their data before running.
-- **My first fix.** The `fix_romanian()` in the first version of this post broke Turkish, the same way the one-sentence rule does.
+- **My predictions.** {{PRED_FAILED}} of the {{PRED_TOTAL}} failed and {{PRED_UNCLEAR}} more were too close to call. I wrote them as directions and set the thresholds when scoring; only the dot-below and mojibake test had its thresholds written first, and {{T13_PRED_PHRASE}}. {{PRED_NOTE}}
+- **My sample.** Everything rests on short paragraphs I wrote about one city, and {{N_SINGLE_RUN}} of the {{N_MODELS}} models ran the main test once, so one model's rate carries an interval about {{CI_WIDTH_MED}} points wide. Trust the patterns more than any one rank. "A third" also depends on my mix of prompts: answers from a document kept the cedilla nearly half the time.
+- **My human test.** {{HUMAN_N}} Romanians compared twelve word pairs on their own screens and did no better than a coin flip ({{HUMAN_SD}}%). Part of that was my page: marked as Romanian, it drew the two letters the same on some screens. With {{HUMAN_N}} people I can't separate the font from how hard the difference is to see. The page is fixed: [take the two-minute test](https://danielbutnar.github.io/comma-below/human/test.html?from=dev).
 
-{% details All the predictions, scored %}
+{% details Two smaller mistakes, and every prediction scored %}
+
+**My upload.** The Kaggle CLI reads task files with the system encoding, cp1250 on my laptop, so my first task file would have uploaded "Brașov" as "BraČ™ov". The task files are now pure ASCII and check a hash of their data before running.
+
+**My first fix.** The `fix_romanian()` in the first version of this post broke Turkish, the same way the one-sentence rule does.
 
 {{PREDICTIONS}}
 
@@ -149,7 +157,7 @@ Whether the echo survives a real retrieval pipeline, where documents are cleaned
 
 ## What changed in how I think about these models
 
-I went in expecting a knowledge test, and the models passed it. What I hadn't thought about is that the text I hand a model is also a style sample, encoding included, and the model answers in it: the keyboard echo. The model follows that sample most closely when it summarizes or answers from my text, which is what retrieval does all day. And it moves between versions, in both directions.
+I went in expecting a knowledge test, and the models passed it. What I hadn't thought about is that the text I hand a model is also a style sample, encoding included, and the model answers in it, most closely when it summarizes or answers from my text, which is what retrieval does all day. A familiar wrong spelling sticks where a strange one gets repaired, and how much a model echoes changes between versions.
 
 So I fix it in code, before the text reaches the model and again after, and only where the text is Romanian:
 
@@ -167,17 +175,17 @@ def fix_romanian(text: str) -> str:
         T_ONLY if set(m.group(0)) & NOT_ROMANIAN else CEDILLA_TO_COMMA), text)
 ```
 
-It would leave the ş in a Romanian sentence that quotes a name like Zürich. In my {{FIX_RO_N}} broken answers it never missed a letter.
+It fixed all {{FIX_RO_N}} broken Romanian answers. Its blind spots: it would leave the ş in a Romanian sentence quoting a name like Zürich, and it still changes a short Turkish sentence like "Hoş geldiniz!".
 
-Want to know whether your model does it? Paste one of its answers below: every cedilla letter turns red, except an ş in a sentence that looks Turkish.
+Does your model do it? Send it the prompt in step 1 below and paste its answer: every cedilla letter turns red. (No box? [Open the checker on its own page](https://danielbutnar.github.io/comma-below/post/checker.html).)
 
 {{CHECKER_TAG}}
 
-Does your language have a pair like ş and ș? Tell me in the comments.
+Next I'd like to know whether the echo survives a real retrieval pipeline, which cleans and chunks documents first, and whether other languages that got a look-alike letter from an old encoding echo it too. Does yours have a pair like ş and ș? Tell me in the comments.
 
 {% details All the numbers (the 15 first-round models) %}
 
-Echo with cedilla is the mean of every run on the same prompts (tasks 2 and 8).
+Task scores in %. Echo with cedilla is the mean of every run on the same prompts (tasks 2 and 8); Echo + rule pools tasks 7 and 8. See counts the first true/false or code point in each answer, as Kaggle does: DeepSeek-R1 listed every letter's code point before giving the right one, so on its final answers it scores {{SEE_DS_FINAL}} (Gemini 3.5 Flash-Lite {{SEE_FL_FINAL}}).
 
 {{TABLE}}
 
@@ -187,4 +195,6 @@ Echo with cedilla is the mean of every run on the same prompts (tasks 2 and 8).
 
 {% cta https://www.kaggle.com/benchmarks/danielbutnar/romanian-comma-below %} Romanian Comma Below on Kaggle {% endcta %}
 
-Thirteen tasks with every model answer in the run outputs. The four-way test's own leaderboard ranks the models on the keyboard echo. The code that builds the tasks, the fake models that test the scorer, the census, the analysis and a script that re-checks the post's numbers against the raw results are on GitHub: [github.com/danielbutnar/comma-below](https://github.com/danielbutnar/comma-below). Every input is generated from correctly spelled text in one file, `src/items.py`, so testing another letter pair or another language is a small change.
+Thirteen tasks, with every model answer in the run outputs. Task 8's leaderboard ranks the models on the keyboard echo, from each model's latest run, and counts an empty answer as a failure: Qwen 3 Next Thinking shows {{QWEN_T_KAGGLE}}% there, and Grok 4.5 and 4.6 show 0% because every call returned an error. The overall score averages different tasks for different models, so read task 8.
+
+The code that builds the tasks, the fake models that test the scorer, the analysis and a script that re-checks this post's numbers against the raw answers are on [GitHub](https://github.com/danielbutnar/comma-below). Every input is generated from correctly spelled text in `src/items.py`, so testing another letter pair or language is a small change. Built with [kaggle-benchmarks](https://pypi.org/project/kaggle-benchmarks/); the checker runs on [LiveCodes](https://livecodes.io). I used Claude as a coding and editing assistant.
