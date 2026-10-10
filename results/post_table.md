@@ -1,3 +1,5 @@
+Round 1 table from the post's first version (1 October: tasks 1-7, 15 models, Echo = the mean of task 2's runs). The current post's table also pools task 8's runs; it is TABLE in results/post_values.json.
+
 | Model | Write | Echo: cedilla input | Echo + rule | Fix | See | Restore | Code |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | Qwen 3 235B | 92 | 85 | 91 | 89 | 89 | 90 | 61 |

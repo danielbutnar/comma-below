@@ -103,6 +103,21 @@ def spearman(x, y) -> float:
     return float(np.corrcoef(rx, ry)[0, 1])
 
 
+def perm_spearman(x, y, n_perm: int = 100000, seed: int = 20261010) -> tuple[float, float]:
+    """Spearman rho and a two-sided permutation p-value (x shuffled against y). It has its own random
+    generator, so calling it leaves every other number in this file as it was."""
+    rx = pd.Series(x).rank().values
+    ry = pd.Series(y).rank().values
+    obs = spearman(x, y)
+    if math.isnan(obs):
+        return obs, math.nan
+    rng = np.random.default_rng(seed)
+    perm = rng.permuted(np.tile(rx, (n_perm, 1)), axis=1)
+    dx, dy = perm - rx.mean(), ry - ry.mean()
+    r = (dx @ dy) / (np.sqrt((dx ** 2).sum(axis=1)) * np.sqrt((dy ** 2).sum()))
+    return obs, float((np.abs(r) >= abs(obs) - 1e-12).mean())
+
+
 def perm_trend(points: list[tuple[str, float, float]], n_perm: int = 20000) -> tuple[float, float]:
     """points: (line, version, pass rate). Mean within-line Spearman rho and a permutation p-value
     (versions shuffled within each line)."""
