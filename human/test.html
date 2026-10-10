@@ -22,7 +22,7 @@
   button.primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; width: 100%; }
   @media (prefers-color-scheme: dark) { button.primary { color: #0b1530; } }
   .pair { display: flex; justify-content: center; gap: 2.25rem; margin: 1.75rem 0; flex-wrap: wrap; }
-  .word { font-size: var(--size, 18px); letter-spacing: 0; }
+  .word { font-size: var(--size, 18px); letter-spacing: 0; font-feature-settings: "locl" 0; }
   .choices { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
   .choices button { width: 100%; }
   .pick { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; margin: 1.5rem 0; }
@@ -80,7 +80,7 @@
 </main>
 <script>
 "use strict";
-// The same word pairs as task 4 ("See") of the benchmark, where every model was right on all of them.
+// The same word pairs as task 4 ("See") of the benchmark.
 const COMMA = { "ș": "ş", "Ș": "Ş", "ț": "ţ", "Ț": "Ţ" };
 const ced = w => [...w].map(c => COMMA[c] || c).join("");
 const WORDS = ["Brașov", "Timișoara", "Iași", "mulțumesc", "Ștefan", "țară", "Constanța", "știri"];
@@ -142,11 +142,15 @@ function shuffle(a) {
   return a;
 }
 const coin = () => { const r = new Uint8Array(1); crypto.getRandomValues(r); return r[0] % 2 === 0; };
-let reads = null, step = -1, sdRight = 0, wrRight = 0, started = 0;
+let reads = null, step = -1, sdRight = 0, sameRight = 0, diffRight = 0, wrRight = 0, started = 0, lockUntil = 0;
 const sdOrder = shuffle(SD.slice());
 const wrOrder = shuffle(WR.slice()).map(w => coin() ? [w, ced(w), 0] : [ced(w), w, 1]);   // [left, right, index of the right one]
+// Answers that arrive right after a new pair appears (a double click, a held Enter) are ignored.
+const locked = () => performance.now() < lockUntil;
 
-function wordSpan(text) { const s = document.createElement("span"); s.className = "word"; s.textContent = text; return s; }
+// The words are marked English: on a page marked Romanian, fonts such as Segoe UI, Roboto, Noto Sans and Open Sans
+// draw the cedilla ş with a comma, so the two letters would look identical. Version 1 of this page had that flaw.
+function wordSpan(text) { const s = document.createElement("span"); s.className = "word"; s.lang = "en"; s.textContent = text; return s; }
 function showPair(a, b) { const p = $("pair"); p.replaceChildren(wordSpan(a), wordSpan(b)); }
 function progress() { $("progress").textContent = step < 0 ? "" : `${Math.min(step + 1, sdOrder.length + wrOrder.length)} ${T[lang].of} ${sdOrder.length + wrOrder.length}`; }
 
@@ -164,6 +168,7 @@ function render() {
     const box = $("wr"); box.classList.remove("hidden");
     box.replaceChildren(...[l, r].map((w, k) => { const b = document.createElement("button"); b.type = "button"; b.dataset.pick = String(k); b.append(wordSpan(w)); return b; }));
   } else return finish();
+  lockUntil = performance.now() + 350;
   progress();
   const first = document.querySelector("#trial button:not(.hidden):not([disabled])"); if (first) first.focus({ preventScroll: true });
 }
@@ -177,21 +182,26 @@ document.querySelectorAll("#sd button").forEach(b => b.addEventListener("click",
     const fb = $("feedback"); fb.textContent = ans === "diff" ? T[lang].practiceOk : T[lang].practiceBad;
     fb.className = ans === "diff" ? "ok" : "bad"; $("next").classList.remove("hidden"); $("next").focus(); return;
   }
-  if (ans === sdOrder[step][2]) sdRight++;
+  if (locked() || step < 0 || step >= sdOrder.length) return;
+  if (ans === sdOrder[step][2]) { sdRight++; if (ans === "same") sameRight++; else diffRight++; }
   step++; render();
 }));
-$("next").addEventListener("click", () => { step = 0; render(); });
+$("next").addEventListener("click", () => { if (step === -1) { step = 0; render(); } });
 $("wr").addEventListener("click", e => {
-  const b = e.target.closest("button"); if (!b) return;
-  if (Number(b.dataset.pick) === wrOrder[step - sdOrder.length][2]) wrRight++;
+  const b = e.target.closest("button"); const cur = wrOrder[step - sdOrder.length];
+  if (!b || !cur || locked()) return;
+  if (Number(b.dataset.pick) === cur[2]) wrRight++;
   step++; render();
 });
 function finish() {
   $("trial").classList.add("hidden"); $("done").classList.remove("hidden");
   $("sdScore").textContent = `${sdRight}/${sdOrder.length}`; $("wrScore").textContent = `${wrRight}/${wrOrder.length}`;
-  const ua = navigator.userAgent, os = /iPhone|iPad|iPod/.test(ua) ? "ios" : /Android/.test(ua) ? "android" : /Mac/.test(ua) ? "mac" : /Windows/.test(ua) ? "win" : "other";
+  const ua = navigator.userAgent, ipad = /Mac/.test(ua) && navigator.maxTouchPoints > 1;   // iPadOS reports a Mac
+  const os = /iPhone|iPod/.test(ua) ? "ios" : /iPad/.test(ua) || ipad ? "ipados" : /Android/.test(ua) ? "android"
+    : /Mac/.test(ua) ? "mac" : /Windows/.test(ua) ? "win" : "other";
   const secs = Math.round((Date.now() - started) / 1000);
-  $("code").textContent = `SD${sdRight}-WR${wrRight}-RO${reads}-${os}-${size}px-${innerWidth}w-${(devicePixelRatio || 1).toFixed(1)}x-${secs}s`;
+  // v2: S and D are the right answers on the 6 identical and the 6 different pairs (SD = S + D).
+  $("code").textContent = `v2-SD${sdRight}-S${sameRight}D${diffRight}-WR${wrRight}-RO${reads}-${os}-${size}px-${innerWidth}w-${(devicePixelRatio || 1).toFixed(1)}x-${secs}s`;
 }
 paint();
 </script>
