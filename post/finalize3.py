@@ -30,7 +30,7 @@ CHART_FILES = {"HERO": "chart-hero-v2.png", "KEYBOARD": "chart-keyboard-v2.png",
 for name, file in CHART_FILES.items():
     assert (HERE / file).exists(), f"missing {file}"
     s = s.replace(f"CHART_{name}_URL", RAW + file)
-s = re.sub(r"(\d) %", r"\1%", s)  # English typography on DEV: "96%", never a line break inside it
+s = re.sub(r"(\d) %(?!\})", r"\1%", s)  # English typography on DEV: "96%", never a line break inside it
 if "--draft" in sys.argv:  # review copy: mark what is still missing instead of failing
     s = re.sub(r"\{\{([A-Z0-9_]+)\}\}", r"[pending: \1]", s)
 left = re.findall(r"\{\{[A-Z0-9_]+\}\}|\b[A-Z0-9]+_URL\b", s)

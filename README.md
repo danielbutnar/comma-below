@@ -91,7 +91,7 @@ Also here:
   them mark their pages as Romanian, fetched 10 October); `analyze.py` loads the runs; `post_stats.py` (Round 1)
   and `round2.py` (Round 2, with bootstrap intervals, McNemar tests and version trends); `task13.py` (the analysis
   pre-registered in task 13); `own_words.py` (do the model's own words follow a copied cedilla?); `fix_check.py`;
-  `human_summary.py` (needs the private `human/results.txt`, so it fails in a fresh clone); `models.py` (labs,
+  `human_summary.py` (needs the private `human/results.txt`; in a fresh clone it says so and leaves `results/human_summary.json` as it is); `models.py` (labs,
   product lines, versions); `charts.py`, `charts2.py`, `charts3.py` write the charts as HTML into `post/`;
   `check_claims.py` recomputes the numbers the post quotes and scores the predictions; cost and quota scripts.
 - `results/`: every scored answer as Kaggle returned it (`results/raw/<task>/<version>/<model>/<run>/*.jsonl`, the
@@ -123,8 +123,8 @@ uv run --no-project --with pandas --with numpy python analysis/round2.py
 uv run --no-project --with pandas --with numpy python analysis/check_claims.py
 ```
 
-Two of the write-up's numbers need the run traces, which are not in the repository: what DeepSeek-R1's
-reasoning says about the letters, and the cost. Without the traces, `check_claims.py --values` keeps the
+Seven values in `results/post_values.json` need the run traces, which are not in the repository: six counts
+of what DeepSeek-R1's reasoning says about the letters (`DS_*`) and the cost (`COST`). Without the traces, `check_claims.py --values` keeps the
 committed values for those; everything else recomputes from the committed answers.
 
 ## Known issues in the pushed tasks

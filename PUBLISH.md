@@ -33,6 +33,9 @@ ties. The address keeps its old "15-llms" slug after the edit; that is fine.
    - the cedilla checker renders (a box titled "Does your model copy the cedilla?");
    - every image loads: the cover and each chart;
    - the five collapsed sections (details) open.
+   - **If the checker box doesn't render** (a Liquid error on save, an empty frame, or `+` signs between
+     words inside it): delete the one long line that starts with `{% livecodes` and save. The line above it
+     already links the checker on its own page, so readers lose nothing.
 5. Click **Save changes**.
 6. Open the post in a private window: the new title and cover show, and the tags still include
    `kagglechallenge`.

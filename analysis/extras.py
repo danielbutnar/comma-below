@@ -41,6 +41,10 @@ OSS_EXAMPLE = "Șoferii sunt rugaţi să parcheze pe strada Mureșenilor și lâ
 
 
 
+# town and street names in my texts (src/items.py), comma-below spelling, folded; a word starting with one is a name
+PLACE_STEMS = ("brașov", "bucureșt", "iași", "mureș", "râșnov", "sighișoar", "timiș", "transfăgărășan")
+
+
 def wilson(k: int, n: int, z: float = 1.96) -> tuple[float, float]:
     """95 % Wilson interval for k of n, in %."""
     if n == 0:
@@ -272,6 +276,38 @@ def add(v: dict, every: pd.DataFrame, latest: pd.DataFrame) -> None:
     lk = every[(every.task == "lookalike") & (every.kind == "rag")]
     # % of answers to Cyrillic look-alike input (both variants) that kept a Cyrillic letter
     v["LK_CYR_COPIED_RAG"] = pct(1 - lk[lk.variant.isin(["cyrillic-all", "cyrillic-names"])]["pass"].mean())
+    # % that kept a Cyrillic letter when only the names were Cyrillic: the same words the mojibake touches
+    v["LK_CYR_NAMES_COPIED_RAG"] = pct(1 - lk[lk.variant == "cyrillic-names"]["pass"].mean())
+
+    # m. "An answer from a document should quote it": task 8 cedilla input, every run. % of answers that are clean,
+    # or whose every cedilla word is a place name from my texts (counting a kept name as a fair quote)
+    def name_only(r) -> bool:
+        ws = [w.translate(TO_COMMA).casefold() for w in (r.cedilla_words or [])]
+        return bool(ws) and all(w.startswith(PLACE_STEMS) for w in ws) and not r.lookalike
+    v["E4_CED_NAMES_OK"] = pct(np.mean([bool(r.pass_) or name_only(r) for r in c4.rename(columns={"pass": "pass_"}).itertuples()]))
+
+    # n. The îndrumaţi move: models other than Claude Opus 5 that wrote the cedilla word for "directed" in a
+    # summary of E07 typed with cedillas (tasks 2 and 8), where my text said "rugați"
+    e07 = every[every.task.isin(["echo", "echo4"]) & (every.variant == "cedilla") & (every.base_id == "E07")]
+    movers = sorted({m for m, r in zip(e07.model, e07.response.fillna("")) if "îndrumaţi" in r} - {"claude-opus-5-default"})
+    v["N_INDRUMATI_OTHER"] = len(movers)
+    # their names, for the record
+    v["INDRUMATI_OTHER_NAMES"] = _and([M.name(m) for m in movers]) if movers else "none"
+    # the same count as a word that can start a sentence ("Seven")
+    v["N_INDRUMATI_WORD"] = (["No", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten"][len(movers)]
+                             if len(movers) <= 10 else str(len(movers)))
+
+    # o. Task 12's control: chats with no cedilla anywhere (clean>clean) where an answer still had a cedilla
+    tu = every[every.task == "turns"]
+    ctrl = tu[tu.cond == "clean>clean"]
+    hit = ctrl[(ctrl.first_cedilla > 0) | (ctrl.second_cedilla > 0)]
+    v["T12_CTRL_N"], v["T12_CTRL_TOTAL"] = len(hit), len(ctrl)
+    v["T12_CTRL_MODELS"] = _and(sorted({M.name(m) for m in hit.model})) if len(hit) else "none"
+
+    # p. Grok 4.20 with reasoning on task 8 alone, the same run basis as V_GROK_NR (which only ran task 8)
+    g = c4[c4.model == "grok-4.20-0309-reasoning"]
+    if len(g):
+        v["V8_GROK_R"] = pct(g["pass"].mean())
 
 
 if __name__ == "__main__":

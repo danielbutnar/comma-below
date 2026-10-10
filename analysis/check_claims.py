@@ -117,7 +117,8 @@ def values() -> dict:
             v["OSS_CLEAN_K"], v["OSS_CLEAN_N"] = int((both.cedilla > 0).sum()), len(both)
         # best models (ties at the top) and run-to-run spread on the same prompts
         top = t[t.cedilla >= t.cedilla.max() - 0.01].sort_values("name")
-        v["TOP_NAMES"] = ", ".join(top["name"])
+        tn = list(top["name"])
+        v["TOP_NAMES"] = tn[0] if len(tn) == 1 else ", ".join(tn[:-1]) + " and " + tn[-1]
         v["TOP_SCORE"] = f"{t.cedilla.max():.0f}"
         runs = every[every.task.isin(["echo", "echo4"]) & (every.variant == "cedilla") & (every.model != "gpt-oss-120b")]
         rr = runs.groupby(["model", "task", "run_id"])["pass"].mean().reset_index()
@@ -384,12 +385,14 @@ def third_version_values(every: pd.DataFrame, v: dict):
     # a fresh run of the same kind of prompts: task 13's cedilla control, per Claude version
     w13 = every[(every.task == "wrong") & (every.variant == "cedilla")]
     for m, key in (("claude-sonnet-4-6-default", "T13_SONNET46"), ("claude-sonnet-5-default", "T13_SONNET5"),
-                   ("claude-opus-4-8-default", "T13_OPUS48"), ("claude-opus-5-default", "T13_OPUS5")):
+                   ("claude-opus-4-8-default", "T13_OPUS48"), ("claude-opus-5-default", "T13_OPUS5"),
+                   ("gpt-5.6-sol", "T13_SOL56"), ("gpt-6-sol", "T13_SOL6")):
         d = w13[w13.model == m]
         if len(d):
             v[key] = pct(d["pass"].mean())
-    if all(k in v for k in ("T13_SONNET46", "T13_SONNET5", "T13_OPUS48", "T13_OPUS5")):
-        assert v["T13_SONNET46"] > v["T13_SONNET5"] and v["T13_OPUS48"] > v["T13_OPUS5"],             "the post says the fresh run put both pairs of versions in the same order"
+    if all(k in v for k in ("T13_SONNET46", "T13_SONNET5", "T13_OPUS48", "T13_OPUS5", "T13_SOL56", "T13_SOL6")):
+        assert (v["T13_SONNET46"] > v["T13_SONNET5"] and v["T13_OPUS48"] > v["T13_OPUS5"]
+                and v["T13_SOL56"] > v["T13_SOL6"]),             "the post says the fresh run put all three pairs of versions in the same order"
     # the own-word replication in task 13 (pre-registered prediction 5)
     w = every[every.task == "wrong"]
     if len(w) and w.model.nunique() >= 10:
@@ -669,9 +672,16 @@ def predictions(every: pd.DataFrame) -> tuple[str, dict, str]:
         by = ("" if not len(who) else f", both {names(who)}" if n_inf == 2 and who.nunique() == 1
               else f", all {names(who)}" if who.nunique() == 1 else f", from {names(who)}")
         v = "held" if inf > 0 and inf_first > inf else "failed"
+        # the control: chats with no cedilla anywhere. A cedilla there means the model writes it on its own.
+        ctrl = tu[tu.cond == "clean>clean"]
+        own = ctrl[(ctrl.first_cedilla > 0) | (ctrl.second_cedilla > 0)]
+        ctrl_note = (f"; the chats with no cedilla at all had {len(own)} of {len(ctrl)} too ({names(own.model)})"
+                     if len(own) else "")
+        if len(own) and v == "held":
+            v = "inconclusive"  # the infection rate is no higher than the control's
         add(12, "A cedilla first text infects some clean second summaries, mostly after a cedilla first summary.",
             f"{inf:.0f} % infected ({n_inf} of {len(cc)} conversations{by}); "
-            f"{inf_first:.0f} % when the first summary was itself in cedilla", v)
+            f"{inf_first:.0f} % when the first summary was itself in cedilla{ctrl_note}", v)
         thin["turns"] = (v, n_inf, len(cc), by.replace(", both ", ", both from ").replace(", all ", ", all from "))
         e2 = every[(every.task == "echo") & (every.variant == "cedilla")]
         if len(e2):  # "copied less than in task 2", as registered
@@ -718,10 +728,9 @@ def predictions(every: pd.DataFrame) -> tuple[str, dict, str]:
     note = ""
     if {"k9", "lk", "turns"} <= set(thin):
         (v9, p9), (v11, p11), (v12, n_inf, n_cc, by) = thin["k9"], thin["lk"], thin["turns"]
-        which = "of the predictions that held" if v9 == v11 == v12 == "held" else "of these verdicts"
-        note = (f"Three {which} rest on very little: the rank correlations in tasks 9 and 11 could be chance "
-                f"(permutation p = {p9:.2f} and {p11:.2f}), and the infection in task 12 is {n_inf} of {n_cc} "
-                f"conversations{by}.")
+        which = " of the predictions that held" if v9 == v11 == v12 == "held" else " verdicts"
+        note = (f"Three{which} rest on very little: two on rank correlations that could be chance "
+                f"(permutation p = {p9:.2f} and {p11:.2f}), and one on the {n_inf} of {n_cc} chat conversations{by}.")
     return head + "\n" + "\n".join(rows), counts, note
 
 

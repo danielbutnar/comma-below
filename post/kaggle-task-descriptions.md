@@ -185,9 +185,9 @@ data before running, so no editor, CLI or notebook conversion can silently swap 
 
 **Added after the runs** (not part of the text pushed with the task):
 
-- An empty answer counts as a failure here. Qwen 3 Next 80B Thinking used up the 8,192-token cap while thinking on 11 of its 22 cedilla prompts, so it shows 45 %; 10 of the 11 answers it finished were clean (91 %, the figure the write-up uses).
+- An empty answer counts as a failure here. Qwen 3 Next 80B Thinking used up the 8,192-token cap while thinking on 11 of its 22 cedilla prompts, so it shows 45 %; 10 of the 11 answers it finished were clean, too few to compare with other models.
 - Grok 4.5 and Grok 4.6 show 0 % because every call returned an error, not because of their answers.
-- Each model ran once on these 22 cedilla prompts, so differences of about 20 points between two models can be chance.
+- Each score here is one run (the model's latest) of these 22 cedilla prompts, so differences of about 20 points between two models can be chance.
 
 Write-up: https://dev.to/danielbutnar/brasov-or-brasov-15-llms-spell-my-city-right-until-you-spell-it-wrong-first-75a
 
