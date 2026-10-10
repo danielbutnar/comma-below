@@ -594,6 +594,9 @@ def predictions(every: pd.DataFrame) -> tuple[str, dict, str]:
             hs = holm(st)  # the correction the post's text uses for the same steps
             dn, up = int((hs.change < 0).sum()), int((hs.change > 0).sum())
         v = "inconclusive" if dn == up == 0 else "held" if up == 0 else "failed" if dn == 0 else "mixed"
+        if v == "held" and up0:
+            v = "inconclusive"  # an upgrade also got better beyond p < 0.05 before the correction: it went both ways
+        thin["v8"] = (v, up0)
         add(8, "Newer versions in a family copy the cedilla at least as often as older ones.",
             f"of {n_steps} upgrades, {dn} copied more and {up or 'none'} copied less after a correction for multiple tests "
             f"({dn0} and {up0} at p < 0.05 before it); no overall trend (rank correlation {rho:+.2f})", v)
@@ -615,7 +618,8 @@ def predictions(every: pd.DataFrame) -> tuple[str, dict, str]:
                 whole[m] = np.mean([x == 1.0 for x in pur]) if pur else np.nan
             j = pd.concat([pd.Series(whole, name="whole"), (100 - per["clean-3"]).rename("infected")], axis=1).dropna()
             r, p = perm_spearman(j.whole, j.infected) if len(j) >= 5 else (np.nan, np.nan)
-            v = "too early" if np.isnan(r) else "inconclusive" if len(j) < 10 else ("held" if r >= 0.3 else "failed")
+            v = ("too early" if np.isnan(r) else "inconclusive" if len(j) < 10 or (r >= 0.3 and p >= 0.05)
+                 else ("held" if r >= 0.3 else "failed"))  # a positive correlation that could be chance is no hold
             hit = j.index[j.infected > 0]
             add(9, "The models that rewrote whole answers in cedilla in task 2 are the ones whose clean-target answers "
                    "get infected.",
@@ -654,7 +658,8 @@ def predictions(every: pd.DataFrame) -> tuple[str, dict, str]:
             ced = e4[e4.variant == "cedilla"].groupby("model")["pass"].mean()
             j = pd.concat([per["cyrillic-names"].rename("cy"), ced.rename("ced")], axis=1).dropna()
             r, p = perm_spearman(j.cy, j.ced) if len(j) >= 5 else (np.nan, np.nan)
-            v = "too early" if np.isnan(r) else "inconclusive" if len(j) < 10 else ("held" if r >= 0.3 else "failed")
+            v = ("too early" if np.isnan(r) else "inconclusive" if len(j) < 10 or (r >= 0.3 and p >= 0.05)
+                 else ("held" if r >= 0.3 else "failed"))  # a positive correlation that could be chance is no hold
             cn = lk[(lk.variant == "cyrillic-names") & lk.model.isin(j.index)]
             kept = cn[~cn["pass"].astype(bool)]
             add(11, "The models that copy the Romanian cedilla most also copy the look-alikes most.",
@@ -726,11 +731,15 @@ def predictions(every: pd.DataFrame) -> tuple[str, dict, str]:
 
     # one sentence for under the table: the verdicts that rest on little data
     note = ""
-    if {"k9", "lk", "turns"} <= set(thin):
-        (v9, p9), (v11, p11), (v12, n_inf, n_cc, by) = thin["k9"], thin["lk"], thin["turns"]
-        which = " of the predictions that held" if v9 == v11 == v12 == "held" else " verdicts"
-        note = (f"Three{which} rest on very little: two on rank correlations that could be chance "
-                f"(permutation p = {p9:.2f} and {p11:.2f}), and one on the {n_inf} of {n_cc} chat conversations{by}.")
+    if {"k9", "lk", "turns", "v8"} <= set(thin):
+        (v9, p9), (v11, p11), (v12, n_inf, n_cc, by), (v8, up0) = thin["k9"], thin["lk"], thin["turns"], thin["v8"]
+        if v8 == v9 == v11 == v12 == "inconclusive":
+            note = (f"Four of the verdicts too close to call rest on evidence that could be chance: the rank correlations "
+                    f"in tasks 9 and 11 (permutation p = {p9:.2f} and {p11:.2f}), task 8's upgrades, which went both ways "
+                    f"before the correction, and task 12's {n_inf} of {n_cc} chat conversations{by}.")
+        else:
+            note = (f"Some verdicts rest on very little: the rank correlations in tasks 9 and 11 (permutation p = "
+                    f"{p9:.2f} and {p11:.2f}) and task 12's {n_inf} of {n_cc} chat conversations{by}.")
     return head + "\n" + "\n".join(rows), counts, note
 
 
