@@ -1,5 +1,8 @@
 """Sum tokens and cost per task and model from downloaded run files.
 
+The run traces (results/raw/**/*.run.json) are not in the repo; download them with
+kaggle b t download romanian-comma-below-<task> -o results/raw. Without them it says so and stops.
+
 Usage:  uv run --no-project python analysis/costs.py
 """
 
@@ -25,7 +28,11 @@ def requests(obj):
 
 def main():
     totals = defaultdict(lambda: defaultdict(float))
-    for f in RAW.glob("*/*/*/*/*.run.json"):
+    files = sorted(RAW.glob("*/*/*/*/*.run.json"))
+    if not files:
+        print(f"no run traces (*.run.json) under {RAW}: they stay on Kaggle (see the docstring)")
+        return
+    for f in files:
         task, version, model = f.parts[-5], f.parts[-4], f.parts[-3]
         d = json.loads(f.read_text(encoding="utf-8"))
         t = totals[(task, model)]

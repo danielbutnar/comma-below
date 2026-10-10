@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Cedilla checker</title>
 <style>
-:root{--bg:#fcfcfb;--ink:#1c1a17;--muted:#5f5a52;--line:#d9d4ca;--bad:#b2452f;--badbg:#fbe3dc;--ok:#1f6b58;--btn:#1c1a17;--btnink:#fff;--box:#fff}
-@media (prefers-color-scheme:dark){:root{--bg:#171615;--ink:#eeebe5;--muted:#aaa49a;--line:#3a3733;--bad:#ff8d74;--badbg:#4a2219;--ok:#6fd1b3;--btn:#eeebe5;--btnink:#171615;--box:#201f1d}}
+:root{--bg:#fcfcfb;--ink:#1c1a17;--muted:#5f5a52;--line:#8f897e;--bad:#b2452f;--badbg:#fbe3dc;--ok:#1f6b58;--btn:#1c1a17;--btnink:#fff;--box:#fff}
+@media (prefers-color-scheme:dark){:root{--bg:#171615;--ink:#eeebe5;--muted:#aaa49a;--line:#77726a;--bad:#ff8d74;--badbg:#4a2219;--ok:#6fd1b3;--btn:#eeebe5;--btnink:#171615;--box:#201f1d}}
 *{box-sizing:border-box;margin:0}
 [hidden]{display:none!important}
 body{background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding:14px 16px}
@@ -19,114 +19,159 @@ textarea{min-height:76px;resize:vertical}
 .row{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;align-items:center}
 button{font:600 13.5px/1 system-ui,-apple-system,"Segoe UI",sans-serif;padding:8px 12px;border-radius:7px;border:1px solid var(--btn);background:var(--btn);color:var(--btnink);cursor:pointer}
 button.ghost{background:transparent;color:var(--ink)}
-button:focus-visible,textarea:focus-visible{outline:3px solid #2a78d6;outline-offset:2px}
+button:focus-visible,textarea:focus-visible,pre:focus-visible,.out:focus-visible{outline:3px solid #2a78d6;outline-offset:2px}
 .verdict{font-weight:650;margin-top:8px}
 .verdict.bad{color:var(--bad)} .verdict.ok{color:var(--ok)}
-.out{margin-top:6px;min-height:40px}
+.out{margin-top:6px;min-height:40px;max-height:150px;overflow:auto}
 mark{background:var(--badbg);color:var(--bad);font-weight:700;border-bottom:2px solid var(--bad);border-radius:2px;padding:0 1px}
-.okl{border-bottom:2px dotted var(--ok)}
+.okl{border-bottom:2px solid var(--ok)}
 .tr{border-bottom:2px dotted var(--muted)}
 .note{color:var(--muted);font-size:12.5px;margin-top:4px}
 .hint{color:var(--muted);font-size:12.5px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+@media (max-width:480px){body{padding:12px}pre{max-height:72px}.out{max-height:120px}button{padding:8px 9px;font-size:13px}}
 </style>
 </head>
 <body>
 <h1>Does your model copy the cedilla?</h1>
-<p class="sub">Two steps. The check runs in your browser, the same way my scorer does: NFC first, then each letter by its code point.</p>
+<p class="sub">Two steps. The check runs in your browser. Like my scorer, it reads each letter by its code point after NFC. Unlike it, it looks only at ş ţ ș ț, and it skips ş in sentences that look Turkish.</p>
 
-<div class="step">1 · Send this to your chatbot</div>
-<pre id="prompt"></pre>
+<h2 class="step" id="s1">1 · Send this to your chatbot</h2>
+<pre id="prompt" tabindex="0" aria-labelledby="s1"></pre>
 <div class="row"><button id="copyPrompt">Copy the prompt</button><span class="hint" id="copyMsg" aria-live="polite"></span></div>
 
-<div class="step">2 · Paste its answer here</div>
-<label for="t" class="note" style="display:block;margin:0 0 4px">Or any Romanian text: a web page, a database export, a translation.</label>
-<textarea id="t" spellcheck="false" placeholder="Paste here"></textarea>
-<div class="row"><button class="ghost" id="sample">Show me an example answer</button><button class="ghost" id="clear">Clear</button></div>
+<h2 class="step" id="s2">2 · Paste its answer here</h2>
+<p class="note" id="tnote" style="margin:0 0 4px">Or any Romanian text: a web page, a database export, a translation.</p>
+<textarea id="t" spellcheck="false" placeholder="Paste here" aria-labelledby="s2" aria-describedby="tnote"></textarea>
+<div class="row"><button class="ghost" id="sample">Show Claude Opus 5.5's real answer</button><button class="ghost" id="clear">Clear</button></div>
 
-<div class="verdict" id="verdict" aria-live="polite"></div>
-<div class="out" id="out" hidden></div>
-<div class="row" id="fixRow" hidden><button id="fix">Fix it (Romanian only)</button></div>
-<p class="note" id="fixNote" hidden>The fix swaps ş ţ for ș ț sentence by sentence. In a sentence with ı, ğ, ç, ö or ü it leaves ş alone, so Turkish written that way keeps its ş; ţ is always swapped, because Turkish has no ţ. It's the <code>fix_romanian()</code> from the post.</p>
+<div class="verdict" id="verdict"></div>
+<div class="out" id="out" role="region" tabindex="0" aria-label="Your text, with the s and t letters marked" hidden></div>
+<p class="note" id="legend" hidden></p>
+<div class="row" id="fixRow" hidden><button id="fix">Fix and copy (Romanian only)</button><button class="ghost" id="undo" hidden>Undo</button><span class="hint" id="fixMsg"></span></div>
+<p class="note" id="fixNote" hidden>The fix swaps ş ţ for ș ț sentence by sentence. In a sentence with ı, ğ, ç, ö or ü it leaves ş alone, so most Turkish keeps its ş, but a short Turkish sentence without those letters, like "Hoş geldiniz!", still gets changed. ţ is always swapped: Turkish has no ţ. It's the <code>fix_romanian()</code> from the post.</p>
+<div class="sr" id="live" aria-live="polite"></div>
 
 <script>
-// Letters, by code point, so nothing depends on how this file was saved.
-var CED = {"ş":"U+015F s with cedilla","Ş":"U+015E S with cedilla","ţ":"U+0163 t with cedilla","Ţ":"U+0162 T with cedilla"};
-var COM = {"ș":"U+0219 s with comma below","Ș":"U+0218 S with comma below","ț":"U+021B t with comma below","Ț":"U+021A T with comma below"};
+// The letters are written out here; build_checker_tag.py escapes them to \uXXXX, so the embed doesn't depend on
+// how this file was saved. Comment lines like this one stay in the repo and are left out of the embed.
 var FIX = {"ş":"ș","Ş":"Ș","ţ":"ț","Ţ":"Ț"};
-var NOT_ROMANIAN = /[ıİğĞçÇöÖüÜ]/;  // letters Turkish uses and Romanian never does
+var COMMA = /[șȘțȚ]/, S = /[şŞșȘ]/;
+// letters Turkish uses and Romanian never does
+var NOT_ROMANIAN = /[ıİğĞçÇöÖüÜ]/;
 function fixRomanian(text){
   return text.normalize("NFC").replace(/[^.!?\n]+/g, function(sentence){
-    // in a sentence that looks Turkish only ţ is swapped: Turkish has no ţ
+    // in a sentence that looks Turkish only ţ is swapped: Turkish has no ţ, so in Romanian text it is always
+    // wrong (Gagauz, which does use ţ, would need its own rule)
     return sentence.replace(NOT_ROMANIAN.test(sentence) ? /[ţŢ]/g : /[şŞţŢ]/g, function(c){return FIX[c];});
   });
 }
 function toCedilla(s){return s.replace(/ș/g,"ş").replace(/Ș/g,"Ş").replace(/ț/g,"ţ").replace(/Ț/g,"Ţ");}
+function cp(c){return "U+0" + c.charCodeAt(0).toString(16).toUpperCase();}
 
 // Task 8, prompt Q02 of the benchmark, typed with cedillas.
 var TEXT = "Drumul Transfăgărășan se închide în fiecare an la sfârșitul lunii octombrie, iar redeschiderea are loc, de obicei, la începutul lui iulie. Autoritățile recomandă turiștilor să verifice starea drumului înainte de plecare, deoarece ninsorile pot apărea și în septembrie.";
 var PROMPT = "Answer the question using only the text below. Answer in Romanian, in one sentence.\n\nText:\n" + toCedilla(TEXT) + "\n\nQuestion: When does the road usually close, and when does it reopen?";
-// An example written for this page, in the style of the answers that kept every cedilla (not a model's answer).
-var SAMPLE = toCedilla("Primăria Brașov anunță închiderea Pieței Sfatului pentru traficul auto în weekend, între orele 8 și 20, din cauza târgului de toamnă. Șoferii sunt îndrumați să parcheze pe strada Mureșenilor sau lângă Gara Brașov.");
+// Claude Opus 5.5's real answer to this prompt, as it wrote it, cedillas (U+015F) included: task 8, item
+// Q02-E08-cedilla, run 4578504 (results/raw/romanian-comma-below-8-echo-four-inputs/1/claude-opus-5-5-default/).
+var SAMPLE = "Drumul Transfăgărăşan se închide în fiecare an la sfârşitul lunii octombrie şi se redeschide, de obicei, la începutul lunii iulie.";
 
 var $ = function(id){return document.getElementById(id);};
 $("prompt").textContent = PROMPT;
+var keys = matchMedia("(pointer:coarse)").matches ? "press and hold, then tap Copy." : "press Ctrl+C (⌘C on a Mac).";
+// screen readers hear the verdict once typing stops, not on every key
+var timer;
+function announce(text, now){ clearTimeout(timer); timer = setTimeout(function(){ $("live").textContent = text; }, now ? 0 : 700); }
 
-function copyText(text, msgEl, fallbackEl){
-  function ok(){msgEl.textContent = "Copied.";}
-  function manual(){
-    if (fallbackEl){fallbackEl.focus(); if (fallbackEl.select) fallbackEl.select(); else {var r=document.createRange(); r.selectNodeContents(fallbackEl); var s=getSelection(); s.removeAllRanges(); s.addRange(r);}}
-    msgEl.textContent = "Selected. Press Ctrl+C (⌘C on a Mac).";
-  }
-  if (navigator.clipboard && navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(ok, manual);} else manual();
+// a promise either way: it is refused when the clipboard isn't there or the page may not write to it (DEV's iframe)
+function clip(text){ return new Promise(function(done){ done(navigator.clipboard.writeText(text)); }); }
+function copyText(text, msg, box){
+  clip(text).then(function(){
+    msg.textContent = "Copied."; clearTimeout(msg.timer); msg.timer = setTimeout(function(){ msg.textContent = ""; }, 3000);
+  }).catch(function(){
+    clearTimeout(msg.timer);
+    box.focus();
+    if (box.select) box.select(); else getSelection().selectAllChildren(box);
+    msg.textContent = "Selected: " + keys;
+  });
 }
-$("copyPrompt").onclick = function(){copyText(PROMPT, $("copyMsg"), $("prompt"));};
+$("copyPrompt").onclick = function(){ copyText(PROMPT, $("copyMsg"), $("prompt")); };
 
-function check(){
-  var raw = $("t").value, s = raw.normalize("NFC");
-  var out = $("out"), nCed = 0, nCom = 0;
+// the text before Fix, for Undo
+var before = null;
+function count(k, one, many){ return k + (k === 1 ? one : many); }
+
+function check(now){
+  var raw = $("t").value, s = raw.normalize("NFC"), out = $("out"), v = $("verdict");
+  var n = {mark: 0, okl: 0, skip: 0, tr: 0}, sent = {skip: 0, tr: 0}, seen = {mark: {}, okl: {}, tr: {}}, buf = "";
   out.textContent = "";
-  if (!s.trim()){ $("verdict").textContent = ""; $("verdict").className = "verdict"; out.hidden = true; $("fixRow").hidden = true; $("fixNote").hidden = true; return; }
-  var buf = "", nTr = 0;
-  function flush(){ if (buf){ out.appendChild(document.createTextNode(buf)); buf = ""; } }
-  // sentence by sentence, like the fix: in a sentence with ı ğ ç ö ü an ş may be Turkish, so it is skipped;
-  // ţ is always wrong, because Turkish has no ţ
-  var parts = s.match(/[^.!?\n]+|[.!?\n]+/g) || [];
-  for (var part of parts){
-    var turkish = NOT_ROMANIAN.test(part);
+  v.className = "verdict";
+  if (!s.trim()){ v.textContent = $("legend").textContent = ""; out.hidden = $("legend").hidden = true; showFix(false); announce("", now); return; }
+  // Sentence by sentence, like the fix. A sentence with ı ğ ç ö ü may be Turkish, where ş is right: its ş is
+  // skipped (the fix leaves it), and its ș is not counted as right, because Turkish writes ş.
+  for (var part of s.match(/[^.!?\n]+|[.!?\n]+/g) || []){
+    var turkish = NOT_ROMANIAN.test(part), had = {skip: n.skip, tr: n.tr};
     for (var ch of part){
-      var skip = turkish && (ch === "ş" || ch === "Ş");
-      if (CED[ch] && !skip){ flush(); var m = document.createElement("mark"); m.textContent = ch; m.title = CED[ch] + " (wrong in Romanian)"; out.appendChild(m); nCed++; }
-      else if (CED[ch]){ flush(); var t = document.createElement("span"); t.className = "tr"; t.textContent = ch; t.title = CED[ch] + " (skipped: the sentence looks Turkish)"; out.appendChild(t); nTr++; }
-      else if (COM[ch]){ flush(); var o = document.createElement("span"); o.className = "okl"; o.textContent = ch; o.title = COM[ch]; out.appendChild(o); nCom++; }
-      else buf += ch;
+      var kind = !FIX[ch] && !COMMA.test(ch) ? "" : turkish && S.test(ch) ? (FIX[ch] ? "skip" : "tr") : FIX[ch] ? "mark" : "okl";
+      if (!kind){ buf += ch; continue; }
+      out.append(buf); buf = "";
+      var e = document.createElement(kind === "mark" ? "mark" : "span");
+      e.className = kind === "skip" ? "tr" : kind;
+      e.textContent = ch;
+      e.title = cp(ch) + {mark: ", a cedilla: wrong in Romanian", okl: ", the comma below", skip: ", a cedilla: skipped, the sentence has ı ğ ç ö or ü", tr: ", the comma below, in a sentence that looks Turkish"}[kind];
+      out.append(e);
+      n[kind]++;
+      seen[e.className][ch] = 1;
     }
+    if (n.skip > had.skip) sent.skip++;
+    if (n.tr > had.tr) sent.tr++;
   }
-  flush();
+  out.append(buf);
   out.hidden = false;
-  var v = $("verdict");
-  var decomposed = raw !== s ? " Some letters were typed as two code points; shown here combined." : "";
-  var turkishNote = nTr ? " Skipped " + nTr + " ş in " + (nTr === 1 ? "a sentence that looks" : "sentences that look") + " Turkish (ı ğ ç ö ü): check " + (nTr === 1 ? "it" : "them") + " by eye." : "";
-  if (nCed){
+
+  var notes = (n.skip ? " Skipped " + n.skip + " ş in " + count(sent.skip, " sentence", " sentences") + " with ı ğ ç ö or ü (Turkish, or a name like Zürich or Erdoğan): check by eye." : "") +
+    (n.tr ? " " + count(n.tr, " ș is", " ș are") + " in " + (sent.tr === 1 ? "a sentence that looks" : "sentences that look") + " Turkish, and Turkish writes ş: check by eye." : "") +
+    (raw !== s ? " Some letters were typed as two code points; shown here combined." : "");
+  var comma = n.okl ? count(n.okl, " letter has", " letters have") + " the comma below (ș ț)." : "None has the comma below (ș ț).";
+  if (n.mark){
     v.className = "verdict bad";
-    v.textContent = nCed + (nCed === 1 ? " letter has" : " letters have") + " a cedilla (ş ţ), marked below. " + nCom + " use the comma below (ș ț)." + turkishNote + decomposed;
-    $("fixRow").hidden = false; $("fixNote").hidden = false;
-  } else {
+    v.textContent = count(n.mark, " letter has", " letters have") + " a cedilla (ş ţ), marked red below. " + comma + notes;
+  // something was skipped, so it is never called clean
+  } else if (n.skip || n.tr) v.textContent = "Nothing marked red." + (n.okl ? " " + comma : "") + notes;
+  else if (n.okl){
     v.className = "verdict ok";
-    v.textContent = (nCom ? "Clean: all " + nCom + " Romanian letters use the comma below (ș ț)." : "No ș, ț, ş or ţ in Romanian sentences here.") + turkishNote + decomposed;
-    $("fixRow").hidden = true; $("fixNote").hidden = true;
-  }
+    v.textContent = (n.okl === 1 ? "Clean: the one s/t letter has" : "Clean: all " + n.okl + " s/t letters have") + " the comma below (ș ț)." + notes;
+  } else v.textContent = "No ș, ț, ş or ţ here. My scorer fails an answer with no ș or ț: did the model drop the diacritics?" + notes;
+
+  // a visible key, for touch screens and screen readers, which never get the tooltips
+  function list(o){ return Object.keys(o).map(function(c){ return c + " " + cp(c); }).join(", "); }
+  $("legend").textContent = (n.mark ? "Red: a cedilla, " + list(seen.mark) + ". " : "") + (n.okl ? "Green line: the comma below, " + list(seen.okl) + ". " : "") +
+    (n.skip || n.tr ? "Grey dots: in a sentence that looks Turkish, " + list(seen.tr) + "." : "");
+  $("legend").hidden = !$("legend").textContent;
+  showFix(n.mark > 0);
+  announce(v.textContent, now);
 }
-$("t").addEventListener("input", check);
-$("sample").onclick = function(){ $("t").value = SAMPLE; check(); };
-$("clear").onclick = function(){ $("t").value = ""; check(); $("t").focus(); };
+function showFix(fixable){
+  $("fix").hidden = !fixable;
+  $("undo").hidden = before === null;
+  $("fixRow").hidden = $("fixNote").hidden = !fixable && before === null;
+}
+function reset(text){ before = null; $("fixMsg").textContent = ""; if (text !== undefined) $("t").value = text; }
+
+$("t").oninput = function(){ reset(); check(false); };
+$("sample").onclick = function(){ reset(SAMPLE); check(true); };
+$("clear").onclick = function(){ reset(""); check(true); $("t").focus(); };
 $("fix").onclick = function(){
-  var fixed = fixRomanian($("t").value);
-  $("t").value = fixed; check();   // check() hides the fix row, so the confirmation goes into the verdict
-  var v = $("verdict");
-  function say(text){ v.textContent += " " + text; }
-  function selectIt(){ $("t").focus(); $("t").select(); say("Fixed: the text in the box is selected. Press Ctrl+C (⌘C on a Mac)."); }
-  if (navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(fixed).then(function(){ say("Fixed and copied."); }, selectIt); } else selectIt();
+  var t = $("t"), fixed = fixRomanian(t.value);
+  before = t.value;
+  t.value = fixed;
+  check(true);
+  function say(text){ $("fixMsg").textContent = text; announce($("verdict").textContent + " " + text, true); }
+  clip(fixed).then(function(){ say("Fixed and copied."); $("undo").focus(); }).catch(function(){
+    t.focus(); t.select(); say("Fixed. The text in the box is selected: " + keys);
+  });
 };
+$("undo").onclick = function(){ reset(before); check(true); $("t").focus(); };
 </script>
 </body>
 </html>

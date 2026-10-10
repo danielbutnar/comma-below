@@ -23,13 +23,14 @@ if tag.exists():
     values["CHECKER_TAG"] = tag.read_text(encoding="utf-8").strip()
 for key, val in values.items():
     s = s.replace("{{" + key + "}}", str(val))
-s = s.replace("COVER_URL", RAW + "cover-v2.png")
+s = s.replace("COVER_URL", RAW + "cover-v3.png")
 # DEV keeps its own copy of each image by URL, so a chart that changes after a paste gets a new file name
-CHART_FILES = {"HERO": "chart-hero.png", "KEYBOARD": "chart-keyboard.png", "WRONG": "chart-wrong.png",
-               "UPGRADES": "chart-upgrades.png", "FIXES": "chart-fixes-v4.png"}
+CHART_FILES = {"HERO": "chart-hero-v2.png", "KEYBOARD": "chart-keyboard-v2.png", "WRONG": "chart-wrong-v2.png",
+               "UPGRADES": "chart-upgrades-v2.png", "FIXES": "chart-fixes-v5.png"}
 for name, file in CHART_FILES.items():
     assert (HERE / file).exists(), f"missing {file}"
     s = s.replace(f"CHART_{name}_URL", RAW + file)
+s = re.sub(r"(\d) %(?!\})", r"\1%", s)  # English typography on DEV: "96%", never a line break inside it
 if "--draft" in sys.argv:  # review copy: mark what is still missing instead of failing
     s = re.sub(r"\{\{([A-Z0-9_]+)\}\}", r"[pending: \1]", s)
 left = re.findall(r"\{\{[A-Z0-9_]+\}\}|\b[A-Z0-9]+_URL\b", s)

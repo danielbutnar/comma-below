@@ -49,11 +49,14 @@ def source_text(base_id: str) -> str:
 def origin(word: str, src: set[str]) -> str:
     """'source' (in the source after folding), 'inflected' (shares a 5-letter start with a source word,
     or every part of a hyphenated word is a source word), else 'new'. Inflected words reuse a copied
-    stem, so only 'new' words count as the model's own."""
+    stem, so only 'new' words count as the model's own. One more case: a stem whose ia becomes ie
+    (Piața, Pieței) is too short for the 5-letter rule. task13.py keeps the rule as pre-registered."""
     k = fold(word)
     if k in src:
         return "source"
     if all(p in src for p in k.split("-")) or any(len(os.path.commonprefix([k, x])) >= 5 for x in src):
+        return "inflected"
+    if any(len(x) >= 5 and "ia" in x and k.startswith(x.replace("ia", "ie")[:-1]) for x in src):
         return "inflected"
     return "new"
 

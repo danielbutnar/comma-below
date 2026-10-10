@@ -3,29 +3,29 @@
 !.env.example
 __pycache__/
 .venv/
+node_modules/
 # the per-item answers (*.jsonl, ~9 MB) are committed so the analysis reruns from the repo;
 # the run traces (*.json, ~90 MB) stay on Kaggle
 results/raw/**
 !results/raw/romanian-comma-below-*/
 !results/raw/romanian-comma-below-*/**/
 !results/raw/romanian-comma-below-*/**/*.jsonl
-kaggle_benchmarks_reference.md
-example_task.py
-# working notes and review builds stay local
-NOTES.md
-post/outline.md
-post/preview.html
-node_modules/
-
-# Round 2 strategy (competitor analysis stays local)
-ROUND2-PLAN.md
-
-post/preview2.html
-PLAN-28.md
+# the human test's result codes stay private; only totals are published (results/human_summary.json)
 human/results.txt
 human/link.txt
+# local preview builds of the write-up
+post/preview.html
+post/preview2.html
 post/preview3.html
-.work/
+post/archive/preview*.html
+# local working notes
+kaggle_benchmarks_reference.md
+example_task.py
+NOTES.md
+post/outline.md
+ROUND2-PLAN.md
+PLAN-28.md
 NEXT-SESSION.md
+.work/
 judging/
 judging-stopped/
