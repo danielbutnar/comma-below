@@ -1,0 +1,59 @@
+Task 13: 28 models, 2240 answers, 28 runs
+
+How the source's s/t letters come back (% of letters; answers with data):
+                answers  no_data  letters  kept  talk  clean_answers  comma  cedilla  dot  legacy  bare  other
+input                                                                                                         
+cedilla             448        1     1658  38.1     0           53.1   61.9     38.1  0.0     0.0   0.0    0.0
+dot                 448        0     1691   0.9     0           96.2   97.2      1.9  0.9     0.0   0.0    0.0
+legacy              448        1     1699   1.4     0           96.2   97.3      1.2  0.0     1.4   0.2    0.0
+cedilla+scoped      448        0     1700   3.4     2           93.8   96.6      3.4  0.0     0.0   0.0    0.0
+cedilla+rule        448        0     1722   4.5     3           92.6   95.5      4.5  0.0     0.0   0.0    0.0 
+
+Without answers that comment on the encoding:
+                letters  kept  comma  cedilla  bare
+input                                              
+cedilla            1658  38.1   61.9     38.1   0.0
+dot                1691   0.9   97.2      1.9   0.0
+legacy             1699   1.4   97.3      1.2   0.2
+cedilla+scoped     1683   3.4   96.6      3.4   0.0
+cedilla+rule       1693   4.4   95.6      4.4   0.0 
+
+Pre-registered predictions
+(1) dot below vs cedilla, kept share of s/t letters: 0.9 % vs 38.1 %, difference -37.1 points (95 % CI -44.9 to -29.0); 447 pairs, 28 models (27 lower, 0 higher) -> held
+(2) old mojibake vs cedilla: 1.4 % vs 38.1 %, difference -36.7 (95 % CI -44.2 to -28.6) -> held
+(3) dot-below and mojibake letters not kept: 98.4 % became comma below, 1.6 % cedilla, 0.1 % bare (3351 letters) -> held
+(4) clean answers: scoped rule 93.8 %, full rule 92.6 %, difference +1.1 (95 % CI -1.5 to +3.6) -> held
+(5) own new s/t words with the cedilla: 13/15 = 87 % when the answer kept every cedilla (15 answers), 1/18 = 6 % when it kept some (12 answers), 0/107 when it kept none -> held
+    exploratory, dot: own words in the dot form 1/1 (kept all), 1/1 (kept some), 0/121 (kept none)
+    exploratory, legacy: own words in the legacy form 2/2 (kept all), 0/0 (kept some), 0/117 (kept none)
+
+Per model (kept share of s/t letters, %):
+                        model                     name  kept_cedilla  clean_cedilla  kept_dot  clean_dot  kept_legacy  clean_legacy  kept_cedilla+scoped  clean_cedilla+scoped  kept_cedilla+rule  clean_cedilla+rule
+     grok-4.20-0309-reasoning      Grok 4.20 Reasoning          80.6           12.5       0.0      100.0          0.0         100.0                  0.0                 100.0                0.0               100.0
+                  gpt-6.1-sol              GPT-6.1 Sol          76.8           25.0       0.0      100.0          0.0         100.0                  0.0                 100.0                0.0               100.0
+      claude-sonnet-5-default          Claude Sonnet 5          65.6           37.5      11.5       56.2         14.1          75.0                  0.0                  93.8                0.0                93.8
+ grok-4.20-0309-non-reasoning  Grok 4.20 Non-Reasoning          59.1           37.5       0.0      100.0          0.0         100.0                 41.5                  50.0               30.4                62.5
+           gemma-4-26b-a4b-it          Gemma 4 26B A4B          55.9           18.8       0.0      100.0          3.4          87.5                  0.0                 100.0                5.1                81.2
+                    gpt-6-sol                GPT-6 Sol          55.4           43.8       0.0      100.0          0.0         100.0                  0.0                 100.0                0.0               100.0
+           gpt-5.4-2026-03-05                  GPT-5.4          55.4           50.0       0.0      100.0          0.0         100.0                  0.0                 100.0                0.0               100.0
+                        glm-5                    GLM-5          51.7           37.5       0.0      100.0         13.4          87.5                  0.0                 100.0                0.0               100.0
+    claude-sonnet-5-5-default        Claude Sonnet 5.5          51.5           37.5       0.0       87.5          0.0         100.0                  0.0                 100.0                0.0               100.0
+                gpt-5.6-terra            GPT-5.6 Terra          50.9           37.5       0.0      100.0          0.0         100.0                  0.0                 100.0                0.0               100.0
+       gemini-3-flash-preview           Gemini 3 Flash          50.0           50.0       0.0      100.0          0.0         100.0                  0.0                 100.0                0.0               100.0
+    claude-haiku-4-5-20251001         Claude Haiku 4.5          49.1           37.5       7.0       75.0          5.4          68.8                  3.4                  87.5                3.4                87.5
+        claude-opus-5-default            Claude Opus 5          43.5           56.2       0.0      100.0          0.0         100.0                  0.0                 100.0                0.0               100.0
+        gemini-3.5-flash-lite    Gemini 3.5 Flash-Lite          42.4           50.0       0.0       93.8          0.0          93.8                  3.4                  93.8                0.0               100.0
+             gemini-2.5-flash         Gemini 2.5 Flash          40.4           25.0       0.0      100.0          0.0         100.0                  0.0                 100.0                6.5                93.8
+                 gpt-5.6-luna             GPT-5.6 Luna          31.6           62.5       0.0      100.0          0.0         100.0                  0.0                 100.0                0.0               100.0
+  qwen3-next-80b-a3b-instruct Qwen 3 Next 80B Instruct          31.2           62.5       0.0      100.0          0.0         100.0                 25.4                  62.5               36.9                62.5
+      gpt-5.4-nano-2026-03-17             GPT-5.4 nano          28.8           37.5       0.0      100.0          0.0         100.0                  3.1                  87.5                7.9                81.2
+             gemini-3.7-flash         Gemini 3.7 Flash          27.6           68.8       0.0      100.0          0.0         100.0                  0.0                 100.0                0.0               100.0
+             deepseek-r1-0528              DeepSeek-R1          25.8           50.0       0.0       93.8          0.0         100.0                  1.5                  87.5                5.5                81.2
+      claude-opus-4-8-default          Claude Opus 4.8          19.0           87.5       1.5       93.8          0.0          93.8                  0.0                 100.0                0.0               100.0
+                  gpt-oss-20b              gpt-oss-20b          18.3           50.0       0.0      100.0          0.0          87.5                 12.1                  62.5               25.0                50.0
+               gemma-4-31b-it              Gemma 4 31B          16.4           62.5       0.0      100.0          0.0         100.0                  0.0                 100.0                0.0               100.0
+gemini-3.1-flash-lite-preview    Gemini 3.1 Flash-Lite          16.1           81.2       0.0      100.0          0.0         100.0                  0.0                 100.0                0.0               100.0
+    claude-sonnet-4-6-default        Claude Sonnet 4.6           9.8           93.8       6.7       93.8          0.0         100.0                  0.0                 100.0                0.0               100.0
+                   gpt-6-luna               GPT-6 Luna           5.7           93.8       0.0      100.0          0.0         100.0                  0.0                 100.0                0.0               100.0
+      gpt-5.4-mini-2026-03-17             GPT-5.4 mini           4.8           81.2       0.0      100.0          0.0         100.0                  0.0                 100.0                0.0               100.0
+                  gpt-5.6-sol              GPT-5.6 Sol           0.0          100.0       0.0      100.0          0.0         100.0                  0.0                 100.0                0.0               100.0

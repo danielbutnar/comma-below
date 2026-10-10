@@ -1,0 +1,200 @@
+no visible answer, left out: {'echo4/gpt-oss-20b': 5, 'echo4/qwen3-next-80b-a3b-thinking': 47}
+## Task 8: Echo, four inputs
+models: 43 | answers: 4436 | runs per model: {1: 35, 2: 8}
+  clean         pooled pass %  99.3 [98.8,  99.6] n=1112
+  cedilla       pooled pass %  68.3 [59.5,  77.2] n=1110
+  ascii         pooled pass %  95.9 [93.9,  97.6] n=1107
+  cedilla+rule  pooled pass %  94.6 [93.1,  95.9] n=1107
+  reply    clean 99 | cedilla 96 | ascii 98 | cedilla+rule 97
+  summary  clean 99 | cedilla 68 | ascii 98 | cedilla+rule 93
+  rag      clean 100 | cedilla 52 | ascii 93 | cedilla+rule 94
+  cedilla: source s/t words in answers 3703; kept cedilla 27.7 %; left without diacritic 0.0 %; correct 72.2 %
+  ascii: source s/t words in answers 3726; kept cedilla 0.6 %; left without diacritic 2.9 %; correct 96.3 %
+  McNemar ascii vs cedilla: ascii only 315, cedilla only 8, p = 3.2e-82
+  McNemar cedilla+rule vs cedilla: cedilla+rule only 307, cedilla only 16, p = 5.7e-71
+  McNemar clean vs cedilla: clean only 347, cedilla only 3, p = 6.2e-99
+                    name  runs  clean  cedilla  cedilla_lo  cedilla_hi  ascii  cedilla+rule  fails  whole_answer_share
+         Claude Opus 4.8     2  100.0     95.5        88.6       100.0  100.0         100.0      2               100.0
+       Claude Sonnet 4.6     1  100.0     95.5        86.4       100.0  100.0         100.0      1                 0.0
+             GPT-5.6 Sol     1  100.0     95.5        86.4       100.0  100.0         100.0      1               100.0
+Qwen 3 Next 80B Thinking     1  100.0     90.9        72.7       100.0   62.5          80.0      1                 0.0
+         Claude Opus 4.7     2  100.0     90.9        81.8        97.7  100.0         100.0      4                75.0
+              GPT-6 Luna     2  100.0     88.6        75.0       100.0  100.0         100.0      5               100.0
+            GPT-5.4 mini     1  100.0     86.4        72.7       100.0  100.0         100.0      3                 0.0
+             Qwen 3 235B     4  100.0     85.2        71.6        96.6  100.0          93.2     13                 0.0
+          Gemini 2.5 Pro     1  100.0     81.8        63.6        95.5  100.0         100.0      4                75.0
+          Gemini 3.1 Pro     4  100.0     80.7        68.2        92.0   95.5         100.0     17                82.4
+       Claude Sonnet 4.5     1  100.0     77.3        59.1        95.5  100.0          90.9      5                80.0
+        Gemini 3.7 Flash     4  100.0     76.1        60.2        89.8  100.0         100.0     21                95.2
+   Gemini 3.1 Flash-Lite     1  100.0     72.7        54.5        90.9   95.5          95.5      6                66.7
+         Claude Opus 5.5     1  100.0     72.7        54.5        90.9  100.0         100.0      6               100.0
+        Gemini 3.8 Flash     4  100.0     70.5        52.3        86.4  100.0         100.0     26               100.0
+        Gemini 3.6 Flash     2  100.0     70.5        54.5        84.1  100.0         100.0     13                76.9
+        Gemini 3.5 Flash     2  100.0     70.5        52.3        86.4   95.5         100.0     13                92.3
+             DeepSeek-R1     4  100.0     69.3        55.7        83.0   95.5          86.4     27                48.1
+         Claude Opus 4.5     1  100.0     68.2        45.5        86.4   95.5          95.5      7                71.4
+         Claude Opus 4.6     1  100.0     68.2        50.0        86.4  100.0         100.0      7               100.0
+                 GPT-5.4     1  100.0     68.2        50.0        86.4  100.0         100.0      7               100.0
+          Gemini 3 Flash     1  100.0     68.2        50.0        86.4  100.0         100.0      7                85.7
+Qwen 3 Next 80B Instruct     2  100.0     68.2        50.0        86.4  100.0          61.4     14                42.9
+   Gemini 3.5 Flash-Lite     4  100.0     67.0        50.0        83.0   90.9         100.0     29                55.2
+                 GPT-5.5     4  100.0     65.9        50.0        81.8  100.0         100.0     30                86.7
+             Gemma 4 31B     4  100.0     64.8        47.7        81.8   95.5         100.0     31                58.1
+               GPT-6 Sol     2  100.0     63.6        45.5        81.8  100.0         100.0     16                87.5
+       Qwen 3 Coder 480B     1  100.0     63.6        45.5        81.8  100.0         100.0      8                50.0
+            GPT-5.6 Luna     1  100.0     63.6        40.9        81.8  100.0         100.0      8               100.0
+         Gemma 4 26B A4B     2  100.0     59.1        36.4        77.3   86.4          90.9     18                61.1
+         Claude Sonnet 5     4  100.0     58.0        39.8        76.1   90.9          95.5     37                89.2
+            GPT-5.4 nano     4  100.0     58.0        39.8        75.0  100.0          81.8     37                24.3
+           Claude Opus 5     4  100.0     55.7        37.5        73.9  100.0         100.0     39               100.0
+             GPT-6.1 Sol     1  100.0     54.5        31.8        77.3  100.0         100.0     10               100.0
+       Claude Sonnet 5.5     1  100.0     54.5        31.8        72.7  100.0         100.0     10                80.0
+        Gemini 2.5 Flash     1  100.0     54.5        31.8        72.7   90.9         100.0     10                70.0
+                   GLM-5     4  100.0     52.3        33.0        70.5   81.8         100.0     42                88.1
+           GPT-5.6 Terra     1  100.0     50.0        27.3        72.7  100.0         100.0     11                72.7
+             gpt-oss-20b     1   81.8     47.6        28.6        66.7  100.0          52.6     11                 9.1
+        Claude Haiku 4.5     4  100.0     46.6        28.4        64.8   72.7          90.9     47                74.5
+ Grok 4.20 Non-Reasoning     1  100.0     45.5        27.2        68.2   95.5          72.7     12                91.7
+            gpt-oss-120b     2   83.8     44.1        25.6        62.9   63.6          59.1     19                31.6
+     Grok 4.20 Reasoning     4  100.0     43.2        25.0        60.2   81.8         100.0     50                98.0
+  version trend (cedilla pass, within lines with >= 3 versions): mean Spearman rho -0.22, permutation p 0.455
+    Claude Opus: Claude Opus 4.5 68 -> Claude Opus 4.6 68 -> Claude Opus 4.7 91 -> Claude Opus 4.8 95 -> Claude Opus 5 56 -> Claude Opus 5.5 73
+    Claude Sonnet: Claude Sonnet 4.5 77 -> Claude Sonnet 4.6 95 -> Claude Sonnet 5 58 -> Claude Sonnet 5.5 55
+    GPT: GPT-5.4 68 -> GPT-5.5 66
+    GPT Luna: GPT-5.6 Luna 64 -> GPT-6 Luna 89
+    GPT Sol: GPT-5.6 Sol 95 -> GPT-6 Sol 64 -> GPT-6.1 Sol 55
+    GPT small: GPT-5.4 nano 58 -> GPT-5.4 mini 86
+    Gemini Flash: Gemini 2.5 Flash 55 -> Gemini 3 Flash 68 -> Gemini 3.5 Flash 70 -> Gemini 3.6 Flash 70 -> Gemini 3.7 Flash 76 -> Gemini 3.8 Flash 70
+    Gemini Flash-Lite: Gemini 3.1 Flash-Lite 73 -> Gemini 3.5 Flash-Lite 67
+    Gemini Pro: Gemini 2.5 Pro 82 -> Gemini 3.1 Pro 81
+    Gemma 4: Gemma 4 26B A4B 59 -> Gemma 4 31B 65
+    Grok 4.20: Grok 4.20 Non-Reasoning 45 -> Grok 4.20 Reasoning 43
+    Qwen 3 Next: Qwen 3 Next 80B Thinking 91 -> Qwen 3 Next 80B Instruct 68
+    gpt-oss: gpt-oss-20b 48 -> gpt-oss-120b 44
+  version steps and pairs (same 22 prompts; change in clean-answer points, sign-flip permutation p):
+    [version] Claude Opus 4.5 -> Claude Opus 4.6: +0 points, p = 1.000
+    [version] Claude Opus 4.6 -> Claude Opus 4.7: +23 points, p = 0.062
+    [version] Claude Opus 4.7 -> Claude Opus 4.8: +5 points, p = 0.683
+    [version] Claude Opus 4.8 -> Claude Opus 5: -40 points, p = 0.000 *
+    [version] Claude Opus 5 -> Claude Opus 5.5: +17 points, p = 0.154
+    [version] Claude Sonnet 4.5 -> Claude Sonnet 4.6: +18 points, p = 0.130
+    [version] Claude Sonnet 4.6 -> Claude Sonnet 5: -38 points, p = 0.000 *
+    [version] Claude Sonnet 5 -> Claude Sonnet 5.5: -3 points, p = 0.861
+    [version] GPT-5.4 -> GPT-5.5: -2 points, p = 0.923
+    [version] GPT-5.6 Luna -> GPT-6 Luna: +25 points, p = 0.030 *
+    [version] GPT-5.6 Sol -> GPT-6 Sol: -32 points, p = 0.009 *
+    [version] GPT-6 Sol -> GPT-6.1 Sol: -9 points, p = 0.309
+    [pair] GPT-5.4 nano -> GPT-5.4 mini: +28 points, p = 0.021 *
+    [version] Gemini 2.5 Flash -> Gemini 3 Flash: +14 points, p = 0.453
+    [version] Gemini 3 Flash -> Gemini 3.5 Flash: +2 points, p = 1.000
+    [version] Gemini 3.5 Flash -> Gemini 3.6 Flash: +0 points, p = 1.000
+    [version] Gemini 3.6 Flash -> Gemini 3.7 Flash: +6 points, p = 0.584
+    [version] Gemini 3.7 Flash -> Gemini 3.8 Flash: -6 points, p = 0.388
+    [version] Gemini 3.1 Flash-Lite -> Gemini 3.5 Flash-Lite: -6 points, p = 0.658
+    [version] Gemini 2.5 Pro -> Gemini 3.1 Pro: -1 points, p = 1.000
+    [pair] Gemma 4 26B A4B -> Gemma 4 31B: +6 points, p = 0.342
+    [pair] Grok 4.20 Non-Reasoning -> Grok 4.20 Reasoning: -2 points, p = 0.843
+    [pair] Qwen 3 Next 80B Thinking -> Qwen 3 Next 80B Instruct: -23 points, p = 0.247
+    [pair] gpt-oss-20b -> gpt-oss-120b: -5 points, p = 0.843
+  reasoning on/off: Grok 4.20 Reasoning 43 vs Grok 4.20 Non-Reasoning 45
+  reasoning on/off: Qwen 3 Next 80B Thinking 91 vs Qwen 3 Next 80B Instruct 68
+  mean cedilla pass by open weights: {False: 69.0, True: 64.5}
+  mean cedilla pass by lab: {'Alibaba': 77.0, 'Anthropic': 71.2, 'DeepSeek': 69.3, 'Google': 69.7, 'OpenAI': 65.5, 'Zhipu': 52.3, 'xAI': 44.3}
+
+## Task 9: Contagion
+models: 15 | answers: 600
+  clean-0    pass % 100.0 [100.0, 100.0] n=120
+  clean-1    pass %  99.2 [97.5, 100.0] n=120
+  clean-3    pass %  95.0 [90.8,  98.3] n=120
+  cedilla-0  pass %  78.3 [70.8,  85.0] n=120
+  cedilla-3  pass %  35.8 [27.5,  44.2] n=120
+  cedilla words in clean-target answers: {'from other documents': 9, 'new words': 21}
+cond                  cedilla-0 cedilla-3 clean-0 clean-1 clean-3
+Claude Haiku 4.5           62.5      12.5   100.0   100.0   100.0
+Claude Opus 5              50.0       0.0   100.0    87.5    50.0
+Claude Sonnet 5            87.5       0.0   100.0   100.0    75.0
+DeepSeek-R1                75.0      37.5   100.0   100.0   100.0
+Gemini 3.1 Pro             75.0      50.0   100.0   100.0   100.0
+Gemini 3.5 Flash-Lite      62.5      50.0   100.0   100.0   100.0
+Gemini 3.7 Flash          100.0      50.0   100.0   100.0   100.0
+Gemini 3.8 Flash          100.0      50.0   100.0   100.0   100.0
+Gemma 4 31B                75.0      37.5   100.0   100.0   100.0
+GLM-5                      75.0      12.5   100.0   100.0   100.0
+GPT-5.4 nano               75.0      25.0   100.0   100.0   100.0
+GPT-5.5                   100.0      75.0   100.0   100.0   100.0
+GPT-6 Astra               100.0      25.0   100.0   100.0   100.0
+Grok 4.20 Reasoning        50.0      25.0   100.0   100.0   100.0
+Qwen 3 235B                87.5      87.5   100.0   100.0   100.0
+
+## Task 10: Turkish guests
+models: 14 | answers: 504
+  tr none    pass % 100.0 [100.0, 100.0] n=112 | Romanian ș inside Turkish words: 0.0 % | no s-letter at all: 0.0 %
+  tr rule    pass %  67.9 [58.9,  75.9] n=112 | Romanian ș inside Turkish words: 22.3 % | no s-letter at all: 9.8 %
+  tr scoped  pass %  93.8 [91.1,  96.4] n=112 | Romanian ș inside Turkish words: 4.5 % | no s-letter at all: 1.8 %
+  ro rule    pass % 100.0 [100.0, 100.0] n=84
+  ro scoped  pass %  98.8 [96.4, 100.0] n=84
+  tr none    n=112 | outcomes % {'correct': 100.0}
+  tr rule    n=112 | outcomes % {'correct': 68.8, 'turkish_with_comma': 14.3, 'no_s': 9.8, 'romanian': 7.1}
+  tr scoped  n=112 | outcomes % {'correct': 93.8, 'romanian': 3.6, 'no_s': 1.8, 'turkish_with_comma': 0.9}
+  words: Turkish with ș: ['Akșamları', 'Anlayıșınız', 'akșam', 'bașlattım', 'hoș', 'iyileștiğinde', 'iș', 'ișlemini', 'kesinleștirmek', 'kișilik', 'kolaylaștırmak', 'koșullarını', 'muhteșem', 'olușan', 'olușturabiliriz', 'papanași', 'paylașırsanız', 'teșekkür', 'ulașabilirsiniz', 'ulaștırabiliriz', 'varıș', 'yaklașık', 'yokuș', 'yürüyüș', 'çalıșma', 'çalıșıyorlar', 'İș', 'Șarap', 'Șarj', 'Șehir', 'șarap', 'șaraplarını', 'șehir', 'șifalar', 'șișe']
+         Romanian: ['așteptăm', 'cățelușă', 'liniștite', 'orașul', 'papanași', 'priveliște', 'românești', 'șederii', 'și']
+         names: ['Brașov', 'Bunești', 'Râșnov', 'Sâmbureștiului'] | unknown: ['olușturabiliriz']
+lang                      ro                tr              
+rule                    rule     scoped   none   rule scoped
+Claude Haiku 4.5       100.0      100.0  100.0   75.0   75.0
+Claude Opus 5          100.0      100.0  100.0   50.0   87.5
+Claude Sonnet 5        100.0      100.0  100.0  100.0  100.0
+DeepSeek-R1            100.0      100.0  100.0   87.5  100.0
+Gemini 3.1 Pro         100.0      100.0  100.0   12.5  100.0
+Gemini 3.5 Flash-Lite  100.0      100.0  100.0   75.0  100.0
+Gemini 3.7 Flash       100.0      100.0  100.0   37.5  100.0
+Gemini 3.8 Flash       100.0      100.0  100.0   25.0  100.0
+Gemma 4 31B            100.0  83.333333  100.0   87.5   87.5
+GLM-5                  100.0      100.0  100.0  100.0  100.0
+GPT-5.4 nano           100.0      100.0  100.0   37.5   62.5
+GPT-5.5                100.0      100.0  100.0   87.5  100.0
+GPT-6 Astra            100.0      100.0  100.0   75.0  100.0
+Grok 4.20 Reasoning    100.0      100.0  100.0  100.0  100.0
+
+## Task 11: Other look-alikes
+models: 11 | answers: 528
+  clean          pass % 100.0 [100.0, 100.0] n=132
+  cyrillic-all   pass %  98.5 [97.0, 100.0] n=132
+  cyrillic-names pass %  95.5 [92.4,  98.5] n=132
+  mojibake       pass %  79.5 [72.7,  88.6] n=132
+  summary  clean 100 | cyrillic-all 100 | cyrillic-names 100 | mojibake 100
+  rag      clean 100 | cyrillic-all 97 | cyrillic-names 91 | mojibake 59
+  McNemar mojibake vs cyrillic-names: mojibake-only pass 3, cyrillic-names-only pass 24, p = 4.9e-05
+  McNemar cyrillic-all vs cyrillic-names: cyrillic-all-only pass 5, cyrillic-names-only pass 1, p = 0.22
+  per-model Spearman(cyrillic-names pass, Romanian cedilla pass) = 0.33 over 10 models
+  per-model Spearman(mojibake pass, Romanian cedilla pass) = -0.66 over 10 models
+variant                clean cyrillic-all cyrillic-names   mojibake
+Claude Haiku 4.5       100.0        100.0          100.0      100.0
+Claude Opus 5          100.0        100.0          100.0      100.0
+Gemini 3.1 Pro         100.0        100.0          100.0  58.333333
+Gemini 3.5 Flash-Lite  100.0        100.0      91.666667      100.0
+Gemini 3.7 Flash       100.0        100.0          100.0  58.333333
+Gemini 3.8 Flash       100.0        100.0          100.0  58.333333
+Gemma 4 31B            100.0        100.0      83.333333  66.666667
+GLM-5                  100.0        100.0      83.333333  66.666667
+GPT-5.4 nano           100.0    83.333333      91.666667  83.333333
+GPT-5.5                100.0        100.0          100.0  83.333333
+GPT-6 Astra            100.0        100.0          100.0      100.0
+
+## Task 12: Turns
+models: 10 | conversations: 180
+  clean>clean    second-summary pass % 100.0 [100.0, 100.0] n=60
+  cedilla>clean  second-summary pass %  96.7 [93.3, 100.0] n=60
+  clean>cedilla  second-summary pass %  83.3 [71.7,  95.0] n=60
+  cedilla>clean: first summary had cedilla in 18 of 60; second infected when first was: 11 %, when first was clean: 0 %
+cond                  cedilla>clean clean>cedilla clean>clean
+Claude Haiku 4.5          66.666667     33.333333       100.0
+Claude Opus 5                 100.0     66.666667       100.0
+Gemini 3.1 Pro                100.0     83.333333       100.0
+Gemini 3.5 Flash-Lite         100.0         100.0       100.0
+Gemini 3.7 Flash              100.0         100.0       100.0
+Gemini 3.8 Flash              100.0         100.0       100.0
+Gemma 4 31B                   100.0     83.333333       100.0
+GPT-5.4 nano                  100.0     66.666667       100.0
+GPT-5.5                       100.0         100.0       100.0
+GPT-6 Astra                   100.0         100.0       100.0

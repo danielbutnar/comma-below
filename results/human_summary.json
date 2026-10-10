@@ -1,0 +1,26 @@
+{
+ "n": 10,
+ "reads_romanian": 10,
+ "devices": {
+  "android": 3,
+  "ios": 6,
+  "win": 1
+ },
+ "sd_k": 60,
+ "sd_n": 120,
+ "sd_pct": 50,
+ "sd_ci": [
+  41,
+  59
+ ],
+ "wr_k": 18,
+ "wr_n": 40,
+ "wr_pct": 45,
+ "wr_ci": [
+  31,
+  60
+ ],
+ "median_seconds": 61.5,
+ "author_sd": 9,
+ "author_wr": 3
+}

@@ -4,7 +4,12 @@ Fake models answer from the gold data and then apply a corruption:
   perfect  - the gold answer
   cedilla  - the gold answer with ș ț replaced by ş ţ (and naive code)
   strip    - the gold answer without any diacritics
-  mirror   - copies cedilla only when the prompt contained cedilla letters
+  mirror   - copies the input's corruption (cedilla, Cyrillic look-alikes, mojibake) when the
+             last prompt has it
+  sticky   - like mirror, but remembers a cedilla from any earlier turn of the chat
+  normalizer - the gold answer with every cedilla letter turned into the comma letter
+               (right for Romanian, wrong for Turkish)
+  legacyreader - repairs every wrong form except the old mojibake, which it reads as the cedilla
 The expected scores are asserted, so a scoring bug fails loudly.
 
 Usage:  uv run --no-project --with pandas --with-editable ../../_reference/kaggle-benchmarks python src/dry_run.py
@@ -68,10 +73,43 @@ def oracle() -> dict[str, str]:
         ans[restore_prompt + row["ascii"]] = row["gold"]
     for i, prompt in I.CODE_PROMPTS:
         ans[prompt] = "CODE"
+    # Round 2: rows carry their full prompt.
+    for row in build.data_echo4():
+        ans[row["prompt"]] = GOLD_RO
+    for row in build.data_contagion():
+        ans[row["prompt"]] = "Șoferii parchează pe strada Mureșenilor."
+    for row in build.data_turkish():
+        ans[row["prompt"]] = GOLD_TR if row["lang"] == "tr" else GOLD_RO
+    for row in build.data_lookalike():
+        ans[row["prompt"]] = GOLD_EN
+    for row in build.data_wrong_letters():
+        ans[row["prompt"]] = GOLD_RO
     return ans
 
 
+GOLD_RO = "Vă mulțumim! Vă așteptăm cu drag în Brașov."
+GOLD_TR = "Teşekkür ederiz, sizi bekliyoruz."
+GOLD_EN = "The night train runs between Zürich and München."
+TO_COMMA = str.maketrans("şŞţŢ", "șȘțȚ")
+DOT = set("ṣṢṭṬ")
+LEGACY = set("ºªþÞ")
 ORACLE = oracle()
+
+
+def corrupt_like(prompt: str, text: str) -> str:
+    """Apply to `text` the corruption found in `prompt` (cedilla, dot below, old Romanian mojibake,
+    Cyrillic look-alikes, UTF-8 mojibake)."""
+    if CED & set(prompt):
+        text = I.to_cedilla(text)
+    if DOT & set(prompt):
+        text = I.to_dot_below(text)
+    if LEGACY & set(prompt):
+        return I.to_legacy_mojibake(text)
+    if any(0x400 <= ord(ch) <= 0x4FF for ch in prompt):
+        text = I.to_homoglyph(text)
+    if "Ã" in prompt:
+        text = I.to_mojibake(text)
+    return text
 
 
 class FakeLLM(actors.LLMChat):
@@ -83,13 +121,15 @@ class FakeLLM(actors.LLMChat):
     def invoke(self, messages, system=None, **kwargs):
         users = [m for m in messages if m.sender.role == "user"]
         prompt = users[-1].content
+        # A retry must not resend the question; a second turn is a different question.
+        not_duplicated = len(users) == 1 or users[-1].content != users[-2].content
         if self.policy == "picky":
-            assert len(users) == 1, "fallback duplicated the question"
+            assert not_duplicated, "fallback duplicated the question"
             if "max_completion_tokens" in kwargs:
                 raise TypeError("create() got an unexpected keyword argument 'max_completion_tokens'")
             assert kwargs.get("max_tokens") == 8192, kwargs
         if self.policy == "flaky":
-            assert len(users) == 1, f"retry duplicated the question: {len(users)} user messages"
+            assert not_duplicated, f"retry duplicated the question: {len(users)} user messages"
             if prompt not in self.seen:
                 self.seen.add(prompt)
                 raise RuntimeError("Error code: 429 - heavy load")
@@ -99,8 +139,17 @@ class FakeLLM(actors.LLMChat):
         if gold == "CODE":
             return LLMResponse(content=NAIVE_CODE if self.policy == "cedilla" else GOOD_CODE)
         p = self.policy
-        if p == "cedilla" or (p == "mirror" and CED & set(prompt)):
+        if p == "cedilla":
             out = I.to_cedilla(gold)
+        elif p == "mirror":
+            out = corrupt_like(prompt, gold)
+        elif p == "sticky":
+            out = corrupt_like("".join(m.content for m in users if isinstance(m.content, str)), gold)
+        elif p == "normalizer":
+            out = gold.translate(TO_COMMA)
+        elif p == "legacyreader":
+            # repairs every wrong form, but reads the old mojibake as the cedilla it encodes
+            out = I.to_cedilla(gold) if LEGACY & set(prompt) else gold
         elif p == "strip":
             out = I.strip_diacritics(gold)
         else:
@@ -128,14 +177,25 @@ EXPECT = {
     "romanian-comma-below-4-see": {"perfect": 1.0, "cedilla": 1.0, "strip": 1.0, "mirror": 1.0, "flaky": 1.0, "picky": 1.0, "thinker": 1.0},
     "romanian-comma-below-5-restore": {"perfect": 1.0, "cedilla": None, "strip": 0.0, "mirror": 1.0, "flaky": 1.0, "picky": 1.0, "thinker": 1.0},
     "romanian-comma-below-6-code": {"perfect": 1.0, "cedilla": None, "strip": 1.0, "mirror": 1.0, "flaky": 1.0, "picky": 1.0, "thinker": 1.0},
+    # Round 2
+    "romanian-comma-below-8-echo-four-inputs": {"perfect": 1.0, "cedilla": 0.0, "strip": 0.0, "mirror": 0.0, "sticky": 0.0, "normalizer": 1.0, "flaky": 1.0, "picky": 1.0, "thinker": 1.0},
+    "romanian-comma-below-9-contagion": {"perfect": 1.0, "cedilla": 0.0, "strip": 0.0, "mirror": 0.2, "sticky": 0.2, "normalizer": 1.0, "flaky": 1.0, "picky": 1.0, "thinker": 1.0},
+    "romanian-comma-below-10-turkish-guests": {"perfect": 1.0, "cedilla": 2 / 3, "strip": 2 / 3, "mirror": 2 / 3, "sticky": 2 / 3, "normalizer": 1 / 3, "flaky": 1.0, "picky": 1.0, "thinker": 1.0},
+    "romanian-comma-below-11-other-look-alikes": {"perfect": 1.0, "cedilla": 1.0, "strip": 1.0, "mirror": 0.25, "sticky": 0.25, "normalizer": 1.0, "flaky": 1.0, "picky": 1.0, "thinker": 1.0},
+    "romanian-comma-below-12-turns": {"perfect": 1.0, "cedilla": 0.0, "strip": 0.0, "mirror": 2 / 3, "sticky": 1 / 3, "normalizer": 1.0, "flaky": 1.0, "picky": 1.0, "thinker": 1.0},
+    "romanian-comma-below-13-other-wrong-letters": {"perfect": 1.0, "cedilla": 0.0, "strip": 0.0, "mirror": 0.0, "sticky": 0.0, "normalizer": 1.0, "legacyreader": 2 / 3, "flaky": 1.0, "picky": 1.0, "thinker": 1.0},
 }
 
 
 def main():
+    """Usage: dry_run.py [slug fragment ...]  (no argument: every task)."""
     import tempfile
+    only = sys.argv[1:]
     os.chdir(tempfile.mkdtemp(prefix="comma-below-dry-"))
     failures = []
     for slug, expect in EXPECT.items():
+        if only and not any(f in slug for f in only):
+            continue
         ns = load_task(slug)
         func = ns[slug.replace("-", "_")]
         for policy, want in expect.items():

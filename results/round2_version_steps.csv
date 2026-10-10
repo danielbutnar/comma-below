@@ -1,0 +1,25 @@
+line,kind,older,newer,change,p,prompts
+Claude Opus,version,Claude Opus 4.5,Claude Opus 4.6,0.0,1.0,22
+Claude Opus,version,Claude Opus 4.6,Claude Opus 4.7,22.727272727272727,0.0616,22
+Claude Opus,version,Claude Opus 4.7,Claude Opus 4.8,4.545454545454546,0.68255,22
+Claude Opus,version,Claude Opus 4.8,Claude Opus 5,-39.77272727272727,0.0004,22
+Claude Opus,version,Claude Opus 5,Claude Opus 5.5,17.045454545454543,0.15375,22
+Claude Sonnet,version,Claude Sonnet 4.5,Claude Sonnet 4.6,18.181818181818183,0.12965,22
+Claude Sonnet,version,Claude Sonnet 4.6,Claude Sonnet 5,-37.5,0.00045,22
+Claude Sonnet,version,Claude Sonnet 5,Claude Sonnet 5.5,-3.4090909090909087,0.86085,22
+GPT,version,GPT-5.4,GPT-5.5,-2.272727272727273,0.92345,22
+GPT Luna,version,GPT-5.6 Luna,GPT-6 Luna,25.0,0.02955,22
+GPT Sol,version,GPT-5.6 Sol,GPT-6 Sol,-31.818181818181817,0.00925,22
+GPT Sol,version,GPT-6 Sol,GPT-6.1 Sol,-9.090909090909092,0.3094,22
+GPT small,pair,GPT-5.4 nano,GPT-5.4 mini,28.40909090909091,0.02085,22
+Gemini Flash,version,Gemini 2.5 Flash,Gemini 3 Flash,13.636363636363635,0.45285,22
+Gemini Flash,version,Gemini 3 Flash,Gemini 3.5 Flash,2.272727272727273,1.0,22
+Gemini Flash,version,Gemini 3.5 Flash,Gemini 3.6 Flash,0.0,1.0,22
+Gemini Flash,version,Gemini 3.6 Flash,Gemini 3.7 Flash,5.681818181818182,0.584,22
+Gemini Flash,version,Gemini 3.7 Flash,Gemini 3.8 Flash,-5.681818181818182,0.38765,22
+Gemini Flash-Lite,version,Gemini 3.1 Flash-Lite,Gemini 3.5 Flash-Lite,-5.681818181818182,0.65815,22
+Gemini Pro,version,Gemini 2.5 Pro,Gemini 3.1 Pro,-1.1363636363636365,1.0,22
+Gemma 4,pair,Gemma 4 26B A4B,Gemma 4 31B,5.681818181818182,0.34215,22
+Grok 4.20,pair,Grok 4.20 Non-Reasoning,Grok 4.20 Reasoning,-2.272727272727273,0.8433,22
+Qwen 3 Next,pair,Qwen 3 Next 80B Thinking,Qwen 3 Next 80B Instruct,-22.727272727272727,0.24655,11
+gpt-oss,pair,gpt-oss-20b,gpt-oss-120b,-4.761904761904762,0.8426,21

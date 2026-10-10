@@ -20,6 +20,16 @@ RAW = ROOT / "results" / "raw"
 OUT = ROOT / "results"
 
 
+SHORT = {"8-echo-four-inputs": "echo4", "9-contagion": "contagion", "10-turkish-guests": "turkish",
+         "11-other-look-alikes": "lookalike", "12-turns": "turns", "13-other-wrong-letters": "wrong"}
+
+
+def short_name(task: str) -> str:
+    """romanian-comma-below-2-echo -> echo; Round 2 tasks get the names in SHORT."""
+    tail = task.removeprefix("romanian-comma-below-")
+    return SHORT.get(tail, task.rsplit("-", 1)[-1])
+
+
 def load(all_runs: bool = False) -> pd.DataFrame:
     """Rows from the newest task version; the newest run per model, or every run."""
     files: dict[tuple[str, str], list[tuple[int, int, pathlib.Path]]] = {}
@@ -34,7 +44,7 @@ def load(all_runs: bool = False) -> pd.DataFrame:
         for version, run_id, f in (in_version if all_runs else in_version[-1:]):
             for line in f.read_text(encoding="utf-8").splitlines():
                 r = json.loads(line)
-                r.update(task=task.rsplit("-", 1)[-1], model=model, version=version, run_id=run_id)
+                r.update(task=short_name(task), model=model, version=version, run_id=run_id)
                 rows.append(r)
     return pd.DataFrame(rows)
 

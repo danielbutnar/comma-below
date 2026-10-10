@@ -98,7 +98,7 @@ const T = {
         qSD: "Sunt identice, literă cu literă?", qWR: "Care e scris corect în română?", practice: "Exemplu:",
         practiceOk: "Corect: diferite. Unul are s fără semn. De aici încolo nu mai primești răspunsul.", practiceBad: "Erau diferite: unul are s fără semn. De aici încolo nu mai primești răspunsul.",
         doneTitle: "Gata, mulțumesc!", sdScore: "Identice sau diferite", wrScore: "Scris corect", chance: "La întâmplare ai nimeri jumătate.",
-        send: "Trimite-i lui Daniel acest cod (doar codul):",
+        send: "Trimite-i lui Daniel acest cod (doar codul):", sendDev: "Dacă vrei, lasă codul într-un comentariu sub articol:",
         reveal: "Diferența: ș cu virgulă dedesubt e litera română corectă. ş cu sedilă e litera turcească, folosită din greșeală în română din anii '90, când calculatoarele nu aveau litera corectă.",
         of: "din" },
   de: { title: "2-Minuten-Test: Sehen Sie den Unterschied?", intro1: "Sie sehen Wortpaare. Sagen Sie, ob sie Buchstabe für Buchstabe gleich oder verschieden sind. Am Ende wählen Sie bei einigen Paaren das richtig geschriebene Wort.",
@@ -107,7 +107,7 @@ const T = {
         qSD: "Buchstabe für Buchstabe gleich?", qWR: "Welches ist richtiges Rumänisch?", practice: "Beispiel:",
         practiceOk: "Richtig: verschieden. Eines hat ein s ohne Zeichen. Ab jetzt gibt es keine Auflösung mehr.", practiceBad: "Die beiden waren verschieden: Eines hat ein s ohne Zeichen. Ab jetzt gibt es keine Auflösung mehr.",
         doneTitle: "Fertig, vielen Dank!", sdScore: "Gleich oder verschieden", wrScore: "Richtig geschrieben", chance: "Mit Raten trifft man die Hälfte.",
-        send: "Schicken Sie Daniel diesen Code (nur den Code):",
+        send: "Schicken Sie Daniel diesen Code (nur den Code):", sendDev: "Wenn Sie möchten, posten Sie den Code in einem Kommentar unter dem Artikel:",
         reveal: "Der Unterschied: ș mit Komma darunter ist der richtige rumänische Buchstabe. ş mit Cedille ist der türkische, der seit den 90ern aus Versehen fürs Rumänische benutzt wird, weil Computer den richtigen nicht hatten.",
         of: "von" },
   en: { title: "2-minute test: can you see the difference?", intro1: "You will see pairs of words. Say whether they are the same, letter for letter, or different. At the end, a few pairs where you pick the correctly spelled word.",
@@ -116,19 +116,24 @@ const T = {
         qSD: "Same, letter for letter?", qWR: "Which one is correct Romanian?", practice: "Example:",
         practiceOk: "Right: different. One has an s with no mark. From now on there are no answers.", practiceBad: "They were different: one has an s with no mark. From now on there are no answers.",
         doneTitle: "Done, thank you!", sdScore: "Same or different", wrScore: "Spelled right", chance: "Guessing gets half of them.",
-        send: "Send Daniel this code (just the code):",
+        send: "Send Daniel this code (just the code):", sendDev: "If you like, post your code in a comment under the article:",
         reveal: "The difference: ș with a comma below is the correct Romanian letter. ş with a cedilla is the Turkish one, used by mistake for Romanian since the 1990s, when computers didn't have the right letter.",
         of: "of" }
 };
-let lang = "ro";
+const params = new URLSearchParams(location.search);
+const fromDev = params.get("from") === "dev";
+let lang = fromDev ? "en" : "ro";
 const $ = id => document.getElementById(id);
 function paint() {
   document.documentElement.lang = lang;
-  document.querySelectorAll("[data-t]").forEach(el => { el.textContent = T[lang][el.dataset.t]; });
+  document.querySelectorAll("[data-t]").forEach(el => {
+    const key = el.dataset.t === "send" && fromDev ? "sendDev" : el.dataset.t;
+    el.textContent = T[lang][key];
+  });
   document.querySelectorAll("[data-lang]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.lang === lang)));
 }
 document.querySelectorAll("[data-lang]").forEach(b => b.addEventListener("click", () => { lang = b.dataset.lang; paint(); }));
-const size = (() => { const s = parseInt(new URLSearchParams(location.search).get("size"), 10); return s >= 12 && s <= 40 ? s : 18; })();
+const size = (() => { const s = parseInt(params.get("size"), 10); return s >= 12 && s <= 40 ? s : 18; })();
 document.documentElement.style.setProperty("--size", size + "px");
 
 function shuffle(a) {

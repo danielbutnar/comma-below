@@ -285,6 +285,139 @@ CODE_TESTS = [
 ]
 # Plus an idempotence test added in build: f(f(x)) == f(x) on the paragraph.
 
+# ---------------------------------------------------------------------------
+# Round 2 (tasks 8-10)
+# ---------------------------------------------------------------------------
+
+# Task 8 · ECHO, FOUR INPUTS — the 22 Echo prompts as clean, cedilla, ASCII (typed
+# without diacritics) and cedilla + the task 7 rule; run on every available model.
+ECHO_RULE = ("Use correct Romanian orthography: write ș and ț with a comma below, never ş or ţ "
+             "with a cedilla, even if the input uses them.")
+
+# Task 9 · CONTAGION — four news paragraphs as documents, one question about one of
+# them. The other documents are typed with cedilla (0, 1 or 3 of them) while the
+# target document is clean, or the target itself is typed with cedilla.
+CONTAGION_POOL = ["E07", "E08", "E09", "E10", "E11", "E12"]
+CONTAGION_PROMPT = ("Answer the question using only the documents below. Answer in Romanian, in one "
+                    "sentence.\n\n{docs}\n\nQuestion: {question}")
+CONTAGION = [
+    ("E07", "Where are drivers asked to park during the weekend?"),
+    ("E08", "When does the road usually close, and when does it reopen?"),
+    ("E10", "Where did the festival take place, and when do next year's tickets go on sale?"),
+    ("E11", "Between which two cities does the night train run, and how long is the journey?"),
+    ("E09", "Which county's schools will start later, and why?"),
+    ("E12", "Where was the bear seen, and what should residents do?"),
+    ("E07", "Which square will be closed to cars, and why?"),
+    ("E08", "What do the authorities recommend to tourists?"),
+]
+CONTAGION_CONDITIONS = ["clean-0", "clean-1", "clean-3", "cedilla-0", "cedilla-3"]
+
+# Task 10 · TURKISH GUESTS — Turkish is written with the cedilla letter ş, so a
+# "never write ş" rule must not touch it. Correct Turkish; not checked by a native
+# speaker (only the letters s/ş/ș are scored).
+TR_SYSTEM = ("You are the booking assistant of a small guesthouse in Brasov, Romania. Reply to the "
+             "guest in the language of the guest's message, in 2 to 4 sentences.")
+TR_RULE_SCOPED = ("When you write Romanian, use correct Romanian orthography: ș and ț with a comma "
+                  "below, never ş or ţ with a cedilla, even if the input uses them. This applies to "
+                  "Romanian only; other languages keep their own letters.")
+TURKISH = [
+    ("TR01", "Merhaba, önümüzdeki cuma ve cumartesi için iki kişilik bir oda ayırtmak istiyorum. "
+     "Kahvaltı fiyata dahil mi? Şimdiden teşekkür ederim."),
+    ("TR02", "İyi akşamlar, cumartesi gecesi saat on bir gibi varacağız. Bu kadar geç giriş yapmak "
+     "mümkün mü? Dört kişiyiz ve küçük bir köpeğimiz var."),
+    ("TR03", "Merhaba, gelecek haftaki rezervasyonumu iptal etmek istiyorum çünkü kızım hastalandı. "
+     "Ödediğim kaporayı geri alabilir miyim? Çok teşekkürler."),
+    ("TR04", "Selam! Pansiyondan şehir merkezine yürüyerek kaç dakika sürüyor? Akşamları otobüs var "
+     "mı, yoksa taksi mi çağırmalıyız?"),
+    ("TR05", "İyi günler, geçen hafta sonu sizde kaldım ve telefon şarj aletimi odada unuttuğumu "
+     "düşünüyorum. Kontrol edebilir misiniz lütfen?"),
+    ("TR06", "Merhaba, ekim ayında otuz kişilik bir aile buluşması düzenliyoruz. Salonunuz ve "
+     "geleneksel yemeklerden oluşan bir menünüz var mı?"),
+    ("TR07", "Merhaba, eşimle birlikte balayı için üç gece kalmak istiyoruz. Manzaralı ve sessiz bir "
+     "odanız var mı? Bir de yakınlarda şarap tadımı yapılabilecek bir yer önerir misiniz?"),
+    ("TR08", "Günaydın, odada çalışma masası ve hızlı internet var mı? İş için geliyorum ve her gün "
+     "çevrim içi toplantılarım olacak."),
+]
+
+
+# Task 11 · OTHER LOOK-ALIKES — the Echo design outside Romanian: English news
+# paragraphs typed clean, with Cyrillic look-alike letters (а с е о р for a c e o p,
+# which look right), or as mojibake (UTF-8 read as Windows-1252, which looks broken).
+LOOKALIKE_SUMMARY = "Summarize the following news paragraph in English, in at most two sentences.\n\n"
+LOOKALIKE_RAG = ("Answer the question using only the text below. Answer in English, in one sentence.\n\n"
+                 "Text:\n{text}\n\nQuestion: {question}")
+LOOKALIKE = [
+    ("L01", "The night train from Zürich to München will run again from next month, after a two-year "
+     "pause. The journey takes about four hours, and the sleeping cars have been renovated.",
+     "Between which two cities does the night train run, and how long is the journey?"),
+    ("L02", "Café Müller in Köln will close at the end of the month after ninety years. The owner, José "
+     "Fernández, says the rent has doubled, and the last day of service will be a Sunday.",
+     "Which café is closing, in which city, and who owns it?"),
+    ("L03", "More than fifteen thousand people attended the film festival in Göteborg over three days. "
+     "The organizers say tickets for next year's edition will go on sale in December, with a discount "
+     "for students.",
+     "Where did the festival take place, and when do next year's tickets go on sale?"),
+    ("L04", "The beach promenade in Málaga is closed for repairs after the storm. Residents are asked to "
+     "use the car parks near the María Zambrano station until the work is finished.",
+     "Where are residents asked to park?"),
+    ("L05", "The road over the Großglockner pass closes every year at the end of October and usually "
+     "reopens in early May. The authorities advise drivers to check the conditions before leaving, "
+     "because snow can fall as early as September.",
+     "When does the road close, and when does it usually reopen?"),
+    ("L06", "Schools in the canton of Genève will start a week later than planned, after several "
+     "buildings needed repairs. Parents will be informed by a message from each school.",
+     "Which schools will start later, and why?"),
+]
+HOMOGLYPH = str.maketrans({"a": "а", "c": "с", "e": "е", "o": "о", "p": "р"})
+# Every Latin letter with a Cyrillic twin that renders the same in common fonts.
+HOMOGLYPH_NAMES = str.maketrans({
+    "a": "а", "c": "с", "e": "е", "h": "һ", "i": "і", "j": "ј", "o": "о",
+    "p": "р", "s": "ѕ", "x": "х", "y": "у", "A": "А", "B": "В", "C": "С",
+    "E": "Е", "H": "Н", "I": "І", "J": "Ј", "K": "К", "M": "М", "O": "О",
+    "P": "Р", "S": "Ѕ", "T": "Т", "X": "Х"})
+
+
+def to_homoglyph(text: str) -> str:
+    """Dense: every Latin a c e o p replaced by the Cyrillic letter that looks the same
+    (about a third of all letters; task 11 v1)."""
+    return text.translate(HOMOGLYPH)
+
+
+def to_homoglyph_names(text: str) -> str:
+    """Sparse: Cyrillic twins only inside the words that have an accented letter (the names),
+    i.e. exactly the words that mojibake damages."""
+    import re
+    return re.sub(r"[^\W\d_]+", lambda m: m.group(0).translate(HOMOGLYPH_NAMES)
+                  if not m.group(0).isascii() else m.group(0), text)
+
+
+def to_mojibake(text: str) -> str:
+    """UTF-8 bytes read as Windows-1252: Zürich becomes ZÃ¼rich."""
+    return text.encode("utf-8").decode("cp1252")
+
+
+# Task 13 · OTHER WRONG LETTERS — task 8's summaries and document questions typed with two
+# more wrong forms of ș ț: one that looks right but no Romanian text uses (dot below), and one
+# that looks broken but filled old Romanian web pages and subtitles (Windows-1250 bytes read
+# as Windows-1252: ş ţ become º þ, ă becomes ã).
+COMMA_TO_DOT = str.maketrans({"ș": "ṣ", "Ș": "Ṣ", "ț": "ṭ", "Ț": "Ṭ"})
+
+
+def to_dot_below(text: str) -> str:
+    """Replace comma-below ș ț with s and t with a dot below (U+1E63, U+1E6D)."""
+    return text.translate(COMMA_TO_DOT)
+
+
+def to_legacy_mojibake(text: str) -> str:
+    """The cedilla text saved as Windows-1250 and read as Windows-1252: Braşov becomes Braºov."""
+    return to_cedilla(text).encode("cp1250").decode("cp1252")
+
+
+# Task 12 · TURNS — two summaries in one chat. Does a cedilla first text leave the
+# second (clean) summary infected, and does a clean first text protect a cedilla second?
+TURN_PAIRS = [("E07", "E08"), ("E08", "E09"), ("E09", "E10"), ("E10", "E11"), ("E11", "E12"), ("E12", "E07")]
+TURN_CONDITIONS = ["clean>clean", "cedilla>clean", "clean>cedilla"]
+
 
 def check_items() -> None:
     """Fail loudly if any hand-typed text contains a cedilla letter."""
@@ -301,9 +434,31 @@ def check_items() -> None:
             if ch in blob:
                 bad.append((name, ch))
     assert not bad, f"cedilla letters typed into gold data: {bad}"
-    for name in ("WRITE", "ECHO", "FIX", "SEE_WORDS", "SEE_SENTENCES", "RESTORE"):
+    for name in ("WRITE", "ECHO", "FIX", "SEE_WORDS", "SEE_SENTENCES", "RESTORE", "TURKISH", "CONTAGION",
+                 "LOOKALIKE"):
         blob = repr(globals()[name])
         assert unicodedata.normalize("NFC", blob) == blob, f"{name} is not NFC"
+    # Turkish is written with the cedilla s; it must never contain the Romanian comma letters.
+    for i, text in TURKISH:
+        assert not set(text) & set("șȘțȚ"), f"{i}: comma-below letter in Turkish text"
+        assert set(text) & set("şŞ"), f"{i}: Turkish text without a cedilla s scores nothing"
+    assert {t for t, _ in CONTAGION} <= set(CONTAGION_POOL)
+    for i, text, _ in LOOKALIKE:
+        assert text.isascii() is False, f"{i}: needs accented letters for the mojibake variant"
+        assert "�" not in to_mojibake(text) and "Ã" in to_mojibake(text), i
+        assert to_homoglyph(text) != text and not set(text) & set("șȘțȚşŞţŢ"), i
+        sparse = to_homoglyph_names(text)
+        assert sparse != text and [w for w in sparse.split() if w.isascii()] == [w for w in text.split() if w.isascii()], i
+    # Task 13: each wrong form replaces every ș ț, keeps everything else, and survives NFC.
+    for i, kind, text in ECHO:
+        dot, legacy = to_dot_below(text), to_legacy_mojibake(text)
+        assert set(text) & set("șȘțȚ"), f"{i}: no ș/ț to replace"
+        assert not set(dot) & set("șȘțȚşŞţŢ") and set(dot) & set("ṣṢṭṬ"), i
+        assert not set(legacy) & set("șȘțȚşŞţŢăĂ") and set(legacy) & set("ºªþÞ"), i
+        assert dot.translate(str.maketrans("ṣṢṭṬ", "șȘțȚ")) == text, i
+        assert legacy.encode("cp1252").decode("cp1250") == to_cedilla(text), i
+        for t in (dot, legacy):
+            assert unicodedata.normalize("NFC", t) == t, f"{i}: task 13 variant is not NFC"
     assert src  # keep inspect import meaningful
 
 

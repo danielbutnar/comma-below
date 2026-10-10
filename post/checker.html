@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cedilla checker</title>
+<style>
+:root{--bg:#fcfcfb;--ink:#1c1a17;--muted:#5f5a52;--line:#d9d4ca;--bad:#b2452f;--badbg:#fbe3dc;--ok:#1f6b58;--btn:#1c1a17;--btnink:#fff;--box:#fff}
+@media (prefers-color-scheme:dark){:root{--bg:#171615;--ink:#eeebe5;--muted:#aaa49a;--line:#3a3733;--bad:#ff8d74;--badbg:#4a2219;--ok:#6fd1b3;--btn:#eeebe5;--btnink:#171615;--box:#201f1d}}
+*{box-sizing:border-box;margin:0}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding:14px 16px}
+h1{font-size:17px;font-weight:650}
+p.sub{color:var(--muted);font-size:13.5px;margin:2px 0 12px}
+.step{font-size:13px;font-weight:650;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin:10px 0 4px}
+pre,textarea,.out{width:100%;border:1px solid var(--line);border-radius:8px;background:var(--box);color:var(--ink);font:14px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding:8px 10px}
+pre{white-space:pre-wrap;max-height:96px;overflow:auto}
+textarea{min-height:76px;resize:vertical}
+.row{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;align-items:center}
+button{font:600 13.5px/1 system-ui,-apple-system,"Segoe UI",sans-serif;padding:8px 12px;border-radius:7px;border:1px solid var(--btn);background:var(--btn);color:var(--btnink);cursor:pointer}
+button.ghost{background:transparent;color:var(--ink)}
+button:focus-visible,textarea:focus-visible{outline:3px solid #2a78d6;outline-offset:2px}
+.verdict{font-weight:650;margin-top:8px}
+.verdict.bad{color:var(--bad)} .verdict.ok{color:var(--ok)}
+.out{margin-top:6px;min-height:40px}
+mark{background:var(--badbg);color:var(--bad);font-weight:700;border-bottom:2px solid var(--bad);border-radius:2px;padding:0 1px}
+.okl{border-bottom:2px dotted var(--ok)}
+.tr{border-bottom:2px dotted var(--muted)}
+.note{color:var(--muted);font-size:12.5px;margin-top:4px}
+.hint{color:var(--muted);font-size:12.5px}
+</style>
+</head>
+<body>
+<h1>Does your model copy the cedilla?</h1>
+<p class="sub">Two steps. The check runs in your browser, the same way my scorer does: NFC first, then each letter by its code point.</p>
+
+<div class="step">1 · Send this to your chatbot</div>
+<pre id="prompt"></pre>
+<div class="row"><button id="copyPrompt">Copy the prompt</button><span class="hint" id="copyMsg" aria-live="polite"></span></div>
+
+<div class="step">2 · Paste its answer here</div>
+<label for="t" class="note" style="display:block;margin:0 0 4px">Or any Romanian text: a web page, a database export, a translation.</label>
+<textarea id="t" spellcheck="false" placeholder="Paste here"></textarea>
+<div class="row"><button class="ghost" id="sample">Show me an example answer</button><button class="ghost" id="clear">Clear</button></div>
+
+<div class="verdict" id="verdict" aria-live="polite"></div>
+<div class="out" id="out" hidden></div>
+<div class="row" id="fixRow" hidden><button id="fix">Fix it (Romanian only)</button><span class="hint" id="fixMsg" aria-live="polite"></span></div>
+<p class="note" id="fixNote" hidden>The fix swaps ş ţ for ș ț sentence by sentence and skips sentences with ı, ğ, ç, ö or ü, so Turkish keeps its ş. It's the <code>fix_romanian()</code> from the post.</p>
+
+<script>
+// Letters, by code point, so nothing depends on how this file was saved.
+var CED = {"ş":"U+015F s with cedilla","Ş":"U+015E S with cedilla","ţ":"U+0163 t with cedilla","Ţ":"U+0162 T with cedilla"};
+var COM = {"ș":"U+0219 s with comma below","Ș":"U+0218 S with comma below","ț":"U+021B t with comma below","Ț":"U+021A T with comma below"};
+var FIX = {"ş":"ș","Ş":"Ș","ţ":"ț","Ţ":"Ț"};
+var NOT_ROMANIAN = /[ıİğĞçÇöÖüÜ]/;  // letters Turkish uses and Romanian never does
+function fixRomanian(text){
+  return text.normalize("NFC").replace(/[^.!?\n]+/g, function(sentence){
+    return NOT_ROMANIAN.test(sentence) ? sentence : sentence.replace(/[şŞţŢ]/g, function(c){return FIX[c];});
+  });
+}
+function toCedilla(s){return s.replace(/ș/g,"ş").replace(/Ș/g,"Ş").replace(/ț/g,"ţ").replace(/Ț/g,"Ţ");}
+
+// Task 8, prompt Q02 of the benchmark, typed with cedillas.
+var TEXT = "Drumul Transfăgărășan se închide în fiecare an la sfârșitul lunii octombrie, iar redeschiderea are loc, de obicei, la începutul lui iulie. Autoritățile recomandă turiștilor să verifice starea drumului înainte de plecare, deoarece ninsorile pot apărea și în septembrie.";
+var PROMPT = "Answer the question using only the text below. Answer in Romanian, in one sentence.\n\nText:\n" + toCedilla(TEXT) + "\n\nQuestion: When does the road usually close, and when does it reopen?";
+// A real answer to the same kind of input (Claude Opus 5, first round).
+var SAMPLE = toCedilla("Primăria Brașov anunță închiderea Pieței Sfatului pentru traficul auto în weekend, între orele 8 și 20, din cauza târgului de toamnă. Șoferii sunt îndrumați să parcheze pe strada Mureșenilor sau lângă Gara Brașov.");
+
+var $ = function(id){return document.getElementById(id);};
+$("prompt").textContent = PROMPT;
+
+function copyText(text, msgEl, fallbackEl){
+  function ok(){msgEl.textContent = "Copied.";}
+  function manual(){
+    if (fallbackEl){fallbackEl.focus(); if (fallbackEl.select) fallbackEl.select(); else {var r=document.createRange(); r.selectNodeContents(fallbackEl); var s=getSelection(); s.removeAllRanges(); s.addRange(r);}}
+    msgEl.textContent = "Selected. Press Ctrl+C (⌘C on a Mac).";
+  }
+  if (navigator.clipboard && navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(ok, manual);} else manual();
+}
+$("copyPrompt").onclick = function(){copyText(PROMPT, $("copyMsg"), $("prompt"));};
+
+function check(){
+  var raw = $("t").value, s = raw.normalize("NFC");
+  var out = $("out"), nCed = 0, nCom = 0;
+  out.textContent = "";
+  if (!s.trim()){ $("verdict").textContent = ""; $("verdict").className = "verdict"; out.hidden = true; $("fixRow").hidden = true; $("fixNote").hidden = true; return; }
+  var buf = "", nTr = 0;
+  function flush(){ if (buf){ out.appendChild(document.createTextNode(buf)); buf = ""; } }
+  // sentence by sentence, like the fix: in a sentence with ı ğ ç ö ü the cedilla is Turkish and right
+  var parts = s.match(/[^.!?\n]+|[.!?\n]+/g) || [];
+  for (var part of parts){
+    var turkish = NOT_ROMANIAN.test(part);
+    for (var ch of part){
+      if (CED[ch] && !turkish){ flush(); var m = document.createElement("mark"); m.textContent = ch; m.title = CED[ch] + " (wrong in Romanian)"; out.appendChild(m); nCed++; }
+      else if (CED[ch]){ flush(); var t = document.createElement("span"); t.className = "tr"; t.textContent = ch; t.title = CED[ch] + " (Turkish sentence: right here)"; out.appendChild(t); nTr++; }
+      else if (COM[ch]){ flush(); var o = document.createElement("span"); o.className = "okl"; o.textContent = ch; o.title = COM[ch]; out.appendChild(o); nCom++; }
+      else buf += ch;
+    }
+  }
+  flush();
+  out.hidden = false;
+  var v = $("verdict");
+  var decomposed = raw !== s ? " Some letters were typed as two code points; shown here combined." : "";
+  var turkishNote = nTr ? " " + nTr + " ş/ţ in Turkish sentences are right there and left alone." : "";
+  if (nCed){
+    v.className = "verdict bad";
+    v.textContent = nCed + (nCed === 1 ? " letter has" : " letters have") + " a cedilla (ş ţ), marked below. " + nCom + " use the comma below (ș ț)." + turkishNote + decomposed;
+    $("fixRow").hidden = false; $("fixNote").hidden = false;
+  } else {
+    v.className = "verdict ok";
+    v.textContent = (nCom ? "Clean: all " + nCom + " Romanian letters use the comma below (ș ț)." : "No ș, ț, ş or ţ in Romanian sentences here.") + turkishNote + decomposed;
+    $("fixRow").hidden = true; $("fixNote").hidden = true;
+  }
+}
+$("t").addEventListener("input", check);
+$("sample").onclick = function(){ $("t").value = SAMPLE; check(); };
+$("clear").onclick = function(){ $("t").value = ""; check(); $("t").focus(); };
+$("fix").onclick = function(){
+  var fixed = fixRomanian($("t").value);
+  var msg = $("fixMsg");
+  $("t").value = fixed; check();
+  function selectIt(){ $("t").focus(); $("t").select(); msg.textContent = "Fixed text is in the box, selected. Press Ctrl+C (⌘C on a Mac)."; }
+  if (navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(fixed).then(function(){ msg.textContent = "Fixed in the box and copied."; }, selectIt); } else selectIt();
+};
+</script>
+</body>
+</html>
