@@ -761,7 +761,7 @@ THINK_QUOTES = [
 QUOTES = [
     ("claude-opus-5-default", "îndrumaţi"),
     ("claude-opus-5-default", "Şoferii sunt îndrumaţi să parcheze pe strada Mureşenilor sau lângă Gara Braşov."),
-    ("gpt-oss-120b", "Șoferii sunt rugaţi să parcheze pe strada Mureșenilor și lângă Gara Brașov."),
+    ("gpt-oss-120b", "Șoferii sunt rugaţi"),  # quoted in part; the full answer is OSS_EXAMPLE
     ("claude-opus-4-6-default", "îndrumaţi"),
     ("gpt-5.6-luna", "îndrumaţi"),
     ("gemini-3.7-flash", "muhteșem dağ manzaralı"),
